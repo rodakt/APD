@@ -13128,6 +13128,61 @@ div#notebook {
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Zadanie-2.4">Zadanie 2.4<a class="anchor-link" href="#Zadanie-2.4">¶</a></h2><p>Ciąg Collatza definiujemy następująco:</p>
+<p>\begin{equation*}
+\begin{aligned}
+a_0 &amp;= n, \\
+a_{i+1} &amp;= \begin{cases}
+\frac{a_i}{2} &amp; \text{jeśli } a_i \text{ jest parzyste}, \\
+3a_i + 1 &amp; \text{jeśli } a_i \text{ jest nieparzyste}.
+\end{cases}
+\end{aligned}
+\end{equation*}</p>
+<p>Liczba $n\in\mathbb{N}$ jest początkowym wyrazem ciągu. Przykładowo, dla $n=6$ mamy ciąg $6, 3, 10, 5, 16, 8, 4, 2, 1$. Ponieważ $4, 2, 1$ jest cyklem, więc nic nowego dalej już nie zobaczymy. Hipoteza Collatza zakłada, że dla każdej liczby naturalnej $n$ ciąg ten zawsze kończy się na cyklu $4, 2, 1$.</p>
+<p>Napisz serwer, który ma odbierać żądania HTTP i zwracać odpowiedzi zgodnie z poniższym schematem:</p>
+<ul>
+<li>jeśli otrzyma żądanie GET na adres <code>/</code>, to zwraca kod stanu 200 i HTML postaci:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Ciąg Collatza<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Witaj na stronie ciągu Collatza!<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Podaj liczbę, aby zobaczyć ciąg Collatza.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">form</span> <span class="na">action</span><span class="o">=</span><span class="s">"/collatz"</span> <span class="na">method</span><span class="o">=</span><span class="s">"get"</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">"n"</span><span class="p">&gt;</span>Liczba:<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">"number"</span> <span class="na">id</span><span class="o">=</span><span class="s">"n"</span> <span class="na">name</span><span class="o">=</span><span class="s">"n"</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">"submit"</span> <span class="na">value</span><span class="o">=</span><span class="s">"Wyślij"</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+<ul>
+<li>jeśli otrzyma żądanie GET na adres <code>/collatz?n=&lt;liczba&gt;</code>, to zwraca kod stanu 200 i HTML postaci:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Ciąg Collatza<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Aktualna liczba: <span class="p">&lt;</span><span class="nt">liczba</span><span class="p">&gt;&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Następna liczba: <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/collatz?n=&lt;następna liczba&gt;"</span><span class="p">&gt;&lt;</span><span class="nt">następna</span> <span class="na">liczba</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+<p>gdzie <code>&lt;liczba&gt;</code> to aktualny wyraz ciągu Collatza, a <code>&lt;następna liczba&gt;</code> to kolejny wyraz ciągu Collatza. Jeśli aktualny wyraz ciągu jest równy 1, to zwróć informację o zakończeniu ciągu.</p>
+<ul>
+<li>w pozostałych przypadkach zwraca kod stanu 404 i treść <code>Nie znaleziono</code></li>
+</ul>
+</div>
+</div>
+</div>
 </div>
 </div>
 </main>
