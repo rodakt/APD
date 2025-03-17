@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>lab_2</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
+<title>wyklad_2</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
   import mermaid from 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.7.0/mermaid.esm.min.mjs';
   mermaid.initialize({ startOnLoad: true });
 </script>
@@ -13089,14 +13089,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Automatyczne-pozyskiwanie-danych">Automatyczne pozyskiwanie danych<a class="anchor-link" href="#Automatyczne-pozyskiwanie-danych">¶</a></h1><h2 id="Tomasz-Rodak">Tomasz Rodak<a class="anchor-link" href="#Tomasz-Rodak">¶</a></h2><h1 id="Lab-2">Lab 2<a class="anchor-link" href="#Lab-2">¶</a></h1><hr/>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Zadanie-2.1">Zadanie 2.1<a class="anchor-link" href="#Zadanie-2.1">¶</a></h2><p>Uruchom i przetestuj działanie programu <code>prosty_serwer_http.py</code> z wykładu 1.</p>
+<h1 id="Automatyczne-pozyskiwanie-danych">Automatyczne pozyskiwanie danych<a class="anchor-link" href="#Automatyczne-pozyskiwanie-danych">¶</a></h1><h2 id="Tomasz-Rodak">Tomasz Rodak<a class="anchor-link" href="#Tomasz-Rodak">¶</a></h2><p>Wykład 2</p>
 <hr/>
 </div>
 </div>
@@ -13104,27 +13097,1507 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Zadanie-2.2">Zadanie 2.2<a class="anchor-link" href="#Zadanie-2.2">¶</a></h2><p>Napisz serwer, który z pewnym domyślnie ustawionym opóźnieniem (np. 5 sekund) odpowiada na żądanie GET zwracając status 200 i tekst "Witaj, świecie!". Wykorzystaj bibliotekę <code>http.server</code>.</p>
-<ol>
-<li>Wykonaj zapytanie do serwera z użyciem <code>curl</code> i zbadaj czas odpowiedzi. Jaki jest czas oczekiwania, jeśli wykonasz dwa zapytania w dwóch różnych terminalach mniej więcej w tym samym czasie? Skomentuj rezultat.</li>
-<li>Wykonaj zapytanie do serwera z użyciem <code>curl</code> z flagą <code>-max-time</code>. Co się wówczas dzieje? Jaki wpływ na wynik ma położenie funkcji opóźniającej w kodzie metody <code>do_GET()</code>?</li>
-</ol>
-<hr/>
+<h2 id="HTML">HTML<a class="anchor-link" href="#HTML">¶</a></h2><p>HTML (HyperText Markup Language) to język znaczników definiujący strukturę strony internetowej. Określa, jakie elementy znajdują się na stronie, takie jak nagłówki, akapity, obrazy czy linki.</p>
+<h3 id="Struktura-HTML">Struktura HTML<a class="anchor-link" href="#Struktura-HTML">¶</a></h3><p>Dokument HTML ma <strong>strukturę drzewa</strong>, gdzie każdy element jest <strong>węzłem</strong>, a znaczniki mogą zawierać inne znaczniki jako <strong>dzieci</strong>. Szkielet dokumentu HTML w postaci drzewa przedstawia się następująco:</p>
+<pre><code>&lt;html&gt;
+│
+├── &lt;head&gt;
+│   ├── &lt;meta charset="UTF-8"&gt;
+│   └── &lt;title&gt; Tytuł strony &lt;/title&gt;
+│
+└── &lt;body&gt;
+    ├── &lt;h1&gt; Nagłówek &lt;/h1&gt;
+    ├── &lt;p&gt; Akapit &lt;/p&gt;
+    └── &lt;a href="https://example.com"&gt; Link &lt;/a&gt;
+
+</code></pre>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Zadanie-2.3">Zadanie 2.3<a class="anchor-link" href="#Zadanie-2.3">¶</a></h2><p>Napisz serwer, który ma odbierać żądania HTTP i zwracać odpowiedzi zgodnie z poniższym schematem:</p>
+<h3 id="Sk%C5%82adnia-HTML">Składnia HTML<a class="anchor-link" href="#Sk%C5%82adnia-HTML">¶</a></h3><p>Składniowo znaczniki HTML umieszczane są w nawiasach <code>&lt; &gt;</code>. Zapisz drzewa HTML z poprzedniego punktu w postaci kodu wyglądałby tak:</p>
+<div class="highlight"><pre><span></span><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">"UTF-8"</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Tytuł strony<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Nagłówek<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>To jest przykładowy akapit.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"https://example.com"</span><span class="p">&gt;</span>Kliknij tutaj<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
 <ul>
-<li>jeśli otrzyma żądanie GET na adres <code>/</code>, to zwraca kod stanu 200 i treść <code>Witaj na moim serwerze!</code></li>
-<li>jeśli otrzyma żądanie GET na adres <code>/fib&amp;n=&lt;liczba&gt;</code>, to zwraca kod stanu 200 i treść będącą $n$-tym wyrazem ciągu Fibonacciego</li>
-<li>jeśli otrzyma żądanie GET na adres <code>/gcd?a=&lt;liczba&gt;&amp;b=&lt;liczba&gt;</code>, to zwraca kod stanu 200 i treść będącą największym wspólnym dzielnikiem liczb $a$ i $b$</li>
-<li>w pozostałych przypadkach zwraca kod stanu 404 i treść <code>Nie znaleziono</code></li>
+<li><strong><code>&lt;!DOCTYPE html&gt;</code></strong> – określa wersję HTML (HTML5).</li>
+<li><strong><code>&lt;html&gt;</code></strong> – główny kontener strony, korzeń drzewa.</li>
+<li><strong><code>&lt;head&gt;</code></strong> – sekcja z meta-informacjami (np. kodowanie, tytuł).</li>
+<li><strong><code>&lt;body&gt;</code></strong> – zawiera widoczną treść strony.</li>
+<li><strong><code>&lt;h1&gt;</code> – <code>&lt;h6&gt;</code></strong> – nagłówki.</li>
+<li><strong><code>&lt;p&gt;</code></strong> – akapit.</li>
+<li><strong><code>&lt;a href="URL"&gt;</code></strong> – link.</li>
 </ul>
-<p>Zawartość odpowiedzi powinna być zwracana w formacie tekstowym w kodowaniu UTF-8 (MIME <code>text/plain</code>, ustaw odpowiedni nagłówek). W miarę możliwości dodaj obsługę błędów.</p>
-<hr/>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Przyk%C5%82ady-znacznik%C3%B3w">Przykłady znaczników<a class="anchor-link" href="#Przyk%C5%82ady-znacznik%C3%B3w">¶</a></h2><ul>
+<li><code>&lt;p&gt;</code> - paragraf;</li>
+<li><code>&lt;br&gt;</code> - przejście do nowego wiersza;</li>
+<li><code>&lt;table&gt;</code> - tabela; <code>&lt;tr&gt;</code> - wiersz tabeli; <code>&lt;td&gt;</code> - komórka tabeli;</li>
+<li><code>&lt;img&gt;</code> - obrazy;</li>
+<li><code>&lt;h1&gt;</code> aż do <code>&lt;h6&gt;</code> - nagłówki;</li>
+<li><code>&lt;a&gt;</code> - hiperłącze;</li>
+<li><code>&lt;ul&gt;</code> - lista nieuporządkowana; <code>&lt;ol&gt;</code> - lista uporządkowana; <code>&lt;li&gt;</code> - elementy listy;</li>
+<li><code>&lt;div&gt;</code> - grupa elementów (tylko CSS);</li>
+<li><code>&lt;span&gt;</code> - grupowanie tekstu wewnątrz elementów (tylko CSS).</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="CSS">CSS<a class="anchor-link" href="#CSS">¶</a></h2><p>CSS (<em>Cascading Style Sheets</em>) to język służący do opisywania wyglądu i formatowania dokumentów napisanych w HTML lub XML. Umożliwia oddzielenie treści strony (HTML) od warstwy prezentacji, czyli tego, jak elementy na stronie są wyświetlane.</p>
+<h3 id="G%C5%82%C3%B3wne-cechy-CSS:">Główne cechy CSS:<a class="anchor-link" href="#G%C5%82%C3%B3wne-cechy-CSS:">¶</a></h3><ul>
+<li><strong>Kaskadowość:</strong> Style mogą być dziedziczone, a reguły określające wygląd mogą nakładać się na siebie. Dzięki temu przeglądarka wybiera najbardziej specyficzne reguły.</li>
+<li><strong>Modularność:</strong> Style można definiować w osobnych plikach, co pozwala na ponowne wykorzystanie i łatwą konserwację kodu.</li>
+<li><strong>Responsywność:</strong> CSS umożliwia tworzenie responsywnych układów, które dostosowują się do różnych rozmiarów ekranów.</li>
+</ul>
+<h3 id="Sk%C5%82adnia-CSS">Składnia CSS<a class="anchor-link" href="#Sk%C5%82adnia-CSS">¶</a></h3><p>Podstawowa reguła CSS składa się z selektora oraz bloku deklaracji:</p>
+<div class="highlight"><pre><span></span><span class="nt">selektor</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">właściwość</span><span class="p">:</span><span class="w"> </span><span class="n">wartość</span><span class="p">;</span>
+<span class="w">  </span><span class="n">właściwość2</span><span class="p">:</span><span class="w"> </span><span class="n">wartość2</span><span class="p">;</span>
+<span class="w">  </span><span class="c">/* kolejne właściwości */</span>
+<span class="p">}</span>
+</pre></div>
+<ul>
+<li><strong>Selektor:</strong> Określa, do jakich elementów HTML mają być zastosowane style. Przykłady selektorów to <code>h1</code>, <code>.klasa</code>, <code>#id</code>.</li>
+<li><strong>Blok deklaracji:</strong> Znajduje się w nawiasach klamrowych <code>{}</code>. Zawiera jedną lub więcej deklaracji.</li>
+<li><strong>Deklaracja:</strong> Każda deklaracja składa się z właściwości i przypisanej do niej wartości, oddzielonych dwukropkiem, a deklaracje kończy średnik.</li>
+</ul>
+<h3 id="Przyk%C5%82ad:">Przykład:<a class="anchor-link" href="#Przyk%C5%82ad:">¶</a></h3><div class="highlight"><pre><span></span><span class="c">/* Stylowanie nagłówka i paragrafu */</span>
+<span class="nt">h1</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="kc">blue</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mi">24</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nt">p</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="kc">gray</span><span class="p">;</span>
+<span class="w">  </span><span class="k">line-height</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<p>W powyższym przykładzie:</p>
+<ul>
+<li>Reguła dla selektora <code>h1</code> ustawia kolor tekstu na niebieski i rozmiar czcionki na 24 piksele.</li>
+<li>Reguła dla selektora <code>p</code> ustawia kolor tekstu na szary oraz określa wysokość linii.</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Klasy-CSS">Klasy CSS<a class="anchor-link" href="#Klasy-CSS">¶</a></h3><p>Klasa CSS to sposób na grupowanie elementów, którym chcemy przypisać te same reguły stylów. W HTML dodaje się ją poprzez atrybut <code>class</code> w tagu, a następnie definiuje style dla tej klasy w pliku CSS przy użyciu kropki (<code>.</code>).</p>
+<p><strong>Przykład klasy CSS:</strong></p>
+<div class="highlight"><pre><span></span><span class="p">.</span><span class="nc">przykladowa-klasa</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">background-color</span><span class="p">:</span><span class="w"> </span><span class="kc">lightblue</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="kt">px</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="kt">px</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+<p><strong>Przykład użycia w HTML:</strong></p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"przykladowa-klasa"</span><span class="p">&gt;</span>
+  To jest div z przypisaną klasą.
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">"przykladowa-klasa"</span><span class="p">&gt;</span>
+  Ten paragraf także korzysta z tej samej klasy.
+<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Dziedziczenie-w-CSS">Dziedziczenie w CSS<a class="anchor-link" href="#Dziedziczenie-w-CSS">¶</a></h3><p>Dziedziczenie to mechanizm, dzięki któremu niektóre właściwości stylów przypisane do elementu nadrzędnego są przekazywane do jego elementów potomnych (automatycznie lub w wyniku wymuszenia). Dzięki temu nie musimy powtarzać definicji tych właściwości dla każdego elementu z osobna.</p>
+<h4 id="Struktura-DOM">Struktura DOM<a class="anchor-link" href="#Struktura-DOM">¶</a></h4><p>Dokument HTML tworzy drzewo, w którym każdy element (węzeł) jest osadzony wewnątrz innego elementu. Jeśli, dajmy na to, <code>&lt;p&gt;</code> znajduje się wewnątrz innego tagu (np. <code>&lt;div&gt;</code>, <code>&lt;article&gt;</code> lub <code>&lt;section&gt;</code>), to właśnie ten element otaczający jest jego rodzicem.</p>
+<p><strong>Przykład:</strong></p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">style</span><span class="o">=</span><span class="s">"color: blue;"</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Tekst w paragrafie dziedziczy kolor niebieski z rodzica.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+<p>W tym przykładzie <code>&lt;div&gt;</code> jest elementem nadrzędnym dla <code>&lt;p&gt;</code>. Dzięki dziedziczeniu właściwości CSS, jeśli <code>&lt;p&gt;</code> nie ma określonego koloru, przejmie kolor ustawiony w <code>&lt;div&gt;</code> (o ile właściwość <code>color</code> jest dziedziczona, a jest).</p>
+<p>Niektóre właściwości, szczególnie te związane z tekstem, są dziedziczone automatycznie. Przykłady to:</p>
+<ul>
+<li><code>color</code> – kolor tekstu.</li>
+<li><code>font-family</code> – rodzaj czcionki.</li>
+<li><code>font-size</code> – rozmiar czcionki.</li>
+</ul>
+<p>Wiele właściwości związanych z układem i wyglądem pudełkowym, jak <code>margin</code>, <code>padding</code>, <code>border</code> czy <code>background</code>, nie są dziedziczone automatycznie. Oznacza to, że ich ustawienia muszą być definiowane indywidualnie dla każdego elementu, jeżeli chcemy je stosować.</p>
+<p>Możemy wymusić dziedziczenie właściwości, nawet jeśli nie jest ono domyślne, ustawiając wartość <code>inherit</code>.</p>
+<p><strong>Przykład:</strong></p>
+<div class="highlight"><pre><span></span><span class="nt">p</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">background-color</span><span class="p">:</span><span class="w"> </span><span class="kc">inherit</span><span class="p">;</span><span class="w"> </span><span class="c">/* Pochłania wartość background-color z elementu nadrzędnego */</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Selektory-CSS-istotne-w-web-scrapingu">Selektory CSS istotne w web scrapingu<a class="anchor-link" href="#Selektory-CSS-istotne-w-web-scrapingu">¶</a></h3><h4 id="1.-Selektor-elementu">1. Selektor elementu<a class="anchor-link" href="#1.-Selektor-elementu">¶</a></h4><p>Wybiera wszystkie wystąpienia danego elementu (znacznika) na stronie. Przykład selektora elementu <code>div</code>:</p>
+<div class="highlight"><pre><span></span><span class="nt">div</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c">/* wybiera wszystkie elementy &lt;div&gt; */</span>
+<span class="p">}</span>
+</pre></div>
+<h4 id="2.-Selektor-klasy">2. Selektor klasy<a class="anchor-link" href="#2.-Selektor-klasy">¶</a></h4><p>Wybiera elementy, które posiadają określoną klasę. Przykład selektora klasy <code>.product</code>:</p>
+<div class="highlight"><pre><span></span><span class="p">.</span><span class="nc">product</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c">/* wybiera wszystkie elementy z klasą "product" */</span>
+<span class="p">}</span>
+</pre></div>
+<h4 id="3.-Selektor-atrybutu">3. Selektor atrybutu<a class="anchor-link" href="#3.-Selektor-atrybutu">¶</a></h4><p>Pozwala wybierać elementy na podstawie obecności atrybutu lub jego konkretnej wartości. Przykład selektora atrybutu <code>a[href]</code>:</p>
+<div class="highlight"><pre><span></span><span class="nt">a</span><span class="o">[</span><span class="nt">href</span><span class="o">]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c">/* wybiera wszystkie linki, które mają atrybut href */</span>
+<span class="p">}</span>
+</pre></div>
+<h4 id="4.-Selektor-potomk%C3%B3w">4. Selektor potomków<a class="anchor-link" href="#4.-Selektor-potomk%C3%B3w">¶</a></h4><p>Wybiera wszystkie elementy będące potomkami zdefiniowanego elementu (niekoniecznie bezpośrednimi). Przykład selektora potomków <code>div p</code>:</p>
+<div class="highlight"><pre><span></span><span class="nt">div</span><span class="w"> </span><span class="nt">p</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c">/* wybiera wszystkie &lt;p&gt; wewnątrz dowolnego &lt;div&gt; */</span>
+<span class="p">}</span>
+</pre></div>
+<h4 id="5.-Selektor-bezpo%C5%9Brednich-potomk%C3%B3w">5. Selektor bezpośrednich potomków<a class="anchor-link" href="#5.-Selektor-bezpo%C5%9Brednich-potomk%C3%B3w">¶</a></h4><p>Wybiera tylko elementy, które są bezpośrednimi dziećmi określonego elementu. Przykład selektora bezpośrednich potomków <code>ul &gt; li</code>:</p>
+<div class="highlight"><pre><span></span><span class="nt">ul</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nt">li</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c">/* wybiera tylko bezpośrednie elementy &lt;li&gt; będące dziećmi &lt;ul&gt; */</span>
+<span class="p">}</span>
+</pre></div>
+<h4 id="6.-Selektory-rodze%C5%84stwa">6. Selektory rodzeństwa<a class="anchor-link" href="#6.-Selektory-rodze%C5%84stwa">¶</a></h4><p>Umożliwiają wybieranie elementów, które są sąsiadami danego elementu.</p>
+<ul>
+<li><strong>Selektor sąsiedniego rodzeństwa (<code>+</code>):</strong> Wybiera pierwszy element występujący bezpośrednio po zadanym elemencie. Przykład selektora sąsiedniego rodzeństwa <code>h2 + p</code>:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="nt">h2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nt">p</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c">/* wybiera pierwszy &lt;p&gt; występujący bezpośrednio po &lt;h2&gt; */</span>
+<span class="p">}</span>
+</pre></div>
+<ul>
+<li><strong>Selektor ogólnego rodzeństwa (<code>~</code>):</strong> Wybiera wszystkie elementy, które są rodzeństwem i występują po zadanym elemencie. Przykład selektora ogólnego rodzeństwa <code>h2 ~ p</code>:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="nt">h2</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="nt">p</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c">/* wybiera wszystkie &lt;p&gt; występujące po &lt;h2&gt; */</span>
+<span class="p">}</span>
+</pre></div>
+<h4 id="7.-Pseudo-klasy">7. Pseudo-klasy<a class="anchor-link" href="#7.-Pseudo-klasy">¶</a></h4><p>Umożliwiają wybór elementów na podstawie ich stanu lub pozycji w hierarchii DOM.</p>
+<ul>
+<li><strong><code>:first-child</code>:</strong> Wybiera pierwszy element wśród rodzeństwa. Przykład selektora <code>ul li:first-child</code>:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="nt">ul</span><span class="w"> </span><span class="nt">li</span><span class="p">:</span><span class="nd">first-child</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c">/* wybiera pierwszy element listy */</span>
+<span class="p">}</span>
+</pre></div>
+<ul>
+<li><p><strong><code>:last-child</code>:</strong> Wybiera ostatni element.</p>
+</li>
+<li><p><strong><code>:nth-child(n)</code>:</strong> Wybiera n-ty element. Przykład selektora <code>ul li:nth-child(2)</code>:</p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="nt">ul</span><span class="w"> </span><span class="nt">li</span><span class="p">:</span><span class="nd">nth-child</span><span class="o">(</span><span class="nt">2</span><span class="o">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c">/* wybiera drugi element listy */</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="BeautifulSoup"><a href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/">BeautifulSoup</a><a class="anchor-link" href="#BeautifulSoup">¶</a></h2><p>Biblioteka do pobierania danych z dokumentów HTML i XML.</p>
+<p>Typowy import:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [1]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Tworzenie-zupy">Tworzenie zupy<a class="anchor-link" href="#Tworzenie-zupy">¶</a></h3><p>"Zupa" (<em>soup</em>) to obiekt reprezentujący sparsowany dokument HTML. Możemy go utworzyć, przekazując do klasy <code>BeautifulSoup</code> dokument HTML w postaci ciągu znaków, łańcucha bajtów lub strumienia dostępu do pliku.</p>
+<p>Z tekstu:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [26]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="c1">## Wyniki Strade Bianche w 2025 roku:</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s1">'https://www.procyclingstats.com/race/strade-bianche/2025/result'</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'strade.html'</span><span class="p">,</span> <span class="s1">'tw'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s1"> :-)'</span><span class="p">)</span>        
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s1"> :-('</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>200 :-)
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [27]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s1">'lxml'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Z łańcucha bajtów:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [28]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="s1">'lxml'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Ze strumienia tekstu:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [29]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'strade.html'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">strade</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">'lxml'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Parsery-HTML">Parsery HTML<a class="anchor-link" href="#Parsery-HTML">¶</a></h3><p><code>lxml</code> w wywołaniu</p>
+<div class="highlight"><pre><span></span><span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s1">'lxml'</span><span class="p">)</span>
+</pre></div>
+<p>oznacza nazwę parsera HTML/XML. Czas wywołania oraz wynikowa zupa mogą zależeć od użytego parsera.</p>
+<p>Informacje na temat różnych możliwych parserów i ich porównanie znajdziesz <a href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-a-parser">tutaj</a>.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Obiekty">Obiekty<a class="anchor-link" href="#Obiekty">¶</a></h3><p>Najważniejsze obiekty definiowane przez <code>BeautifulSoup</code> to</p>
+<ul>
+<li><code>BeautifulSoup</code></li>
+<li><code>Tag</code></li>
+<li><code>NavigableString</code></li>
+<li><code>Comment</code></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="BeautifulSoup"><code>BeautifulSoup</code><a class="anchor-link" href="#BeautifulSoup">¶</a></h3><p>Obiekt reprezentujący cały dokument:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [9]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">strade</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[9]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>bs4.BeautifulSoup</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Dokument nie jest znacznikiem i jako taki nie ma unikalnej nazwy. Dlatego atrybut <code>.name</code> jest nazwą specjalną dokumentu:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [10]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">name</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[10]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>'[document]'</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Tag"><code>Tag</code><a class="anchor-link" href="#Tag">¶</a></h3><p>Obiekt <code>Tag</code> odpowiada elementowi HTML/XML:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [13]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">zupa</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s1">'&lt;b class="boldest"&gt;Extremely bold&lt;/b&gt;'</span><span class="p">,</span> <span class="s1">'html.parser'</span><span class="p">)</span>
+<span class="n">tag</span> <span class="o">=</span> <span class="n">zupa</span><span class="o">.</span><span class="n">b</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[13]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>bs4.element.Tag</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Nazwa-znacznika">Nazwa znacznika<a class="anchor-link" href="#Nazwa-znacznika">¶</a></h3><p>Nazwa znacznika dostępna jest w atrybucie <code>Tag.name</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [14]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">tag</span><span class="o">.</span><span class="n">name</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[14]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>'b'</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Atrybuty">Atrybuty<a class="anchor-link" href="#Atrybuty">¶</a></h3><p>Dostęp do atrybutów znacznika po kluczu jak w słowniku:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [15]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">tag</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s1">'&lt;b id="boldest"&gt;bold&lt;/b&gt;'</span><span class="p">,</span> <span class="s1">'html.parser'</span><span class="p">)</span><span class="o">.</span><span class="n">b</span>
+<span class="n">tag</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[15]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>'boldest'</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Wszystkie atrybuty w atrybucie <code>Tag.attrs</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [16]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">tag</span><span class="o">.</span><span class="n">attrs</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[16]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>{'id': 'boldest'}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Atrybuty-wielowarto%C5%9Bciowe">Atrybuty wielowartościowe<a class="anchor-link" href="#Atrybuty-wielowarto%C5%9Bciowe">¶</a></h3><p>Przechowywane są w typie listowym:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [17]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">css_soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s1">'&lt;p class="body"&gt;&lt;/p&gt;'</span><span class="p">,</span> <span class="s1">'html.parser'</span><span class="p">)</span>
+<span class="n">css_soup</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">'class'</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[17]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>['body']</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [18]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">css_soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s1">'&lt;p class="body strikeout"&gt;&lt;/p&gt;'</span><span class="p">,</span> <span class="s1">'html.parser'</span><span class="p">)</span>
+<span class="n">css_soup</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">'class'</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[18]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>['body', 'strikeout']</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Jeśli atrybut wygląda jak wielowartościowy, ale w standardzie HTML zdefiniowany jest jako jednowartościowy, to biblioteka pozostawi go w formie tekstu:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [19]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">id_soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s1">'&lt;p id="my id"&gt;&lt;/p&gt;'</span><span class="p">,</span> <span class="s1">'html.parser'</span><span class="p">)</span>
+<span class="n">id_soup</span><span class="o">.</span><span class="n">p</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[19]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>'my id'</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="NavigableString"><code>NavigableString</code><a class="anchor-link" href="#NavigableString">¶</a></h3><p>Porcja tekstu należąca do znacznika:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [20]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s1">'&lt;b class="boldest"&gt;Extremely bold&lt;/b&gt;'</span><span class="p">,</span> <span class="s1">'html.parser'</span><span class="p">)</span>
+<span class="n">tag</span> <span class="o">=</span> <span class="n">soup</span><span class="o">.</span><span class="n">b</span>
+<span class="n">tag</span><span class="o">.</span><span class="n">string</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[20]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>'Extremely bold'</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [21]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">string</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[21]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>bs4.element.NavigableString</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Atrybuty-znacznika">Atrybuty znacznika<a class="anchor-link" href="#Atrybuty-znacznika">¶</a></h3><h4 id="Droga-w-d%C3%B3%C5%82">Droga w dół<a class="anchor-link" href="#Droga-w-d%C3%B3%C5%82">¶</a></h4><ul>
+<li>Znacznik <em>dziecko</em> jest atrybutem znacznika <em>rodzic</em>.</li>
+<li><code>.contents</code>, <code>.children</code></li>
+<li><code>.descendants</code></li>
+<li><code>.string</code></li>
+<li><code>.strings</code>, <code>.stripped_strings</code></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Droga-w-g%C3%B3r%C4%99">Droga w górę<a class="anchor-link" href="#Droga-w-g%C3%B3r%C4%99">¶</a></h4><ul>
+<li><code>.parent</code></li>
+<li><code>.parents</code></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="W%C4%99dr%C3%B3wka-w-bok">Wędrówka w bok<a class="anchor-link" href="#W%C4%99dr%C3%B3wka-w-bok">¶</a></h4><ul>
+<li><code>.next_sibling</code></li>
+<li><code>.previous_sibling</code></li>
+<li><code>.next_siblings</code></li>
+<li><code>.previous_siblings</code></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="W%C4%99dr%C3%B3wka-naprz%C3%B3d-i-wstecz">Wędrówka naprzód i wstecz<a class="anchor-link" href="#W%C4%99dr%C3%B3wka-naprz%C3%B3d-i-wstecz">¶</a></h4><ul>
+<li><code>.next_element</code></li>
+<li><code>.previous_element</code></li>
+<li><code>.next_elements</code></li>
+<li><code>.previous_elements</code></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Przeszukiwanie-drzewa">Przeszukiwanie drzewa<a class="anchor-link" href="#Przeszukiwanie-drzewa">¶</a></h2><p>Metody <code>.find...()</code></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Filtry">Filtry<a class="anchor-link" href="#Filtry">¶</a></h3><p>Obiekty dopasowywane z elementami podczas przeszukiwania drzewa.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Rodzaje-filtr%C3%B3w">Rodzaje filtrów<a class="anchor-link" href="#Rodzaje-filtr%C3%B3w">¶</a></h3><ul>
+<li>Łańcuch znaków</li>
+<li>Wyrażenie regularne</li>
+<li>Lista</li>
+<li><code>True</code></li>
+<li>Funkcja</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="%C5%81a%C5%84cuch-znak%C3%B3w">Łańcuch znaków<a class="anchor-link" href="#%C5%81a%C5%84cuch-znak%C3%B3w">¶</a></h4><p>Przykład. Wszystkie znaczniki <code>&lt;font&gt;</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [39]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">'font'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[39]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;font&gt;&lt;span class="flag gb"&gt;&lt;/span&gt;gb&lt;/font&gt;,
+ &lt;font&gt;road&lt;/font&gt;,
+ &lt;font class="hideIfMobile"&gt;19th&lt;/font&gt;,
+ &lt;font class="hideIfMobile"&gt;(1.UWT)&lt;/font&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Wyra%C5%BCenie-regularne">Wyrażenie regularne<a class="anchor-link" href="#Wyra%C5%BCenie-regularne">¶</a></h4><p>Przykład: Znaczniki zaczynające się literą <code>b</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [41]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^b'</span><span class="p">))]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[41]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>['base', 'base', 'body']</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Lista">Lista<a class="anchor-link" href="#Lista">¶</a></h4><p>Dopasowuje element z dowolnym filtrem z listy.</p>
+<p>Przykład. Znaczniki <code>&lt;base&gt;</code> oraz <code>&lt;f...&gt;</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [42]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">([</span><span class="s1">'base'</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^f.*'</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[42]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;base href="https://www.procyclingstats.com/race.php"/&gt;,
+ &lt;base href="race.php"/&gt;,
+ &lt;form action="search.php" class="msearch"&gt;&lt;input id="term" type="hidden"/&gt;
+ &lt;input class="search4" data-nav="race/-id-" data-nav2="" data-page="race" id="search" name="term" placeholder="search" type="text"/&gt;&lt;/form&gt;,
+ &lt;font&gt;&lt;span class="flag gb"&gt;&lt;/span&gt;gb&lt;/font&gt;,
+ &lt;font&gt;road&lt;/font&gt;,
+ &lt;form style="  "&gt;&lt;select onchange="window.location.href=this.value; " style="width: calc(100% - 2px);"&gt;&lt;option selected="" value="race/strade-bianche/2025/result"&gt;2025&lt;/option&gt;&lt;option value="race/strade-bianche/2024/result"&gt;2024&lt;/option&gt;&lt;option value="race/strade-bianche/2023/result"&gt;2023&lt;/option&gt;&lt;option value="race/strade-bianche/2022/result"&gt;2022&lt;/option&gt;&lt;option value="race/strade-bianche/2021/result"&gt;2021&lt;/option&gt;&lt;option value="race/strade-bianche/2020/result"&gt;2020&lt;/option&gt;&lt;option value="race/strade-bianche/2019/result"&gt;2019&lt;/option&gt;&lt;option value="race/strade-bianche/2018/result"&gt;2018&lt;/option&gt;&lt;option value="race/strade-bianche/2017/result"&gt;2017&lt;/option&gt;&lt;option value="race/strade-bianche/2016/result"&gt;2016&lt;/option&gt;&lt;option value="race/strade-bianche/2015/result"&gt;2015&lt;/option&gt;&lt;option value="race/strade-bianche/2014/result"&gt;2014&lt;/option&gt;&lt;option value="race/strade-bianche/2013/result"&gt;2013&lt;/option&gt;&lt;option value="race/strade-bianche/2012/result"&gt;2012&lt;/option&gt;&lt;option value="race/strade-bianche/2011/result"&gt;2011&lt;/option&gt;&lt;option value="race/strade-bianche/2010/result"&gt;2010&lt;/option&gt;&lt;option value="race/strade-bianche/2009/result"&gt;2009&lt;/option&gt;&lt;option value="race/strade-bianche/2008/result"&gt;2008&lt;/option&gt;&lt;option value="race/strade-bianche/2007/result"&gt;2007&lt;/option&gt;&lt;/select&gt;&lt;/form&gt;,
+ &lt;form style="  max-width: 150px; width: 100%;  "&gt;&lt;select onchange="window.location.href=this.value; " style="width: calc(100% - 2px);"&gt;&lt;option selected="" value="race/strade-bianche/2025"&gt;ME&lt;/option&gt;&lt;option value="race/strade-bianche-donne/2025"&gt;WE&lt;/option&gt;&lt;/select&gt;&lt;/form&gt;,
+ &lt;font class="hideIfMobile"&gt;19th&lt;/font&gt;,
+ &lt;font class="hideIfMobile"&gt;(1.UWT)&lt;/font&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="True"><code>True</code><a class="anchor-link" href="#True">¶</a></h4><p>Dopasowuje wszystko.</p>
+<p>Przykład. Nazwy wszystkich znaczników z dokumentu:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [43]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="n">Counter</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="kc">True</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[43]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>Counter({'td': 1750,
+         'span': 828,
+         'div': 548,
+         'a': 538,
+         'li': 196,
+         'input': 183,
+         'tr': 176,
+         'option': 79,
+         'ul': 30,
+         'path': 16,
+         'h3': 14,
+         'th': 10,
+         'svg': 8,
+         'g': 8,
+         'script': 7,
+         'link': 7,
+         'meta': 5,
+         'font': 4,
+         'select': 4,
+         'label': 4,
+         'form': 3,
+         'img': 3,
+         'base': 2,
+         'html': 1,
+         'head': 1,
+         'title': 1,
+         'body': 1,
+         'header': 1,
+         'h1': 1,
+         'h2': 1,
+         'table': 1,
+         'thead': 1,
+         'tbody': 1})</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Funkcja">Funkcja<a class="anchor-link" href="#Funkcja">¶</a></h4><p>Jednoargumentowa funkcja gra rolę filtra, gdy wywoływana na elementach zwraca wartości <code>True</code>/<code>False</code>. Dopasowują się wtedy te elementy, dla których uzyskano <code>True</code>.</p>
+<p>Przykład. Znaczniki, które mają atrybut <code>id</code> ale nie <code>class</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [44]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">has_id_but_no_class</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="n">tag</span><span class="o">.</span><span class="n">has_attr</span><span class="p">(</span><span class="s1">'class'</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tag</span><span class="o">.</span><span class="n">has_attr</span><span class="p">(</span><span class="s1">'id'</span><span class="p">)</span>
+
+<span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">has_id_but_no_class</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[44]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;input id="term" type="hidden"/&gt;,
+ &lt;input id="pageid" type="hidden" value="1190"/&gt;,
+ &lt;input id="userid" type="hidden" value="0"/&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Gdy funkcja zostanie przekazana przez nazwę do metody wyszukującej, to nazwa będzie grała rolę atrybutu elementu, a do funkcji zostanie przekazana wartość tego atrybutu. Dopasują się te elementy, dla których funkcja zwróci <code>True</code>.</p>
+<p>Przykład. Znaczniki posiadające taki atrybut <code>href</code>, którego wartość zaczyna się napisem <code>race</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [45]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">has_race_as_value</span><span class="p">(</span><span class="n">href_value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">href_value</span> <span class="ow">and</span> <span class="n">href_value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'race'</span><span class="p">)</span>
+
+<span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="n">has_race_as_value</span><span class="p">)[:</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[45]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;base href="race.php"/&gt;,
+ &lt;a class="reg" href="races.php"&gt;Races&lt;/a&gt;,
+ &lt;a href="race/tour-de-france"&gt;Tour de France&lt;/a&gt;,
+ &lt;a href="race/giro-d-italia"&gt;Giro d'Italia&lt;/a&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id=".find_all()"><code>.find_all()</code><a class="anchor-link" href="#.find_all()">¶</a></h3><p>Sygnatura metody:</p>
+<div class="highlight"><pre><span></span><span class="n">obj</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">recursive</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">limit</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+<p>Sprawdza dopasowanie do filtrów dla wszystkich potomków <code>obj</code>. Wynik zwraca w postaci listy.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="name"><code>name</code><a class="anchor-link" href="#name">¶</a></h4><p>Odnosi się do nazw znaczników. Pomija stringi. Wartość <code>name</code> jest dowolnym filtrem, czyli łańcuchem znaków, wyrażeniem regularnym, listą, funkcją lub wartością <code>True</code>.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Argumenty-find_all()-podawane-nazw%C4%85">Argumenty <code>find_all()</code> podawane nazwą<a class="anchor-link" href="#Argumenty-find_all()-podawane-nazw%C4%85">¶</a></h4><p>Argument podany wraz z nazwą, która nie została rozpoznany, czyli argument o nazwie innej niż jedna z <code>name, attrs, recursive, string, limit</code>, jest traktowany jako atrybut znacznika o wartości dopasowywanej do filtra.</p>
+<p>Przykład. Znaczniki <code>&lt;a&gt;</code> o pustym atrybucie <code>href</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [46]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="s1">''</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[46]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;a class="mobMenu" href=""&gt;☰ Menu&lt;/a&gt;,
+ &lt;a class="more4 toggleNavDropdown" href=""&gt;▼&lt;/a&gt;,
+ &lt;a class="more4 toggleNavDropdown" href=""&gt;▼&lt;/a&gt;,
+ &lt;a class="more4 toggleNavDropdown" href=""&gt;▼&lt;/a&gt;,
+ &lt;a class="more4 toggleNavDropdown" href=""&gt;▼&lt;/a&gt;,
+ &lt;a&gt;&lt;/a&gt;,
+ &lt;a class="clearFilter blue hide" href="" style="padding: 0px 7px; "&gt;clear filter&lt;/a&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Znaczniki, w których wartością atrybutu <code>class</code> jest <code>'reg'</code>. Ponieważ <code>class</code> jest słowem zarezerwowanym w Pythonie, więc stosuje się zastępczą nazwę <code>class_</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [47]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">class_</span><span class="o">=</span><span class="s1">'reg'</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[47]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;a class="reg" href="index.php"&gt;Home&lt;/a&gt;,
+ &lt;a class="reg" href="races.php"&gt;Races&lt;/a&gt;,
+ &lt;a class="reg" href="teams.php"&gt;Teams&lt;/a&gt;,
+ &lt;a class="reg" href="rankings.php"&gt;Rankings&lt;/a&gt;,
+ &lt;a class="reg" href="statistics.php"&gt;Statistics&lt;/a&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Znaczniki, które posiadają atrybut <code>href</code> o wartości zaczynającej się od napisu <code>'race'</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [48]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">href</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^race'</span><span class="p">))[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[48]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;base href="race.php"/&gt;,
+ &lt;a class="reg" href="races.php"&gt;Races&lt;/a&gt;,
+ &lt;a href="race/tour-de-france"&gt;Tour de France&lt;/a&gt;,
+ &lt;a href="race/giro-d-italia"&gt;Giro d'Italia&lt;/a&gt;,
+ &lt;a href="race/vuelta-a-espana"&gt;La Vuelta ciclista a España&lt;/a&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Znaczniki, które posiadają atrybut <code>href</code> o wartości zaczynającej się od napisu <code>'race'</code> i nie posiadają atrybutu <code>class</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [49]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">href</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^race'</span><span class="p">),</span> <span class="n">class_</span><span class="o">=</span><span class="kc">None</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[49]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;base href="race.php"/&gt;,
+ &lt;a href="race/tour-de-france"&gt;Tour de France&lt;/a&gt;,
+ &lt;a href="race/giro-d-italia"&gt;Giro d'Italia&lt;/a&gt;,
+ &lt;a href="race/vuelta-a-espana"&gt;La Vuelta ciclista a España&lt;/a&gt;,
+ &lt;a href="race/world-championship"&gt;World Championships&lt;/a&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Znaczniki, które posiadają atrybut <code>href</code> o wartości zaczynającej się od napisu <code>'race'</code> i nie posiadają atrybutu <code>class</code> lub mają ten atrybut pusty:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [50]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">href</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^race'</span><span class="p">),</span> <span class="n">class_</span><span class="o">=</span><span class="s1">''</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[50]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;base href="race.php"/&gt;,
+ &lt;a href="race/tour-de-france"&gt;Tour de France&lt;/a&gt;,
+ &lt;a href="race/giro-d-italia"&gt;Giro d'Italia&lt;/a&gt;,
+ &lt;a href="race/vuelta-a-espana"&gt;La Vuelta ciclista a España&lt;/a&gt;,
+ &lt;a href="race/world-championship"&gt;World Championships&lt;/a&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Znaczniki, które posiadają atrybut <code>href</code> o wartości zaczynającej się od napisu <code>'race'</code> i  posiadają atrybutu <code>class</code> pusty lub nie:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [52]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">href</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^race'</span><span class="p">),</span> <span class="n">class_</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[52]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;a class="reg" href="races.php"&gt;Races&lt;/a&gt;,
+ &lt;a class="cur" href="race/strade-bianche/2025/result"&gt;Results&lt;/a&gt;,
+ &lt;a class="" href="race/strade-bianche/2025/result/info"&gt;Info▼&lt;/a&gt;,
+ &lt;a class="" href="race/strade-bianche/2025/result/live"&gt;Live&lt;/a&gt;,
+ &lt;a class="" href="race/strade-bianche/2025/result/game"&gt;Game&lt;/a&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Znaczniki, które posiadają atrybut <code>data-n</code> o wartości <code>0</code>, <code>1</code> lub <code>2</code>. Tego atrybutu nie można przekazać jako nazwy argumentu. Dlatego korzystamy z parametru <code>attrs</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [53]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s1">'data-n'</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^[012]$'</span><span class="p">)})</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[53]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;li data-n="1"&gt;&lt;a href="race/strade-bianche/2025/result/result/result"&gt;Results - Results&lt;/a&gt;&lt;/li&gt;,
+ &lt;li data-n="2"&gt;&lt;a href="race/strade-bianche/2025/result/info/info"&gt;Info - Info&lt;/a&gt;&lt;/li&gt;,
+ &lt;li data-n="1"&gt;&lt;a href="race/strade-bianche/2025/result/info/complementary-results"&gt;Complementary results&lt;/a&gt;&lt;/li&gt;,
+ &lt;li data-n="1"&gt;&lt;a href="race/strade-bianche/2025/result/info/photos"&gt;Finish photo&lt;/a&gt;&lt;/li&gt;,
+ &lt;li data-n="1"&gt;&lt;a href="race/strade-bianche/2025/result/info/profiles"&gt;Profiles&lt;/a&gt;&lt;/li&gt;,
+ &lt;li data-n="1"&gt;&lt;a href="race/strade-bianche/2025/result/info/time-table"&gt;Time table&lt;/a&gt;&lt;/li&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Znaczniki, w których jedna z wartości atrybutu <code>class</code> ma wartość <code>toggleNavDropdown</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [54]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">class_</span><span class="o">=</span><span class="s1">'toggleNavDropdown'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[54]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;a class="more4 toggleNavDropdown" href=""&gt;▼&lt;/a&gt;,
+ &lt;a class="more4 toggleNavDropdown" href=""&gt;▼&lt;/a&gt;,
+ &lt;a class="more4 toggleNavDropdown" href=""&gt;▼&lt;/a&gt;,
+ &lt;a class="more4 toggleNavDropdown" href=""&gt;▼&lt;/a&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="string"><code>string</code><a class="anchor-link" href="#string">¶</a></h4><p>Wartością parametru <code>string</code> jest dowolny filtr. Metoda przeszukuje wtedy stringi zamiast znaczników.</p>
+<p>Przykład. Wszystkie stringi:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [55]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="kc">True</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[55]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>['HTML',
+ ' Global site tag (gtag.js) - Google Analytics ',
+ '\n',
+ '\n',
+ "\n  window.dataLayer = window.dataLayer || [];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());\n\n  gtag('config', 'G-2MNJ20S7SJ');\n"]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Stringi składające się z dwóch słów: pierwsze wielkimi literami z zakresu A-Z, drugie zaczyna się wielką literą, dalej małe, zakres a-z:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [56]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">string</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'^[A-Z]+\s[A-Z][a-z]+$'</span><span class="p">))[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[56]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>['INEOS Grenadiers',
+ 'INEOS Grenadiers',
+ 'PIDCOCK Thomas',
+ 'WELLENS Tim',
+ 'HEALY Ben']</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="limit"><code>limit</code><a class="anchor-link" href="#limit">¶</a></h4><p>Ograniczenie z góry liczby znalezionych wyników.</p>
+<p>Przykład. 5 pierwszych znaczników <code>&lt;a&gt;</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [57]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[57]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;a class="logo" href="index.php"&gt;&lt;/a&gt;,
+ &lt;a class="mobMenu" href=""&gt;☰ Menu&lt;/a&gt;,
+ &lt;a class="reg" href="index.php"&gt;Home&lt;/a&gt;,
+ &lt;a class="reg" href="races.php"&gt;Races&lt;/a&gt;,
+ &lt;a class="more4 toggleNavDropdown" href=""&gt;▼&lt;/a&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="recursive"><code>recursive</code><a class="anchor-link" href="#recursive">¶</a></h4><p>Jeśli <code>False</code>, to przeszukiwani są tylko bezpośredni potomkowie.</p>
+<p>Przykład.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [58]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">strade</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">div</span><span class="o">.</span><span class="n">div</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[58]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>2</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [59]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">strade</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">div</span><span class="o">.</span><span class="n">div</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[59]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>67</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Znacznik-jest-wywo%C5%82ywalny">Znacznik jest wywoływalny<a class="anchor-link" href="#Znacznik-jest-wywo%C5%82ywalny">¶</a></h3><p>Znaczniki HTML i obiekty BeautifulSoup są wywoływalne. Wywołanie to odpowiada wywołaniu metody <code>.find_all()</code>.</p>
+<p>Przykład. Znaczniki <code>&lt;a&gt;</code> zawierające atrybut <code>href</code> ze słowem <code>race</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [60]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">body</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">'race'</span><span class="p">))[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[60]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;a class="reg" href="races.php"&gt;Races&lt;/a&gt;,
+ &lt;a href="race/tour-de-france"&gt;Tour de France&lt;/a&gt;,
+ &lt;a href="race/giro-d-italia"&gt;Giro d'Italia&lt;/a&gt;,
+ &lt;a href="race/vuelta-a-espana"&gt;La Vuelta ciclista a España&lt;/a&gt;,
+ &lt;a href="race/world-championship"&gt;World Championships&lt;/a&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Znaczniki <code>&lt;a&gt;</code> zawierające atrybut <code>href</code> ze słowem <code>race</code> i posiadające atrybut <code>class</code>:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [61]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">strade</span><span class="o">.</span><span class="n">body</span><span class="p">(</span><span class="s1">'a'</span><span class="p">,</span> <span class="n">href</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">'race'</span><span class="p">),</span> <span class="n">class_</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt output_prompt">Out[61]:</div>
+<div class="output_text output_subarea output_execute_result">
+<pre>[&lt;a class="reg" href="races.php"&gt;Races&lt;/a&gt;,
+ &lt;a class="cur" href="race/strade-bianche/2025/result"&gt;Results&lt;/a&gt;,
+ &lt;a class="" href="race/strade-bianche/2025/result/info"&gt;Info▼&lt;/a&gt;,
+ &lt;a class="" href="race/strade-bianche/2025/result/live"&gt;Live&lt;/a&gt;,
+ &lt;a class="" href="race/strade-bianche/2025/result/game"&gt;Game&lt;/a&gt;,
+ &lt;a class="" href="race/strade-bianche/2025/result/statistics"&gt;Stats&lt;/a&gt;,
+ &lt;a class="" href="race/strade-bianche/2025/result/more"&gt;More▼&lt;/a&gt;,
+ &lt;a class="goto mr10 fs14" href="race/strade-bianche/2025/result/live" style=""&gt;LiveStats&lt;/a&gt;]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id=".find()"><code>.find()</code><a class="anchor-link" href="#.find()">¶</a></h3><p>Sygnatura metody:</p>
+<div class="highlight"><pre><span></span><span class="n">obj</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">recursive</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+<p>Sprawdza dopasowanie do filtrów dla potomków <code>obj</code>. Zwraca pierwsze znalezione dopasowanie lub <code>None</code>, jeśli dopasowania nie ma. Argumenty odpowiadają argumentom <code>.find_all()</code>.</p>
+<p>Niemal ten sam efekt osiągniemy wywołując <code>.find_all()</code> z argumentem <code>limit=1</code>. Róznica jest taka, że <code>.find_all()</code> zwróci listę z jedną wartością lub listę pustą, a <code>.find()</code> zwróci znaleziony element lub <code>None</code>.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Pozosta%C5%82e-metody-wyszukuj%C4%85ce">Pozostałe metody wyszukujące<a class="anchor-link" href="#Pozosta%C5%82e-metody-wyszukuj%C4%85ce">¶</a></h2><p>Metody <code>.find...()</code> są wariantami <code>.find_all()</code> lub <code>.find()</code>. Różnice między nimi są efektem zakresu przeszukiwanego drzewa. Argumenty tych metod odpowiadają argumentom <code>.find_all()</code> lub <code>.find()</code>.</p>
+<ul>
+<li><code>.find_parents()</code>, <code>find_parent()</code></li>
+<li><code>.find_next_siblings()</code>, <code>.find_next_sibling()</code></li>
+<li><code>.find_previous_siblings()</code>, <code>.find_previous_sibling()</code></li>
+<li><code>.find_all_next()</code>, <code>.find_next()</code></li>
+<li><code>.find_all_previous()</code>, <code>.find_previous()</code></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Przeszukiwanie-drzewa-z-wykorzystaniem-selektor%C3%B3w-CSS">Przeszukiwanie drzewa z wykorzystaniem selektorów CSS<a class="anchor-link" href="#Przeszukiwanie-drzewa-z-wykorzystaniem-selektor%C3%B3w-CSS">¶</a></h2><p>Funkcja <code>select()</code> przeszukuje drzewo z wykorzystaniem selektorów CSS. Zwraca listę znalezionych elementów.</p>
+<p>Sygnatura funkcji:</p>
+<div class="highlight"><pre><span></span><span class="n">BeautifulSoup</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</pre></div>
+<p>lub</p>
+<div class="highlight"><pre><span></span><span class="n">Tag</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">selector</span><span class="p">)</span>
+</pre></div>
+<p>gdzie <code>selector</code> to łańcuch znaków zawierający selektor CSS.</p>
+<p>Funkcja obsługuje większość standardowych selektorów CSS, takich jak:</p>
+<ul>
+<li>Selektory tagów: <code>select('p')</code> - wszystkie elementy <code>&lt;p&gt;</code></li>
+<li>Selektory klas: <code>select('.klasa')</code> - elementy z klasą "klasa"</li>
+<li>Selektory ID: <code>select('#id')</code> - element z ID "id"</li>
+<li>Selektory atrybutów: <code>select('[attr=value]')</code> - elementy z atrybutem "attr" o wartości "value"</li>
+<li>Selektory zagnieżdżone: <code>select('div p')</code> - elementy <code>&lt;p&gt;</code> wewnątrz <code>&lt;div&gt;</code></li>
+<li>Selektory potomków bezpośrednich: <code>select('div &gt; p')</code> - elementy <code>&lt;p&gt;</code> będące bezpośrednimi potomkami <code>&lt;div&gt;</code></li>
+</ul>
+<p>Zwraca listę obiektów <code>Tag</code>.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="%C4%86wiczenie">Ćwiczenie<a class="anchor-link" href="#%C4%86wiczenie">¶</a></h2><p>Pobierz do pliku CSV tabelę z wynikami wyścigu <a href="https://www.procyclingstats.com/race/strade-bianche/2025/result">Strade Bianche 2025</a>.</p>
 </div>
 </div>
 </div>
