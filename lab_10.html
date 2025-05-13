@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>lab_9</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
+<title>lab_10</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
   import mermaid from 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.7.0/mermaid.esm.min.mjs';
   mermaid.initialize({ startOnLoad: true });
 </script>
@@ -13089,28 +13089,14 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Automatyczne-pozyskiwanie-danych">Automatyczne pozyskiwanie danych<a class="anchor-link" href="#Automatyczne-pozyskiwanie-danych">¶</a></h1><h2 id="Tomasz-Rodak">Tomasz Rodak<a class="anchor-link" href="#Tomasz-Rodak">¶</a></h2><h1 id="Lab-9">Lab 9<a class="anchor-link" href="#Lab-9">¶</a></h1><hr/>
+<h1 id="Automatyczne-pozyskiwanie-danych">Automatyczne pozyskiwanie danych<a class="anchor-link" href="#Automatyczne-pozyskiwanie-danych">¶</a></h1><h2 id="Tomasz-Rodak">Tomasz Rodak<a class="anchor-link" href="#Tomasz-Rodak">¶</a></h2><h1 id="Lab-10">Lab 10<a class="anchor-link" href="#Lab-10">¶</a></h1><hr/>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Zadanie-9.1">Zadanie 9.1<a class="anchor-link" href="#Zadanie-9.1">¶</a></h2><p>Napisz program asynchroniczny, który symuluje pobieranie danych z trzech różnych źródeł. Każde źródło ma różny czas odpowiedzi (1s, 2s, 3s). Zaimplementuj:</p>
-<ol>
-<li>Wersję sekwencyjną używającą korutyn (jedna po drugiej)</li>
-<li>Wersję współbieżną używającą <code>asyncio.create_task()</code></li>
-<li>Wersję używającą <code>asyncio.gather()</code></li>
-</ol>
-<p>Porównaj czasy wykonania wszystkich trzech podejść.</p>
-<hr/>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Zadanie-9.2">Zadanie 9.2<a class="anchor-link" href="#Zadanie-9.2">¶</a></h2><p>Napisz program, który wypisze rozmiar w kB stron startowych z 10 różnych serwisów. Obsłuż błędy HTTP i timeouty.</p>
+<h2 id="Zadanie-10.1">Zadanie 10.1<a class="anchor-link" href="#Zadanie-10.1">¶</a></h2><p>Napisz program, który wypisze rozmiar w kB stron startowych z 10 różnych serwisów. Obsłuż błędy HTTP i timeouty.</p>
 <p>Program napisz w trzech wersjach:</p>
 <ol>
 <li>Wersja sekwencyjna wykorzystująca <code>requests</code></li>
@@ -13125,7 +13111,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Zadanie-9.3">Zadanie 9.3<a class="anchor-link" href="#Zadanie-9.3">¶</a></h2><p>Napisz program, który będzie rozwiązywał nazwy hostów (<em>domain name resolution</em>) dla podanego zakresu nazw. Program ten ma działać w dwóch wariantach:</p>
+<h2 id="Zadanie-10.2">Zadanie 10.2<a class="anchor-link" href="#Zadanie-10.2">¶</a></h2><p>Napisz program, który będzie rozwiązywał nazwy hostów (<em>domain name resolution</em>) dla podanego zakresu nazw. Program ten ma działać w dwóch wariantach:</p>
 <ol>
 <li><strong>Wersja synchroniczna</strong>: wykorzystująca standardową funkcję <code>socket.getaddrinfo()</code> do rozwiązywania nazw hostów jeden po drugim</li>
 <li><strong>Wersja asynchroniczna</strong>: wykorzystująca <code>loop.getaddrinfo()</code> z biblioteki <code>asyncio</code> do równoległego rozwiązywania wielu nazw hostów. Zmienna <code>loop</code> to instancja pętli zdarzeń <code>asyncio</code>, która jest odpowiedzialna za zarządzanie asynchronicznymi operacjami.</li>
