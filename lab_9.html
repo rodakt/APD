@@ -13107,58 +13107,6 @@ div#notebook {
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Zadanie-9.2">Zadanie 9.2<a class="anchor-link" href="#Zadanie-9.2">¶</a></h2><p>Napisz program, który wypisze rozmiar w kB stron startowych z 10 różnych serwisów. Obsłuż błędy HTTP i timeouty.</p>
-<p>Program napisz w trzech wersjach:</p>
-<ol>
-<li>Wersja sekwencyjna wykorzystująca <code>requests</code></li>
-<li>Wersja współbieżna wykorzystująca <code>asyncio.create_task()</code> i <code>aiohttp</code> lub <code>httpx</code></li>
-<li>Wersja współbieżna wykorzystująca <code>asyncio.gather()</code> i <code>aiohttp</code> lub <code>httpx</code></li>
-</ol>
-<p>Porównaj czasy wykonania wszystkich trzech podejść.</p>
-<hr/>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Zadanie-9.3">Zadanie 9.3<a class="anchor-link" href="#Zadanie-9.3">¶</a></h2><p>Napisz program, który będzie rozwiązywał nazwy hostów (<em>domain name resolution</em>) dla podanego zakresu nazw. Program ten ma działać w dwóch wariantach:</p>
-<ol>
-<li><strong>Wersja synchroniczna</strong>: wykorzystująca standardową funkcję <code>socket.getaddrinfo()</code> do rozwiązywania nazw hostów jeden po drugim</li>
-<li><strong>Wersja asynchroniczna</strong>: wykorzystująca <code>loop.getaddrinfo()</code> z biblioteki <code>asyncio</code> do równoległego rozwiązywania wielu nazw hostów. Zmienna <code>loop</code> to instancja pętli zdarzeń <code>asyncio</code>, która jest odpowiedzialna za zarządzanie asynchronicznymi operacjami.</li>
-</ol>
-<p>Funkcja <code>getaddrinfo()</code> służy do tłumaczenia nazw domen (np. "www.example.com") na konkretne adresy IP (np. "93.184.216.34"). Jest to podstawowy mechanizm rozwiązywania nazw hostów w sieciach komputerowych, który wykorzystuje system DNS (Domain Name System).</p>
-<p>W standardowym module <code>socket</code> funkcja <code>getaddrinfo()</code> działa synchronicznie - oznacza to, że każde zapytanie DNS blokuje wykonanie programu do momentu otrzymania odpowiedzi od serwera DNS.</p>
-<p>W module <code>asyncio</code>, metoda <code>loop.getaddrinfo()</code> działa asynchronicznie - pozwala to na wysłanie wielu zapytań DNS jednocześnie, a następnie na kontynuowanie wykonywania programu podczas oczekiwania na odpowiedzi.</p>
-<ol>
-<li>Program powinien przyjmować listę nazw hostów do rozwiązania (np. z pliku, linii poleceń lub jako zdefiniowaną listę w kodzie)</li>
-<li>Dla każdej implementacji (synchronicznej i asynchronicznej):<ul>
-<li>Zapisz czas rozpoczęcia i zakończenia całego procesu</li>
-<li>Dla każdej nazwy hosta zapisz rozwiązane adresy IP</li>
-<li>Obsłuż potencjalne błędy (np. nieprawidłowe nazwy hostów)</li>
-</ul>
-</li>
-<li>Na koniec wyświetl porównanie czasów wykonania obu implementacji</li>
-</ol>
-<p>Przykładowa lista nazw hostów do przetestowania</p>
-<pre><code>www.google.com
-www.facebook.com
-www.amazon.com
-www.microsoft.com
-www.apple.com
-www.youtube.com
-www.twitter.com
-www.instagram.com
-www.linkedin.com
-www.reddit.com
-</code></pre>
-<hr/>
-</div>
-</div>
-</div>
 </div>
 </div>
 </main>
