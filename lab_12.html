@@ -3,7 +3,7 @@
 <html lang="en">
 <head><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>lab_11</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
+<title>lab_12</title><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script><script type="module">
   import mermaid from 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.7.0/mermaid.esm.min.mjs';
   mermaid.initialize({ startOnLoad: true });
 </script>
@@ -13089,85 +13089,45 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered" id="cell-id=e1a3aa50"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Automatyczne-pozyskiwanie-danych">Automatyczne pozyskiwanie danych<a class="anchor-link" href="#Automatyczne-pozyskiwanie-danych">¶</a></h1><h2 id="Tomasz-Rodak">Tomasz Rodak<a class="anchor-link" href="#Tomasz-Rodak">¶</a></h2><h1 id="Lab-11">Lab 11<a class="anchor-link" href="#Lab-11">¶</a></h1><hr/>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered" id="cell-id=07fc1abf"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Biblioteka-duckduckgo-search">Biblioteka <a href="https://github.com/deedy5/duckduckgo_search">duckduckgo-search</a><a class="anchor-link" href="#Biblioteka-duckduckgo-search">¶</a></h2><p>Biblioteka <code>duckduckgo-search</code> umożliwia programistyczne korzystanie z wyszukiwarki DuckDuckGo. Klasa <code>DDGS</code> udostępnia synchroniczne API do wyszukiwania.</p>
-<h3 id="Instalacja">Instalacja<a class="anchor-link" href="#Instalacja">¶</a></h3><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>duckduckgo-search
-</pre></div>
-<h3 id="Klasa-DDGS---synchroniczne-wyszukiwanie">Klasa DDGS - synchroniczne wyszukiwanie<a class="anchor-link" href="#Klasa-DDGS---synchroniczne-wyszukiwanie">¶</a></h3><p>Klasa <code>DDGS</code> pozwala na synchroniczne wyszukiwanie w następujących kategoriach:</p>
-<ul>
-<li>Wyszukiwanie tekstu (<code>text</code>)</li>
-<li>Wyszukiwanie obrazów (<code>images</code>)</li>
-<li>Wyszukiwanie wideo (<code>videos</code>)</li>
-<li>Wyszukiwanie wiadomości (<code>news</code>)</li>
-</ul>
-<h3 id="Przyk%C5%82ad-u%C5%BCycia-synchronicznego-API">Przykład użycia synchronicznego API<a class="anchor-link" href="#Przyk%C5%82ad-u%C5%BCycia-synchronicznego-API">¶</a></h3><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">duckduckgo_search</span> <span class="kn">import</span> <span class="n">DDGS</span>
-
-<span class="k">def</span> <span class="nf">search_example</span><span class="p">():</span>
-    <span class="k">with</span> <span class="n">DDGS</span><span class="p">()</span> <span class="k">as</span> <span class="n">ddgs</span><span class="p">:</span>
-        <span class="c1"># Synchroniczne wyszukiwanie tekstu</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ddgs</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
-            <span class="s1">'Python programming'</span><span class="p">,</span> 
-            <span class="n">region</span><span class="o">=</span><span class="s1">'pl-pl'</span><span class="p">,</span>
-            <span class="n">safesearch</span><span class="o">=</span><span class="s1">'moderate'</span><span class="p">,</span> 
-            <span class="n">timelimit</span><span class="o">=</span><span class="s1">'y'</span><span class="p">,</span>  <span class="c1"># wyniki z ostatniego roku</span>
-            <span class="n">max_results</span><span class="o">=</span><span class="mi">5</span>
-        <span class="p">))</span>
-        <span class="k">return</span> <span class="n">results</span>
-</pre></div>
-<h3 id="Parametry-wyszukiwania">Parametry wyszukiwania<a class="anchor-link" href="#Parametry-wyszukiwania">¶</a></h3><p>Metody synchroniczne akceptują następujące parametry:</p>
+<h1 id="Automatyczne-pozyskiwanie-danych">Automatyczne pozyskiwanie danych<a class="anchor-link" href="#Automatyczne-pozyskiwanie-danych">¶</a></h1><h2 id="Tomasz-Rodak">Tomasz Rodak<a class="anchor-link" href="#Tomasz-Rodak">¶</a></h2><h1 id="Lab-12">Lab 12<a class="anchor-link" href="#Lab-12">¶</a></h1><hr/>
+<p>Przy implementacji podanych niżej zadań sugeruję następujące podejście:</p>
 <ol>
-<li><p><strong>Wspólne dla wszystkich typów</strong>:</p>
+<li><p><strong>Nazewnictwo plików</strong>:</p>
 <ul>
-<li><code>keywords</code> - słowa kluczowe do wyszukiwania</li>
-<li><code>region</code> - kod regionu (np. 'pl-pl', 'us-en')</li>
-<li><code>safesearch</code> - poziom filtrowania treści ('on', 'moderate', 'off')</li>
-<li><code>timelimit</code> - zakres czasowy ('d' - dzień, 'w' - tydzień, 'm' - miesiąc, 'y' - rok)</li>
-<li><code>max_results</code> - maksymalna liczba wyników (None dla wszystkich dostępnych)</li>
+<li>Zapisuj pliki obrazków z nazwą utworzoną jako md5sum adresu URL</li>
 </ul>
 </li>
-<li><p><strong>Dodatkowe dla wyszukiwania obrazów</strong>:</p>
+<li><p><strong>Grupowanie URL-i</strong>:</p>
 <ul>
-<li><code>size</code> - rozmiar obrazu ('small', 'medium', 'large', 'wallpaper')</li>
-<li><code>color</code> - kolor obrazu ('color', 'monochrome', 'red', 'orange', itd.)</li>
-<li><code>type_image</code> - typ obrazu ('photo', 'clipart', 'gif', 'transparent', 'line')</li>
-<li><code>layout</code> - układ obrazu ('square', 'tall', 'wide')</li>
+<li>Przed rozpoczęciem pobierania, pogrupuj adresy URL według domeny</li>
+<li>Zapewnij, że nie będą wykonywane jednoczesne zapytania do tej samej domeny</li>
+<li>W przypadku implementacji asynchronicznej, zaplanuj zadania tak, aby zapytania do tej samej domeny były wykonywane sekwencyjnie</li>
+</ul>
+</li>
+<li><p><strong>Śledz zapisane pliki</strong>:</p>
+<ul>
+<li>Utrzymuj rejestr (np. zbiór) już pobranych URL-i</li>
+<li>Przed rozpoczęciem pobierania sprawdź, czy plik z danego URL-a już istnieje; jeśli tak, pomiń go</li>
 </ul>
 </li>
 </ol>
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing text_cell rendered" id="cell-id=9c0daed1"><div class="prompt input_prompt">
+<div class="cell border-box-sizing text_cell rendered" id="cell-id=f809451f"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Zadanie-11.1">Zadanie 11.1<a class="anchor-link" href="#Zadanie-11.1">¶</a></h2><p>Przeanalizuj strukturę wyników zwracanych przez różne metody wyszukiwania klasy <code>DDGS</code>. Wykonaj następujące kroki:</p>
-<ol>
-<li>Przeprowadź wyszukiwanie tekstowe używając metody <code>text()</code> dla wybranego przez siebie zapytania.</li>
-<li>Przeprowadź wyszukiwanie obrazów używając metody <code>images()</code> dla tego samego zapytania.</li>
-<li>Przeprowadź wyszukiwanie wiadomości używając metody <code>news()</code>.</li>
-</ol>
-<p>Dla każdego typu wyszukiwania:</p>
-<ul>
-<li>Wypisz strukturę przykładowego wyniku (klucze i wartości)</li>
-<li>Porównaj struktury wyników z różnych typów wyszukiwania</li>
-<li>Zidentyfikuj pola wspólne i unikalne dla każdego typu</li>
+<h2 id="Zadanie-12.1:-Synchroniczne-pobieranie-obraz%C3%B3w">Zadanie 12.1: Synchroniczne pobieranie obrazów<a class="anchor-link" href="#Zadanie-12.1:-Synchroniczne-pobieranie-obraz%C3%B3w">¶</a></h2><p>Zaimplementuj synchroniczną wersję programu, który pobiera obrazy z adresów URL zgromadzonych w bazie utworzonej w zadaniu lab 11.2. Ta implementacja posłuży jako punkt odniesienia do porównania wydajności.</p>
+<h2 id="Zadanie-12.2:-Asynchroniczne-pobieranie-z-limitem-czasu">Zadanie 12.2: Asynchroniczne pobieranie z limitem czasu<a class="anchor-link" href="#Zadanie-12.2:-Asynchroniczne-pobieranie-z-limitem-czasu">¶</a></h2><p>Zaimplementuj asynchroniczną wersję programu do pobierania obrazów wykorzystującą <code>asyncio.wait_for()</code>.</p>
+<h2 id="Zadanie-12.3:-Asynchroniczne-pobieranie-z-przetwarzaniem-w-miar%C4%99-uko%C5%84czenia">Zadanie 12.3: Asynchroniczne pobieranie z przetwarzaniem w miarę ukończenia<a class="anchor-link" href="#Zadanie-12.3:-Asynchroniczne-pobieranie-z-przetwarzaniem-w-miar%C4%99-uko%C5%84czenia">¶</a></h2><p>Zaimplementuj asynchroniczną wersję programu do pobierania obrazów wykorzystującą <code>asyncio.as_completed()</code>.</p>
+<h2 id="Zadanie-12.4:-Asynchroniczne-pobieranie-z-r%C3%B3wnoleg%C5%82ym-wykonaniem">Zadanie 12.4: Asynchroniczne pobieranie z równoległym wykonaniem<a class="anchor-link" href="#Zadanie-12.4:-Asynchroniczne-pobieranie-z-r%C3%B3wnoleg%C5%82ym-wykonaniem">¶</a></h2><p>Zaimplementuj asynchroniczną wersję programu do pobierania obrazów wykorzystującą <code>asyncio.gather()</code>.</p>
+<h2 id="Wsp%C3%B3lne-wymagania-dla-wszystkich-zada%C5%84:">Wspólne wymagania dla wszystkich zadań:<a class="anchor-link" href="#Wsp%C3%B3lne-wymagania-dla-wszystkich-zada%C5%84:">¶</a></h2><ul>
+<li>Wczytaj adresy URL obrazów z bazy danych</li>
+<li>Pobierz każdy obraz i zapisz go lokalnie</li>
+<li>Zmierz czas wykonania całego procesu</li>
+<li>Dodaj obsługę błędów (błędny URL, błąd HTTP, timeout, niepoprawny format odpowiedzi)</li>
+<li>Implementuj mechanizm opóźnienia (throttling) dla kolejnych żądań do tej samej domeny (np. minimalny odstęp 1 sekundy między żądaniami do tego samego serwera)</li>
 </ul>
-<p>Sprawdź, jak zmienia się czas wykonania zapytania w zależności od parametru <code>max_results</code>.</p>
-<hr/>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered" id="cell-id=9cf275bd"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Zadanie-11.2">Zadanie 11.2<a class="anchor-link" href="#Zadanie-11.2">¶</a></h2><p>Wybierz interesujące Cię zagadnienie (np. "architektura modernistyczna", "góry świata", "dzieła sztuki renesansu" itp.), a następnie wykorzystaj bibliotekę <code>duckduckgo-search</code> do pobrania kilkuset adresów URL obrazów. Wyniki zapisz w pliku JSON.</p>
-<p>DuckDuckGo nie pozwala na pobieranie dużej liczby wyników w jednym zapytaniu, dlatego konieczne będzie zastosowanie różnych wariantów zapytań i parametrów wyszukiwania.</p>
 </div>
 </div>
 </div>
