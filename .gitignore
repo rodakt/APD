@@ -19,6 +19,7 @@
 !wyklad_[0-9][0-9].html
 !lab_[0-9].html
 !lab_[0-9][0-9].html
+!_config/style.html
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -59,3 +60,22 @@ Thumbs.db
 
 # files containing `solved` in the name
 *solved*
+
+# --- LaTeX (dla plików test_10VI2025.* i podobnych) ---
+*.aux
+*.fdb_bak
+*.fls
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.pdf
+
+# folder metadanych
+meta/
+
+# --- Pliki tymczasowe i robocze (rozszerzone) ---
+*_tmp.*
+*_bak.*
+*.md.bak
+
