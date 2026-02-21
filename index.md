@@ -2,16 +2,20 @@
 title: "Automatyczne pozyskiwanie danych"
 ---
 
-Strona kursu "Automatyczne pozyskiwanie danych" (APD) 
+## Opis przedmiotu
 
-Semester letni 2025/2026
-
+Kurs uczy automatycznego pozyskiwania danych z sieci. Zaczynamy od protokołu HTTP i pracy z API, przechodzimy przez parsowanie HTML i crawling, kończymy na asynchronicznym pobieraniu danych, Scrapy i Selenium.
 
 ## Wykłady
 
-- [Wykład 1](wyklady/wyklad_1.md)
+- [Wykład 1: HTTP i klienci HTTP](wyklady/wyklad_1.md)
 
 ## Laboratoria
 
-- [Laboratorium 0](laby/lab_0.md)
-- [Laboratorium 1](laby/lab_1.md)
+- [Laboratorium 0: Python — podstawy](laby/lab_0.md)
+- [Laboratorium 1: HTTP i klienci HTTP](laby/lab_1.md)
+
+## Zaliczenie
+
+- Wykład: Test pisemny stacjonarny. Brak dostępu do materiałów i elektroniki.
+- Ćwiczenia: Projekt/zadanie domowe z indywidualną obroną ustną. 

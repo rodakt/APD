@@ -1,5 +1,5 @@
 ---
-title: "Lab 0: Python — powtórka przed kursem"
+title: "Lab 0: Python — podstawy"
 subtitle: "Automatyczne pozyskiwanie danych — ćwiczenia"
 author: "Tomasz Rodak"
 ---

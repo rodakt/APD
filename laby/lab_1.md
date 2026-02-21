@@ -125,12 +125,14 @@ Otwórz w przeglądarce `https://api.dane.gov.pl/doc` i wykonaj po kolei:
 8. W sekcji **Curl** Swagger pokaże polecenie `curl`:
     * jeśli jest bardzo długie (z parametrami typu `id[gt]`, `id[lt]`, `title[...]`, `description[...]` itd.), potraktuj je jako „szablon” i **usuń z URL-a wszystkie te automatycznie dodane filtry**, zostawiając tylko to, co ustawiłeś ręcznie (np. `page` i `per_page`).
 
-::: note
-**Uwaga:** Swagger często wypełnia „pusty formularz” przykładowymi wartościami **we wszystkich** polach naraz (zwłaszcza tam, gdzie parametr jest obiektem filtrów typu `term/terms/gt/lt/gte/lte/...`). To jest artefakt UI, nie wymaganie API. W praktyce zostawiasz tylko te pola, których faktycznie chcesz użyć (zwykle: `page`, `per_page`; ewentualnie *jeden* operator na pole).
+::: {.callout-warning}
+## Uwaga dotycząca Swaggera
+Swagger często wypełnia „pusty formularz” przykładowymi wartościami **we wszystkich** polach naraz (zwłaszcza tam, gdzie parametr jest obiektem filtrów typu `term/terms/gt/lt/gte/lte/...`). To jest artefakt UI, nie wymaganie API. W praktyce zostawiasz tylko te pola, których faktycznie chcesz użyć (zwykle: `page`, `per_page`; ewentualnie *jeden* operator na pole).
 :::
 
-::: checkpoint
-**Checkpoint:** Czy widzisz pole `data` z listą obiektów? Czy potrafisz wskazać `id` i `title` pierwszego datasetu? Zapisz sobie jedno `id` — przyda się za chwilę.
+::: {.callout-note}
+## Checkpoint
+Czy widzisz pole `data` z listą obiektów? Czy potrafisz wskazać `id` i `title` pierwszego datasetu? Zapisz sobie jedno `id` — przyda się za chwilę.
 :::
 
 ---
@@ -167,8 +169,8 @@ content-type: application/vnd.api+json
 {"data":[{"id":"...", ...}], ...}
 ```
 
-::: key-concept
-**Co widzisz:** linię statusu (`HTTP/2 200`), nagłówki odpowiedzi (w tym `content-type`), pustą linię, a potem ciało odpowiedzi (JSON). To jest dokładnie struktura odpowiedzi HTTP z wykładu.
+::: {.callout-note}
+Widzisz linię statusu (`HTTP/2 200`), nagłówki odpowiedzi (w tym `content-type`), pustą linię, a potem ciało odpowiedzi (JSON). To jest dokładnie struktura odpowiedzi HTTP z wykładu.
 :::
 
 ## Tryb diagnostyczny
@@ -198,8 +200,9 @@ curl -s "https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2" | python3 -m js
 
 Pipe przez `python3 -m json.tool` formatuje JSON z wcięciami. Flaga `-s` wycisza pasek postępu.
 
-::: checkpoint
-**Checkpoint:** Potrafisz wskazać w wyjściu `curl -i` kod statusu, `Content-Type` i początek ciała JSON?
+::: {.callout-note}
+## Checkpoint
+Potrafisz wskazać w wyjściu `curl -i` kod statusu, `Content-Type` i początek ciała JSON?
 :::
 
 ---
@@ -277,8 +280,9 @@ print("Typ:", type(data))
 print("Klucze:", list(data.keys()))
 ```
 
-::: key-concept
-**Ważne:** `r.json()` rzuci wyjątek, jeśli ciało odpowiedzi nie jest poprawnym JSON-em (np. gdy serwer zwrócił HTML ze stroną błędu). Dlatego przed parsowaniem warto sprawdzić `r.status_code` lub użyć `r.raise_for_status()`.
+::: {.callout-tip}
+## Ważne
+`r.json()` rzuci wyjątek, jeśli ciało odpowiedzi nie jest poprawnym JSON-em (np. gdy serwer zwrócił HTML ze stroną błędu). Dlatego przed parsowaniem warto sprawdzić `r.status_code` lub użyć `r.raise_for_status()`.
 :::
 
 ## Bezpieczny wzorzec: sprawdzaj przed parsowaniem
@@ -291,8 +295,9 @@ data = r.json()
 
 Metoda `raise_for_status()` zamienia kody błędów na wyjątek Pythona — dzięki temu nie próbujesz parsować odpowiedzi z błędem.
 
-::: checkpoint
-**Checkpoint:** Wykonaj `requests.get("https://httpbin.org/json")` i wypisz `status_code`, `Content-Type` z nagłówków, oraz klucze (keys) sparsowanego JSON-a. Czy wszystko się zgadza?
+::: {.callout-note}
+## Checkpoint
+Wykonaj `requests.get("https://httpbin.org/json")` i wypisz `status_code`, `Content-Type` z nagłówków, oraz klucze (keys) sparsowanego JSON-a. Czy wszystko się zgadza?
 :::
 
 ---
@@ -355,8 +360,9 @@ print("Meta:", data.get("meta", {}))
 
 W polu `links` powinien pojawić się klucz `next` z URL-em następnej strony. W polu `meta` — łączna liczba zbiorów (`count`).
 
-::: checkpoint
-**Checkpoint:** Czy widzisz listę 5 datasetów z ich `id` i tytułami? Czy w `links` jest adres `next`? Zapisz `id` jednego datasetu, który wydaje ci się ciekawy.
+::: {.callout-note}
+## Checkpoint
+Czy widzisz listę 5 datasetów z ich `id` i tytułami? Czy w `links` jest adres `next`? Zapisz `id` jednego datasetu, który wydaje ci się ciekawy.
 :::
 
 ## Krok 5: szczegóły wybranego datasetu
@@ -406,8 +412,9 @@ for res in resources:
 
 Jeśli lista zasobów jest pusta, wybierz inny dataset i powtórz od kroku 5.
 
-::: checkpoint
-**Checkpoint:** Czy widzisz listę zasobów z ich `id`, tytułami i formatami? Jeśli tak — udało ci się przejść pełny łańcuch: kolekcja → element → podzasoby. To jest główna umiejętność tego labu.
+::: {.callout-note}
+## Checkpoint
+Czy widzisz listę zasobów z ich `id`, tytułami i formatami? Jeśli tak — udało ci się przejść pełny łańcuch: kolekcja → element → podzasoby. To jest główna umiejętność tego labu.
 :::
 
 ---
@@ -452,8 +459,8 @@ except requests.exceptions.RequestException as e:
 
 Ustawiamy absurdalnie krótki timeout (`0.001` s), żeby wymusić błąd. W praktyce sensowna wartość to 5–30 sekund.
 
-::: key-concept
-**Wzorzec minimalny do zapamiętania:**
+::: {.callout-tip}
+## Wzorzec minimalny do zapamiętania
 
 ```python
 try:
@@ -469,8 +476,9 @@ except requests.exceptions.RequestException as e:
 ```
 :::
 
-::: checkpoint
-**Checkpoint:** Czy umiesz rozróżnić trzy sytuacje: odpowiedź 200 (sukces), odpowiedź 404 (błąd serwera w sensie „nie znaleziono"), wyjątek Timeout (brak odpowiedzi)? To jest kluczowe w automatyzacji.
+::: {.callout-note}
+## Checkpoint
+Czy umiesz rozróżnić trzy sytuacje: odpowiedź 200 (sukces), odpowiedź 404 (błąd serwera w sensie „nie znaleziono"), wyjątek Timeout (brak odpowiedzi)? To jest kluczowe w automatyzacji.
 :::
 
 ---
