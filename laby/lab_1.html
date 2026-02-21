@@ -76,7 +76,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-e7ecd568c683b2e2c610cd06a11c59d5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-d8c0aa9bb5023bd024182d9dc683c43e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -177,7 +177,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../laby/lab_0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Lab 0: Python — powtórka przed kursem</span></a>
+ <span class="menu-text">Lab 0: Python — podstawy</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -390,11 +390,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>jeśli jest bardzo długie (z parametrami typu <code>id[gt]</code>, <code>id[lt]</code>, <code>title[...]</code>, <code>description[...]</code> itd.), potraktuj je jako „szablon” i <strong>usuń z URL-a wszystkie te automatycznie dodane filtry</strong>, zostawiając tylko to, co ustawiłeś ręcznie (np. <code>page</code> i <code>per_page</code>).</li>
 </ul></li>
 </ol>
-<div class="note">
-<p><strong>Uwaga:</strong> Swagger często wypełnia „pusty formularz” przykładowymi wartościami <strong>we wszystkich</strong> polach naraz (zwłaszcza tam, gdzie parametr jest obiektem filtrów typu <code>term/terms/gt/lt/gte/lte/...</code>). To jest artefakt UI, nie wymaganie API. W praktyce zostawiasz tylko te pola, których faktycznie chcesz użyć (zwykle: <code>page</code>, <code>per_page</code>; ewentualnie <em>jeden</em> operator na pole).</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<div class="checkpoint">
-<p><strong>Checkpoint:</strong> Czy widzisz pole <code>data</code> z listą obiektów? Czy potrafisz wskazać <code>id</code> i <code>title</code> pierwszego datasetu? Zapisz sobie jedno <code>id</code> — przyda się za chwilę.</p>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Uwaga dotycząca Swaggera
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Swagger często wypełnia „pusty formularz” przykładowymi wartościami <strong>we wszystkich</strong> polach naraz (zwłaszcza tam, gdzie parametr jest obiektem filtrów typu <code>term/terms/gt/lt/gte/lte/...</code>). To jest artefakt UI, nie wymaganie API. W praktyce zostawiasz tylko te pola, których faktycznie chcesz użyć (zwykle: <code>page</code>, <code>per_page</code>; ewentualnie <em>jeden</em> operator na pole).</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Czy widzisz pole <code>data</code> z listą obiektów? Czy potrafisz wskazać <code>id</code> i <code>title</code> pierwszego datasetu? Zapisz sobie jedno <code>id</code> — przyda się za chwilę.</p>
+</div>
 </div>
 <hr>
 </section>
@@ -419,8 +439,18 @@ content-type: application/vnd.api+json
 ...
 
 {"data":[{"id":"...", ...}], ...}</code></pre>
-<div class="key-concept">
-<p><strong>Co widzisz:</strong> linię statusu (<code>HTTP/2 200</code>), nagłówki odpowiedzi (w tym <code>content-type</code>), pustą linię, a potem ciało odpowiedzi (JSON). To jest dokładnie struktura odpowiedzi HTTP z wykładu.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Widzisz linię statusu (<code>HTTP/2 200</code>), nagłówki odpowiedzi (w tym <code>content-type</code>), pustą linię, a potem ciało odpowiedzi (JSON). To jest dokładnie struktura odpowiedzi HTTP z wykładu.</p>
+</div>
 </div>
 </section>
 <section id="tryb-diagnostyczny" class="level2" data-number="3.3">
@@ -440,8 +470,18 @@ content-type: application/vnd.api+json
 <h2 data-number="3.4" class="anchored" data-anchor-id="sama-odpowiedź-ładnie-sformatowana"><span class="header-section-number">3.4</span> Sama odpowiedź, ładnie sformatowana</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">"https://api.dane.gov.pl/1.4/datasets?page=1&amp;per_page=2"</span> <span class="kw">|</span> <span class="ex">python3</span> <span class="at">-m</span> json.tool <span class="kw">|</span> <span class="fu">head</span> <span class="at">-40</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Pipe przez <code>python3 -m json.tool</code> formatuje JSON z wcięciami. Flaga <code>-s</code> wycisza pasek postępu.</p>
-<div class="checkpoint">
-<p><strong>Checkpoint:</strong> Potrafisz wskazać w wyjściu <code>curl -i</code> kod statusu, <code>Content-Type</code> i początek ciała JSON?</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Potrafisz wskazać w wyjściu <code>curl -i</code> kod statusu, <code>Content-Type</code> i początek ciała JSON?</p>
+</div>
 </div>
 <hr>
 </section>
@@ -503,8 +543,18 @@ content-type: application/vnd.api+json
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> r.json()           <span class="co"># parsuje JSON → dict</span></span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Typ:"</span>, <span class="bu">type</span>(data))</span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Klucze:"</span>, <span class="bu">list</span>(data.keys()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="key-concept">
-<p><strong>Ważne:</strong> <code>r.json()</code> rzuci wyjątek, jeśli ciało odpowiedzi nie jest poprawnym JSON-em (np. gdy serwer zwrócił HTML ze stroną błędu). Dlatego przed parsowaniem warto sprawdzić <code>r.status_code</code> lub użyć <code>r.raise_for_status()</code>.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Ważne
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>r.json()</code> rzuci wyjątek, jeśli ciało odpowiedzi nie jest poprawnym JSON-em (np. gdy serwer zwrócił HTML ze stroną błędu). Dlatego przed parsowaniem warto sprawdzić <code>r.status_code</code> lub użyć <code>r.raise_for_status()</code>.</p>
+</div>
 </div>
 </section>
 <section id="bezpieczny-wzorzec-sprawdzaj-przed-parsowaniem" class="level2" data-number="4.6">
@@ -513,8 +563,18 @@ content-type: application/vnd.api+json
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>r.raise_for_status()  <span class="co"># rzuci wyjątek przy 4xx / 5xx</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> r.json()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Metoda <code>raise_for_status()</code> zamienia kody błędów na wyjątek Pythona — dzięki temu nie próbujesz parsować odpowiedzi z błędem.</p>
-<div class="checkpoint">
-<p><strong>Checkpoint:</strong> Wykonaj <code>requests.get("https://httpbin.org/json")</code> i wypisz <code>status_code</code>, <code>Content-Type</code> z nagłówków, oraz klucze (keys) sparsowanego JSON-a. Czy wszystko się zgadza?</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Wykonaj <code>requests.get("https://httpbin.org/json")</code> i wypisz <code>status_code</code>, <code>Content-Type</code> z nagłówków, oraz klucze (keys) sparsowanego JSON-a. Czy wszystko się zgadza?</p>
+</div>
 </div>
 <hr>
 </section>
@@ -565,8 +625,18 @@ content-type: application/vnd.api+json
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Linki:"</span>, data.get(<span class="st">"links"</span>, {}))</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Meta:"</span>, data.get(<span class="st">"meta"</span>, {}))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>W polu <code>links</code> powinien pojawić się klucz <code>next</code> z URL-em następnej strony. W polu <code>meta</code> — łączna liczba zbiorów (<code>count</code>).</p>
-<div class="checkpoint">
-<p><strong>Checkpoint:</strong> Czy widzisz listę 5 datasetów z ich <code>id</code> i tytułami? Czy w <code>links</code> jest adres <code>next</code>? Zapisz <code>id</code> jednego datasetu, który wydaje ci się ciekawy.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Czy widzisz listę 5 datasetów z ich <code>id</code> i tytułami? Czy w <code>links</code> jest adres <code>next</code>? Zapisz <code>id</code> jednego datasetu, który wydaje ci się ciekawy.</p>
+</div>
 </div>
 </section>
 <section id="krok-5-szczegóły-wybranego-datasetu" class="level2" data-number="5.5">
@@ -608,8 +678,18 @@ content-type: application/vnd.api+json
 <span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"       format: </span><span class="sc">{</span>res_attrs<span class="sc">.</span>get(<span class="st">'format'</span>, <span class="st">'?'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Jeśli lista zasobów jest pusta, wybierz inny dataset i powtórz od kroku 5.</p>
-<div class="checkpoint">
-<p><strong>Checkpoint:</strong> Czy widzisz listę zasobów z ich <code>id</code>, tytułami i formatami? Jeśli tak — udało ci się przejść pełny łańcuch: kolekcja → element → podzasoby. To jest główna umiejętność tego labu.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Czy widzisz listę zasobów z ich <code>id</code>, tytułami i formatami? Jeśli tak — udało ci się przejść pełny łańcuch: kolekcja → element → podzasoby. To jest główna umiejętność tego labu.</p>
+</div>
 </div>
 <hr>
 </section>
@@ -645,8 +725,16 @@ content-type: application/vnd.api+json
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
 <span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Inny błąd:"</span>, e)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Ustawiamy absurdalnie krótki timeout (<code>0.001</code> s), żeby wymusić błąd. W praktyce sensowna wartość to 5–30 sekund.</p>
-<div class="key-concept">
-<p><strong>Wzorzec minimalny do zapamiętania:</strong></p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Wzorzec minimalny do zapamiętania
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> requests.get(url, timeout<span class="op">=</span><span class="dv">10</span>)</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    r.raise_for_status()</span>
@@ -658,8 +746,19 @@ content-type: application/vnd.api+json
 <span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
 <span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Błąd połączenia:"</span>, e)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="checkpoint">
-<p><strong>Checkpoint:</strong> Czy umiesz rozróżnić trzy sytuacje: odpowiedź 200 (sukces), odpowiedź 404 (błąd serwera w sensie „nie znaleziono”), wyjątek Timeout (brak odpowiedzi)? To jest kluczowe w automatyzacji.</p>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Czy umiesz rozróżnić trzy sytuacje: odpowiedź 200 (sukces), odpowiedź 404 (błąd serwera w sensie „nie znaleziono”), wyjątek Timeout (brak odpowiedzi)? To jest kluczowe w automatyzacji.</p>
+</div>
 </div>
 <hr>
 </section>
@@ -788,7 +887,7 @@ content-type: application/vnd.api+json
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/APD\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

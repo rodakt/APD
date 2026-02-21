@@ -40,7 +40,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-e7ecd568c683b2e2c610cd06a11c59d5.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-d8c0aa9bb5023bd024182d9dc683c43e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -141,7 +141,7 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./laby/lab_0.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Lab 0: Python — powtórka przed kursem</span></a>
+ <span class="menu-text">Lab 0: Python — podstawy</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -165,6 +165,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#opis-przedmiotu" id="toc-opis-przedmiotu" class="nav-link active" data-scroll-target="#opis-przedmiotu"><span class="header-section-number">1</span> Opis przedmiotu</a></li>
   <li><a href="#wykłady" id="toc-wykłady" class="nav-link" data-scroll-target="#wykłady"><span class="header-section-number">2</span> Wykłady</a></li>
   <li><a href="#laboratoria" id="toc-laboratoria" class="nav-link" data-scroll-target="#laboratoria"><span class="header-section-number">3</span> Laboratoria</a></li>
+  <li><a href="#zaliczenie" id="toc-zaliczenie" class="nav-link" data-scroll-target="#zaliczenie"><span class="header-section-number">4</span> Zaliczenie</a></li>
   </ul>
 </nav>
     </div>
@@ -192,18 +193,26 @@ ul.task-list li input[type="checkbox"] {
 
 <section id="opis-przedmiotu" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="opis-przedmiotu"><span class="header-section-number">1</span> Opis przedmiotu</h2>
+<p>Kurs uczy automatycznego pozyskiwania danych z sieci. Zaczynamy od protokołu HTTP i pracy z API, przechodzimy przez parsowanie HTML i crawling, kończymy na asynchronicznym pobieraniu danych, Scrapy i Selenium.</p>
 </section>
 <section id="wykłady" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="wykłady"><span class="header-section-number">2</span> Wykłady</h2>
 <ul>
-<li><a href="./wyklady/wyklad_1.html">Wykład 1</a></li>
+<li><a href="./wyklady/wyklad_1.html">Wykład 1: HTTP i klienci HTTP</a></li>
 </ul>
 </section>
 <section id="laboratoria" class="level2" data-number="3">
 <h2 data-number="3" class="anchored" data-anchor-id="laboratoria"><span class="header-section-number">3</span> Laboratoria</h2>
 <ul>
-<li><a href="./laby/lab_0.html">Laboratorium 0</a></li>
-<li><a href="./laby/lab_1.html">Laboratorium 1</a></li>
+<li><a href="./laby/lab_0.html">Laboratorium 0: Python — podstawy</a></li>
+<li><a href="./laby/lab_1.html">Laboratorium 1: HTTP i klienci HTTP</a></li>
+</ul>
+</section>
+<section id="zaliczenie" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="zaliczenie"><span class="header-section-number">4</span> Zaliczenie</h2>
+<ul>
+<li>Wykład: Test pisemny stacjonarny. Brak dostępu do materiałów i elektroniki.</li>
+<li>Ćwiczenia: Projekt/zadanie domowe z indywidualną obroną ustną.</li>
 </ul>
 
 
@@ -283,7 +292,7 @@ ul.task-list li input[type="checkbox"] {
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/APD\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
