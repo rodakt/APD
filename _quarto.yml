@@ -1,0 +1,33 @@
+project:
+  type: website
+  render:
+    - "*.md"
+    - "wyklady/*.md"
+    - "laby/*.md"
+    - "!*.ipynb" # Ignorujemy Jupyter Notebooki, dopóki ich nie przerobisz
+
+website:
+  title: "Automatyczne pozyskiwanie danych"
+  description: "Materiały do kursu"
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
+      - index.md
+      - section: "Wykłady"
+        contents:
+          - wyklady/wyklad_1.md
+          # - wyklady/wyklad_2.md
+      - section: "Laboratoria"
+        contents:
+          - laby/lab_0.md
+          - laby/lab_1.md
+
+format:
+  html:
+    theme: sandstone
+    toc: true
+    toc-title: "Spis treści"
+    number-sections: true
+    code-copy: true
+    syntax-highlighting: pygments

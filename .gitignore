@@ -15,11 +15,11 @@
 
 # HTML files
 *.html
-!wyklad_[0-9].html
-!wyklad_[0-9][0-9].html
-!lab_[0-9].html
-!lab_[0-9][0-9].html
-!_config/style.html
+# !wyklad_[0-9].html
+# !wyklad_[0-9][0-9].html
+# !lab_[0-9].html
+# !lab_[0-9][0-9].html
+# !_config/style.html
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -79,3 +79,8 @@ meta/
 *_bak.*
 *.md.bak
 
+
+# quarto folder _site
+/.quarto/
+/_site/
+**/*.quarto_ipynb
