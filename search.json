@@ -1,0 +1,915 @@
+[
+  {
+    "objectID": "wyklady/wyklady_2.html",
+    "href": "wyklady/wyklady_2.html",
+    "title": "Wykład 2: Serwer HTTP — od http.server do Flask",
+    "section": "",
+    "text": "Na Wykładzie 1 patrzyliśmy na HTTP wyłącznie od strony klienta: wysyłaliśmy żądania (curl, requests) i analizowaliśmy odpowiedzi. Teraz przechodzimy na drugą stronę — budujemy serwer, który te odpowiedzi generuje. Celem nie jest nauka web-developmentu, lecz demistyfikacja serwera HTTP i zbudowanie kontrolowanego środowiska do nauki scrapingu i crawlingu.\nZakres obejmuje:\n\nserwer HTTP jako program w Pythonie — od http.server do Flask,\nrouting: jak serwer dopasowuje żądanie do funkcji obsługującej,\ngenerowanie odpowiedzi: HTML, JSON, kody statusu, nagłówki,\nserwer jako „model świata” — kontrolowane strony z linkami,\nintuicja grafowa: strony jako wierzchołki, linki jako krawędzie — przygotowanie do crawlingu.\n\n\n\n\n\nNa Wykładzie 1 serwer opisaliśmy jako „czarną skrzynkę”, która odbiera żądanie i zwraca odpowiedź. Teraz otworzymy tę skrzynkę i zobaczymy, że serwer HTTP to zwykły program — w naszym przypadku skrypt w Pythonie — który:\n\nnasłuchuje na porcie (np. 8000),\nodbiera żądanie HTTP (metoda, ścieżka, nagłówki, body),\nwykonuje logikę (routing, przetwarzanie danych),\nodsyła odpowiedź HTTP (status, nagłówki, body).\n\nTo jest dokładnie to, co widzieliśmy w curl -v — tyle że teraz piszemy kod po stronie &lt; (odpowiedzi), a nie &gt; (żądania).\n\n\n\n\nPython ma wbudowany moduł http.server, który pozwala napisać serwer HTTP bez żadnych zewnętrznych zależności. Nie będziemy go używać w labach (jest zbyt niskopoziomowy), ale warto zobaczyć go raz, żeby zrozumieć, co dokładnie robi serwer.\n\n\nfrom http.server import HTTPServer, BaseHTTPRequestHandler\n\nclass MyHandler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        self.send_response(200)\n        self.send_header(\"Content-Type\", \"text/plain; charset=utf-8\")\n        self.end_headers()\n        self.wfile.write(b\"Witaj! To jest odpowiedz serwera.\\n\")\n\nserver = HTTPServer((\"localhost\", 8000), MyHandler)\nprint(\"Serwer działa na http://localhost:8000\")\nserver.serve_forever()\n\n\n\n\nHTTPServer((\"localhost\", 8000), MyHandler) — tworzy serwer nasłuchujący na porcie 8000.\nMyHandler — klasa, która definiuje, jak obsłużyć żądania. Dziedziczy po BaseHTTPRequestHandler.\ndo_GET(self) — metoda wywoływana, gdy klient wyśle GET. (Analogicznie: do_POST dla POST.)\nself.send_response(200) — ustawia kod statusu. To jest to HTTP/1.1 200 OK, które widzieliśmy w curl -i.\nself.send_header(\"Content-Type\", ...) — dodaje nagłówek odpowiedzi.\nself.end_headers() — kończy sekcję nagłówków (pusta linia przed body).\nself.wfile.write(b\"...\") — wysyła ciało odpowiedzi (bajty).\n\n\n\n\nPo uruchomieniu serwera, w drugim terminalu:\ncurl -i http://localhost:8000\nZobaczysz:\nHTTP/1.0 200 OK\nContent-Type: text/plain; charset=utf-8\n...\n\nWitaj! To jest odpowiedz serwera.\nAlbo w Pythonie:\nimport requests\nr = requests.get(\"http://localhost:8000\")\nprint(r.status_code, r.text)\n\n\n\nWewnątrz do_GET mamy dostęp do tego, co przysłał klient:\ndef do_GET(self):\n    print(\"Ścieżka:\", self.path)           # np. \"/hello?name=Jan\"\n    print(\"Metoda:\", self.command)           # \"GET\"\n    print(\"Nagłówki:\", dict(self.headers))   # słownik nagłówków żądania\n    # ...\n\n\n\ndef do_GET(self):\n    html = \"&lt;html&gt;&lt;body&gt;&lt;h1&gt;Strona główna&lt;/h1&gt;&lt;p&gt;To jest HTML.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;\"\n    self.send_response(200)\n    self.send_header(\"Content-Type\", \"text/html; charset=utf-8\")\n    self.end_headers()\n    self.wfile.write(html.encode(\"utf-8\"))\n\n\n\nimport json\n\ndef do_GET(self):\n    data = {\"status\": \"ok\", \"items\": [1, 2, 3]}\n    body = json.dumps(data).encode(\"utf-8\")\n    self.send_response(200)\n    self.send_header(\"Content-Type\", \"application/json\")\n    self.end_headers()\n    self.wfile.write(body)\n\n\n\nModuł http.server wymaga ręcznego:\n\nparsowania ścieżki i query string,\nrozróżniania tras (routing),\nustawiania każdego nagłówka,\nkodowania body do bajtów.\n\nTo jest cenne dydaktycznie (widać każdy krok), ale w praktyce produkuje dużo powtarzalnego kodu (boilerplate), który nie uczy HTTP — tylko frustruje. Dlatego od tej pory korzystamy z Flaska.\n\n\n\n\n\nFlask to mikroframework webowy dla Pythona. W tym kursie używamy go nie do budowania aplikacji webowych, lecz jako wygodnego modelu serwera HTTP, który mapuje się niemal 1:1 na pojęcia z Wykładu 1.\n\n\n\n\n\n\n\nPojęcie HTTP (Wykład 1)\nOdpowiednik w Flask\n\n\n\n\nRouting (metoda + ścieżka → handler)\n@app.route(\"/path\", methods=[\"GET\"])\n\n\nQuery string (?key=value)\nrequest.args[\"key\"]\n\n\nBody żądania (formularz)\nrequest.form[\"field\"]\n\n\nBody żądania (JSON)\nrequest.get_json()\n\n\nKod statusu\nreturn ..., 200 albo return ..., 404\n\n\nNagłówek Content-Type: text/html\nreturn \"&lt;html&gt;...\" (domyślnie)\n\n\nNagłówek Content-Type: application/json\nreturn jsonify({...})\n\n\nNagłówki niestandardowe\nmake_response() + response.headers[...] = ...\n\n\n\n\n\npip install flask\nFlask jest open-source (licencja BSD), nie wymaga konta ani rejestracji.\n\n\n\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route(\"/\")\ndef index():\n    return \"Witaj! To jest odpowiedź serwera.\"\n\nif __name__ == \"__main__\":\n    app.run(debug=True, port=5000)\nPo uruchomieniu: http://localhost:5000/.\nPorównaj z wersją http.server — ten sam efekt, ale bez ręcznego send_response, send_header, end_headers, wfile.write.\n\n\n\nSerwer musi umieć rozróżnić, czego dotyczy żądanie. W Flask robi to dekorator @app.route:\n@app.route(\"/\")\ndef index():\n    return \"Strona główna\"\n\n@app.route(\"/about\")\ndef about():\n    return \"O nas\"\n\n@app.route(\"/items\")\ndef items_list():\n    return \"Lista przedmiotów\"\nKażda funkcja obsługuje jedną trasę (ścieżkę). Gdy klient wysyła GET /about, Flask wywołuje about().\n\n\n\n@app.route(\"/items/&lt;int:item_id&gt;\")\ndef item_detail(item_id):\n    return f\"Szczegóły przedmiotu nr {item_id}\"\n\n&lt;int:item_id&gt; — Flask wyciąga fragment ścieżki, konwertuje na int i przekazuje jako argument.\nGET /items/42 → item_detail(42) → \"Szczegóły przedmiotu nr 42\".\n\nTo jest wzorzec kolekcja / element z Wykładu 1 (/items vs /items/42), zaimplementowany po stronie serwera.\n\n\n\nfrom flask import Flask, request\n\n@app.route(\"/search\")\ndef search():\n    q = request.args.get(\"q\", \"\")\n    page = request.args.get(\"page\", 1, type=int)\n    return f\"Szukam: {q}, strona: {page}\"\n\nrequest.args to słownik-podobny obiekt z parametrami query string.\nGET /search?q=python&page=2 → search() → \"Szukam: python, strona: 2\".\n\nTo jest dokładnie to, co po stronie klienta podawaliśmy jako params={\"q\": \"python\", \"page\": 2} w requests.get().\n\n\n\nDomyślnie @app.route obsługuje tylko GET. Żeby obsłużyć inne metody:\n@app.route(\"/items\", methods=[\"GET\", \"POST\"])\ndef items():\n    if request.method == \"GET\":\n        return \"Lista przedmiotów\"\n    elif request.method == \"POST\":\n        data = request.get_json()\n        return f\"Tworzę: {data}\", 201\n\n\n\nDomyślnie Flask zwraca 200. Inny kod podajemy jako drugi element krotki:\n@app.route(\"/items/&lt;int:item_id&gt;\")\ndef item_detail(item_id):\n    if item_id &gt; 100:\n        return \"Nie znaleziono\", 404\n    return f\"Przedmiot {item_id}\"\nTest:\ncurl -i http://localhost:5000/items/999\n# HTTP/1.1 404 NOT FOUND\n# ...\n# Nie znaleziono\nStudent widzi teraz obie strony: klient wysyła żądanie, serwer decyduje o kodzie.\n\n\n\nfrom flask import Flask, jsonify\n\n@app.route(\"/api/items\")\ndef api_items():\n    items = [\n        {\"id\": 1, \"name\": \"Jabłko\"},\n        {\"id\": 2, \"name\": \"Gruszka\"},\n    ]\n    return jsonify(items)\njsonify() robi dwie rzeczy:\n\nserializuje dane do JSON,\nustawia Content-Type: application/json.\n\nTo jest odpowiednik tego, co w http.server wymagało ręcznego json.dumps() + send_header(\"Content-Type\", \"application/json\").\n\n\n\n@app.route(\"/page\")\ndef page():\n    return \"\"\"\n    &lt;html&gt;\n    &lt;body&gt;\n        &lt;h1&gt;Tytuł strony&lt;/h1&gt;\n        &lt;p&gt;To jest akapit.&lt;/p&gt;\n        &lt;a href=\"/other\"&gt;Link do innej strony&lt;/a&gt;\n    &lt;/body&gt;\n    &lt;/html&gt;\n    \"\"\"\nFlask domyślnie ustawia Content-Type: text/html. Przeglądarka renderuje HTML; curl i requests widzą surowy tekst.\n\n\n\nSerwer nie musi zwracać stałego tekstu — może generować HTML na podstawie danych:\n@app.route(\"/numbers\")\ndef numbers():\n    html = \"&lt;html&gt;&lt;body&gt;&lt;h1&gt;Liczby&lt;/h1&gt;&lt;ul&gt;\"\n    for i in range(1, 11):\n        html += f'&lt;li&gt;&lt;a href=\"/numbers/{i}\"&gt;Liczba {i}&lt;/a&gt;&lt;/li&gt;'\n    html += \"&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;\"\n    return html\n\n@app.route(\"/numbers/&lt;int:n&gt;\")\ndef number_detail(n):\n    return f\"\"\"\n    &lt;html&gt;&lt;body&gt;\n        &lt;h1&gt;Liczba {n}&lt;/h1&gt;\n        &lt;p&gt;Kwadrat: {n**2}&lt;/p&gt;\n        &lt;a href=\"/numbers\"&gt;Powrót do listy&lt;/a&gt;\n    &lt;/body&gt;&lt;/html&gt;\n    \"\"\"\nTen serwer tworzy sieć stron połączonych linkami: strona /numbers linkuje do /numbers/1, /numbers/2, …, a każda z nich linkuje z powrotem. To jest dokładnie struktura, po której będziemy się poruszać crawlerem.\n\n\n\n\n\nW Labach 1–2 korzystaliśmy z publicznego API (dane.gov.pl). Było to dobre do nauki klientów HTTP, ale miało ograniczenia:\n\nbrak kontroli nad strukturą danych,\nbrak kontroli nad kodami błędów i opóźnieniami,\nryzyko obciążenia cudzego serwera,\nzależność od dostępności zewnętrznej usługi.\n\nOd teraz tworzymy własne serwery lokalne — małe programy Flask, które:\n\nserwują strony HTML z kontrolowaną strukturą (tabele, linki, formularze),\nzwracają JSON z przewidywalnymi danymi,\nmogą symulować błędy (404, 500), opóźnienia (time.sleep), paginację,\ndziałają offline, na komputerze studenta.\n\nTo jest laboratorium, w którym uczymy się parsowania HTML, crawlingu, obsługi sesji — bez ryzyka i z pełną powtarzalnością.\n\n\nfrom flask import Flask, jsonify, request\n\napp = Flask(__name__)\n\n# Symulowane dane\nALL_ITEMS = [{\"id\": i, \"name\": f\"Element {i}\"} for i in range(1, 51)]\n\n@app.route(\"/api/items\")\ndef items():\n    page = request.args.get(\"page\", 1, type=int)\n    per_page = request.args.get(\"per_page\", 10, type=int)\n    \n    start = (page - 1) * per_page\n    end = start + per_page\n    page_items = ALL_ITEMS[start:end]\n    \n    response = {\n        \"data\": page_items,\n        \"meta\": {\"total\": len(ALL_ITEMS), \"page\": page, \"per_page\": per_page},\n    }\n    \n    if end &lt; len(ALL_ITEMS):\n        response[\"links\"] = {\"next\": f\"/api/items?page={page+1}&per_page={per_page}\"}\n    \n    return jsonify(response)\nTen serwer zachowuje się dokładnie jak API dane.gov.pl — ma paginację, meta, links.next — ale działa lokalnie i ma 50 elementów zamiast tysięcy.\n\n\n\n@app.route(\"/api/flaky\")\ndef flaky():\n    import random\n    if random.random() &lt; 0.3:\n        return jsonify({\"error\": \"Server overloaded\"}), 503\n    return jsonify({\"status\": \"ok\"})\nPrzydatny do testowania logiki retry z Labu 2 — bez czekania, aż prawdziwy serwer się „zepsuje”.\n\n\n\n\n\nKluczową aplikacją serwera lokalnego w tym kursie jest tworzenie sieci stron połączonych hiperłączami. To jest materiał, na którym będziemy ćwiczyć crawling (Lab 4).\n\n\nCiąg Collatza (problem 3n+1) generuje dla danej liczby naturalnej sekwencję:\n\njeśli n jest parzyste → n/2,\njeśli n jest nieparzyste → 3n+1,\nkoniec, gdy n = 1.\n\nKażdą liczbę możemy przedstawić jako stronę HTML, a przejście do następnej — jako link:\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route(\"/collatz/&lt;int:n&gt;\")\ndef collatz(n):\n    if n == 1:\n        return \"\"\"\n        &lt;html&gt;&lt;body&gt;\n            &lt;h1&gt;1&lt;/h1&gt;\n            &lt;p&gt;Koniec ciągu!&lt;/p&gt;\n            &lt;a href=\"/collatz/7\"&gt;Rozpocznij od 7&lt;/a&gt;\n        &lt;/body&gt;&lt;/html&gt;\n        \"\"\"\n    \n    if n % 2 == 0:\n        next_n = n // 2\n    else:\n        next_n = 3 * n + 1\n    \n    return f\"\"\"\n    &lt;html&gt;&lt;body&gt;\n        &lt;h1&gt;{n}&lt;/h1&gt;\n        &lt;p&gt;Następna liczba: {next_n}&lt;/p&gt;\n        &lt;a href=\"/collatz/{next_n}\"&gt;Przejdź do {next_n}&lt;/a&gt;\n        &lt;br&gt;\n        &lt;a href=\"/collatz/1\"&gt;Idź do 1 (koniec)&lt;/a&gt;\n    &lt;/body&gt;&lt;/html&gt;\n    \"\"\"\nZ perspektywy klienta: GET /collatz/6 zwraca HTML z linkiem do /collatz/3, ten do /collatz/10, itd. Program, który automatycznie podąża za tymi linkami, to crawler.\n\n\n\n\n\nZanim napiszemy crawler (Lab 4), potrzebujemy jednego pojęcia ze świata grafów. Nie będziemy formalizować teorii — wystarczy intuicja.\n\n\nWyobraź sobie serwer, który ma 5 stron. Każda strona zawiera linki do niektórych innych:\nStrona A  →  Strona B, Strona C\nStrona B  →  Strona A, Strona D\nStrona C  →  Strona D\nStrona D  →  Strona E\nStrona E  →  Strona A\nTo jest graf skierowany:\n\nwierzchołki = strony (A, B, C, D, E),\nkrawędzie = linki (A→B oznacza: „strona A zawiera link do strony B”).\n\n\n\n\nCrawler to program, który:\n\nzaczyna od strony startowej (np. A),\npobiera jej HTML,\nwyciąga z niej linki (np. B i C),\ndodaje je do kolejki „do odwiedzenia”,\npowtarza — pobiera następną stronę z kolejki, wyciąga linki, itd.\n\nKluczowy problem: unikanie cykli. W powyższym grafie A→B→A→B→… to pętla nieskończona. Rozwiązanie: pamiętaj zbiór odwiedzonych URL-ów i nie odwiedzaj ich ponownie.\nvisited = {A}\nqueue = [B, C]         # linki z A\n\nvisit B → visited = {A, B}, queue = [C, D]     # A już odwiedzone, pomijamy\nvisit C → visited = {A, B, C}, queue = [D]     # D już w kolejce? to zależy od implementacji\nvisit D → visited = {A, B, C, D}, queue = [E]\nvisit E → visited = {A, B, C, D, E}, queue = [] # A odwiedzone, pomijamy\n\nKoniec — wszystkie strony odwiedzone.\nTo jest algorytm BFS (przeszukiwanie wszerz), ale nie musisz znać tej nazwy — wystarczy wzorzec: kolejka + zbiór odwiedzonych.\n\n\n\nW Labie 4 napiszemy crawler, który:\n\npobiera stronę HTML z lokalnego serwera (requests.get),\nwyciąga z niej linki (na razie regex lub str.split — bez BeautifulSoup, bo to Wykład 3),\nfiltruje linki (tylko te prowadzące do naszego serwera),\ndodaje nieodwiedzone do kolejki,\npowtarza, aż kolejka jest pusta lub osiągnie limit.\n\nTo będzie nasz pierwszy „robot” automatycznie przechodzący po stronach.\n\n\n\n\n\nPoniżej zestawienie technik, które będą przydatne w labach.\n\n\nfrom flask import Flask, make_response\n\n@app.route(\"/custom\")\ndef custom():\n    resp = make_response(\"Treść odpowiedzi\")\n    resp.headers[\"X-Custom-Header\"] = \"wartość\"\n    resp.headers[\"Content-Type\"] = \"text/plain; charset=utf-8\"\n    resp.status_code = 200\n    return resp\nmake_response() daje pełną kontrolę nad odpowiedzią — analogicznie do ręcznych send_header w http.server, ale wygodniej.\n\n\n\nfrom flask import redirect\n\n@app.route(\"/old-page\")\ndef old_page():\n    return redirect(\"/new-page\", code=301)\n\n@app.route(\"/new-page\")\ndef new_page():\n    return \"To jest nowa strona.\"\nTest:\ncurl -i http://localhost:5000/old-page\n# HTTP/1.1 301 MOVED PERMANENTLY\n# Location: /new-page\n\ncurl -L http://localhost:5000/old-page\n# To jest nowa strona.\nStudent widzi przekierowanie (301 + Location:) z obu stron — i wie, dlaczego curl -L lub requests (które domyślnie podąża za przekierowaniami) trafia na właściwą stronę.\n\n\n\nfrom flask import send_file\n\n@app.route(\"/download/data.csv\")\ndef download_csv():\n    return send_file(\"data/sample.csv\", as_attachment=True)\nPrzydatne, gdy serwer ma serwować pliki danych — analogicznie do Download URL z API dane.gov.pl (Lab 2).\n\n\n\nfrom flask import abort\n\n@app.route(\"/items/&lt;int:item_id&gt;\")\ndef item(item_id):\n    if item_id not in ITEMS_DB:\n        abort(404)\n    return jsonify(ITEMS_DB[item_id])\nabort(404) przerywa obsługę żądania i zwraca odpowiedź z kodem 404. Można też zdefiniować własne strony błędów:\n@app.errorhandler(404)\ndef not_found(error):\n    return jsonify({\"error\": \"Nie znaleziono\"}), 404\n\n\n\n\n\nPo tym wykładzie student widzi pełny obraz komunikacji HTTP:\n     KLIENT                                SERWER\n     ──────                                ──────\n     requests.get(                         @app.route(\"/items\",\n       \"/items\",                              methods=[\"GET\"])\n       params={\"page\": 2}                  def items():\n     )                                        page = request.args.get(\"page\")\n                          ─── GET /items?page=2 ───►\n                          ◄── 200 OK, JSON ────\n     \n     r.status_code  ←  200                 return jsonify(data), 200\n     r.json()       ←  {\"data\": [...]}     jsonify(data)\n     r.headers      ←  Content-Type: ...   (automatycznie)\nTo jest ta sama wymiana komunikatów, którą widzieliśmy w curl -v na Wykładzie 1 — tyle że teraz rozumiemy obie strony.\n\n\n\n\n\n\napp.run(debug=True, port=5000)\ndebug=True włącza:\n\nauto-reload — serwer restartuje się po zmianie kodu (nie trzeba ręcznie go zatrzymywać i uruchamiać),\ndebugger — przy błędzie w kodzie serwera, w przeglądarce pojawia się szczegółowy traceback.\n\nW labach zawsze używamy debug=True. W produkcji — nigdy.\n\n\n\nDomyślnie Flask używa portu 5000. Jeśli jest zajęty, podaj inny:\napp.run(debug=True, port=8080)\n\n\n\nTypowy workflow w labie:\n\nTerminal 1: uruchomiony serwer (python server.py),\nTerminal 2: klient — curl, skrypt Pythona z requests, albo Jupyter Notebook.\n\nSerwer musi działać w tle, gdy wysyłasz do niego żądania. To jest naturalna konsekwencja modelu klient–serwer.\n\n\n\n\n\nNa tym wykładzie:\n\nzobaczyliśmy serwer HTTP „od środka” — od http.server (nisko, jawnie) do Flask (wygodnie, z mapowaniem na pojęcia HTTP),\npoznaliśmy Flask jako narzędzie do budowania kontrolowanych środowisk dydaktycznych,\nnauczyliśmy się generować HTML z linkami — podstawa do crawlingu,\nzbudowaliśmy intuicję grafową (strony = wierzchołki, linki = krawędzie, crawler = przeszukiwanie grafu).\n\nCo dalej:\n\nLab 3: budujemy serwer Flask — strony z linkami (ciąg Collatza), mini-API, testowanie klientami (curl, requests, przeglądarka).\nLab 4: piszemy crawlera w requests, który automatycznie przechodzi po stronach serwera z Labu 3, zbiera dane i zapisuje je do pliku."
+  },
+  {
+    "objectID": "wyklady/wyklady_2.html#cele-i-zakres",
+    "href": "wyklady/wyklady_2.html#cele-i-zakres",
+    "title": "Wykład 2: Serwer HTTP — od http.server do Flask",
+    "section": "",
+    "text": "Na Wykładzie 1 patrzyliśmy na HTTP wyłącznie od strony klienta: wysyłaliśmy żądania (curl, requests) i analizowaliśmy odpowiedzi. Teraz przechodzimy na drugą stronę — budujemy serwer, który te odpowiedzi generuje. Celem nie jest nauka web-developmentu, lecz demistyfikacja serwera HTTP i zbudowanie kontrolowanego środowiska do nauki scrapingu i crawlingu.\nZakres obejmuje:\n\nserwer HTTP jako program w Pythonie — od http.server do Flask,\nrouting: jak serwer dopasowuje żądanie do funkcji obsługującej,\ngenerowanie odpowiedzi: HTML, JSON, kody statusu, nagłówki,\nserwer jako „model świata” — kontrolowane strony z linkami,\nintuicja grafowa: strony jako wierzchołki, linki jako krawędzie — przygotowanie do crawlingu."
+  },
+  {
+    "objectID": "wyklady/wyklady_2.html#serwer-jako-program",
+    "href": "wyklady/wyklady_2.html#serwer-jako-program",
+    "title": "Wykład 2: Serwer HTTP — od http.server do Flask",
+    "section": "",
+    "text": "Na Wykładzie 1 serwer opisaliśmy jako „czarną skrzynkę”, która odbiera żądanie i zwraca odpowiedź. Teraz otworzymy tę skrzynkę i zobaczymy, że serwer HTTP to zwykły program — w naszym przypadku skrypt w Pythonie — który:\n\nnasłuchuje na porcie (np. 8000),\nodbiera żądanie HTTP (metoda, ścieżka, nagłówki, body),\nwykonuje logikę (routing, przetwarzanie danych),\nodsyła odpowiedź HTTP (status, nagłówki, body).\n\nTo jest dokładnie to, co widzieliśmy w curl -v — tyle że teraz piszemy kod po stronie &lt; (odpowiedzi), a nie &gt; (żądania)."
+  },
+  {
+    "objectID": "wyklady/wyklady_2.html#demistyfikacja-http.server-z-biblioteki-standardowej",
+    "href": "wyklady/wyklady_2.html#demistyfikacja-http.server-z-biblioteki-standardowej",
+    "title": "Wykład 2: Serwer HTTP — od http.server do Flask",
+    "section": "",
+    "text": "Python ma wbudowany moduł http.server, który pozwala napisać serwer HTTP bez żadnych zewnętrznych zależności. Nie będziemy go używać w labach (jest zbyt niskopoziomowy), ale warto zobaczyć go raz, żeby zrozumieć, co dokładnie robi serwer.\n\n\nfrom http.server import HTTPServer, BaseHTTPRequestHandler\n\nclass MyHandler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        self.send_response(200)\n        self.send_header(\"Content-Type\", \"text/plain; charset=utf-8\")\n        self.end_headers()\n        self.wfile.write(b\"Witaj! To jest odpowiedz serwera.\\n\")\n\nserver = HTTPServer((\"localhost\", 8000), MyHandler)\nprint(\"Serwer działa na http://localhost:8000\")\nserver.serve_forever()\n\n\n\n\nHTTPServer((\"localhost\", 8000), MyHandler) — tworzy serwer nasłuchujący na porcie 8000.\nMyHandler — klasa, która definiuje, jak obsłużyć żądania. Dziedziczy po BaseHTTPRequestHandler.\ndo_GET(self) — metoda wywoływana, gdy klient wyśle GET. (Analogicznie: do_POST dla POST.)\nself.send_response(200) — ustawia kod statusu. To jest to HTTP/1.1 200 OK, które widzieliśmy w curl -i.\nself.send_header(\"Content-Type\", ...) — dodaje nagłówek odpowiedzi.\nself.end_headers() — kończy sekcję nagłówków (pusta linia przed body).\nself.wfile.write(b\"...\") — wysyła ciało odpowiedzi (bajty).\n\n\n\n\nPo uruchomieniu serwera, w drugim terminalu:\ncurl -i http://localhost:8000\nZobaczysz:\nHTTP/1.0 200 OK\nContent-Type: text/plain; charset=utf-8\n...\n\nWitaj! To jest odpowiedz serwera.\nAlbo w Pythonie:\nimport requests\nr = requests.get(\"http://localhost:8000\")\nprint(r.status_code, r.text)\n\n\n\nWewnątrz do_GET mamy dostęp do tego, co przysłał klient:\ndef do_GET(self):\n    print(\"Ścieżka:\", self.path)           # np. \"/hello?name=Jan\"\n    print(\"Metoda:\", self.command)           # \"GET\"\n    print(\"Nagłówki:\", dict(self.headers))   # słownik nagłówków żądania\n    # ...\n\n\n\ndef do_GET(self):\n    html = \"&lt;html&gt;&lt;body&gt;&lt;h1&gt;Strona główna&lt;/h1&gt;&lt;p&gt;To jest HTML.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;\"\n    self.send_response(200)\n    self.send_header(\"Content-Type\", \"text/html; charset=utf-8\")\n    self.end_headers()\n    self.wfile.write(html.encode(\"utf-8\"))\n\n\n\nimport json\n\ndef do_GET(self):\n    data = {\"status\": \"ok\", \"items\": [1, 2, 3]}\n    body = json.dumps(data).encode(\"utf-8\")\n    self.send_response(200)\n    self.send_header(\"Content-Type\", \"application/json\")\n    self.end_headers()\n    self.wfile.write(body)\n\n\n\nModuł http.server wymaga ręcznego:\n\nparsowania ścieżki i query string,\nrozróżniania tras (routing),\nustawiania każdego nagłówka,\nkodowania body do bajtów.\n\nTo jest cenne dydaktycznie (widać każdy krok), ale w praktyce produkuje dużo powtarzalnego kodu (boilerplate), który nie uczy HTTP — tylko frustruje. Dlatego od tej pory korzystamy z Flaska."
+  },
+  {
+    "objectID": "wyklady/wyklady_2.html#flask-serwer-http-jako-model-pojęć-http",
+    "href": "wyklady/wyklady_2.html#flask-serwer-http-jako-model-pojęć-http",
+    "title": "Wykład 2: Serwer HTTP — od http.server do Flask",
+    "section": "",
+    "text": "Flask to mikroframework webowy dla Pythona. W tym kursie używamy go nie do budowania aplikacji webowych, lecz jako wygodnego modelu serwera HTTP, który mapuje się niemal 1:1 na pojęcia z Wykładu 1.\n\n\n\n\n\n\n\nPojęcie HTTP (Wykład 1)\nOdpowiednik w Flask\n\n\n\n\nRouting (metoda + ścieżka → handler)\n@app.route(\"/path\", methods=[\"GET\"])\n\n\nQuery string (?key=value)\nrequest.args[\"key\"]\n\n\nBody żądania (formularz)\nrequest.form[\"field\"]\n\n\nBody żądania (JSON)\nrequest.get_json()\n\n\nKod statusu\nreturn ..., 200 albo return ..., 404\n\n\nNagłówek Content-Type: text/html\nreturn \"&lt;html&gt;...\" (domyślnie)\n\n\nNagłówek Content-Type: application/json\nreturn jsonify({...})\n\n\nNagłówki niestandardowe\nmake_response() + response.headers[...] = ...\n\n\n\n\n\npip install flask\nFlask jest open-source (licencja BSD), nie wymaga konta ani rejestracji.\n\n\n\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route(\"/\")\ndef index():\n    return \"Witaj! To jest odpowiedź serwera.\"\n\nif __name__ == \"__main__\":\n    app.run(debug=True, port=5000)\nPo uruchomieniu: http://localhost:5000/.\nPorównaj z wersją http.server — ten sam efekt, ale bez ręcznego send_response, send_header, end_headers, wfile.write.\n\n\n\nSerwer musi umieć rozróżnić, czego dotyczy żądanie. W Flask robi to dekorator @app.route:\n@app.route(\"/\")\ndef index():\n    return \"Strona główna\"\n\n@app.route(\"/about\")\ndef about():\n    return \"O nas\"\n\n@app.route(\"/items\")\ndef items_list():\n    return \"Lista przedmiotów\"\nKażda funkcja obsługuje jedną trasę (ścieżkę). Gdy klient wysyła GET /about, Flask wywołuje about().\n\n\n\n@app.route(\"/items/&lt;int:item_id&gt;\")\ndef item_detail(item_id):\n    return f\"Szczegóły przedmiotu nr {item_id}\"\n\n&lt;int:item_id&gt; — Flask wyciąga fragment ścieżki, konwertuje na int i przekazuje jako argument.\nGET /items/42 → item_detail(42) → \"Szczegóły przedmiotu nr 42\".\n\nTo jest wzorzec kolekcja / element z Wykładu 1 (/items vs /items/42), zaimplementowany po stronie serwera.\n\n\n\nfrom flask import Flask, request\n\n@app.route(\"/search\")\ndef search():\n    q = request.args.get(\"q\", \"\")\n    page = request.args.get(\"page\", 1, type=int)\n    return f\"Szukam: {q}, strona: {page}\"\n\nrequest.args to słownik-podobny obiekt z parametrami query string.\nGET /search?q=python&page=2 → search() → \"Szukam: python, strona: 2\".\n\nTo jest dokładnie to, co po stronie klienta podawaliśmy jako params={\"q\": \"python\", \"page\": 2} w requests.get().\n\n\n\nDomyślnie @app.route obsługuje tylko GET. Żeby obsłużyć inne metody:\n@app.route(\"/items\", methods=[\"GET\", \"POST\"])\ndef items():\n    if request.method == \"GET\":\n        return \"Lista przedmiotów\"\n    elif request.method == \"POST\":\n        data = request.get_json()\n        return f\"Tworzę: {data}\", 201\n\n\n\nDomyślnie Flask zwraca 200. Inny kod podajemy jako drugi element krotki:\n@app.route(\"/items/&lt;int:item_id&gt;\")\ndef item_detail(item_id):\n    if item_id &gt; 100:\n        return \"Nie znaleziono\", 404\n    return f\"Przedmiot {item_id}\"\nTest:\ncurl -i http://localhost:5000/items/999\n# HTTP/1.1 404 NOT FOUND\n# ...\n# Nie znaleziono\nStudent widzi teraz obie strony: klient wysyła żądanie, serwer decyduje o kodzie.\n\n\n\nfrom flask import Flask, jsonify\n\n@app.route(\"/api/items\")\ndef api_items():\n    items = [\n        {\"id\": 1, \"name\": \"Jabłko\"},\n        {\"id\": 2, \"name\": \"Gruszka\"},\n    ]\n    return jsonify(items)\njsonify() robi dwie rzeczy:\n\nserializuje dane do JSON,\nustawia Content-Type: application/json.\n\nTo jest odpowiednik tego, co w http.server wymagało ręcznego json.dumps() + send_header(\"Content-Type\", \"application/json\").\n\n\n\n@app.route(\"/page\")\ndef page():\n    return \"\"\"\n    &lt;html&gt;\n    &lt;body&gt;\n        &lt;h1&gt;Tytuł strony&lt;/h1&gt;\n        &lt;p&gt;To jest akapit.&lt;/p&gt;\n        &lt;a href=\"/other\"&gt;Link do innej strony&lt;/a&gt;\n    &lt;/body&gt;\n    &lt;/html&gt;\n    \"\"\"\nFlask domyślnie ustawia Content-Type: text/html. Przeglądarka renderuje HTML; curl i requests widzą surowy tekst.\n\n\n\nSerwer nie musi zwracać stałego tekstu — może generować HTML na podstawie danych:\n@app.route(\"/numbers\")\ndef numbers():\n    html = \"&lt;html&gt;&lt;body&gt;&lt;h1&gt;Liczby&lt;/h1&gt;&lt;ul&gt;\"\n    for i in range(1, 11):\n        html += f'&lt;li&gt;&lt;a href=\"/numbers/{i}\"&gt;Liczba {i}&lt;/a&gt;&lt;/li&gt;'\n    html += \"&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;\"\n    return html\n\n@app.route(\"/numbers/&lt;int:n&gt;\")\ndef number_detail(n):\n    return f\"\"\"\n    &lt;html&gt;&lt;body&gt;\n        &lt;h1&gt;Liczba {n}&lt;/h1&gt;\n        &lt;p&gt;Kwadrat: {n**2}&lt;/p&gt;\n        &lt;a href=\"/numbers\"&gt;Powrót do listy&lt;/a&gt;\n    &lt;/body&gt;&lt;/html&gt;\n    \"\"\"\nTen serwer tworzy sieć stron połączonych linkami: strona /numbers linkuje do /numbers/1, /numbers/2, …, a każda z nich linkuje z powrotem. To jest dokładnie struktura, po której będziemy się poruszać crawlerem."
+  },
+  {
+    "objectID": "wyklady/wyklady_2.html#serwer-jako-kontrolowane-środowisko",
+    "href": "wyklady/wyklady_2.html#serwer-jako-kontrolowane-środowisko",
+    "title": "Wykład 2: Serwer HTTP — od http.server do Flask",
+    "section": "",
+    "text": "W Labach 1–2 korzystaliśmy z publicznego API (dane.gov.pl). Było to dobre do nauki klientów HTTP, ale miało ograniczenia:\n\nbrak kontroli nad strukturą danych,\nbrak kontroli nad kodami błędów i opóźnieniami,\nryzyko obciążenia cudzego serwera,\nzależność od dostępności zewnętrznej usługi.\n\nOd teraz tworzymy własne serwery lokalne — małe programy Flask, które:\n\nserwują strony HTML z kontrolowaną strukturą (tabele, linki, formularze),\nzwracają JSON z przewidywalnymi danymi,\nmogą symulować błędy (404, 500), opóźnienia (time.sleep), paginację,\ndziałają offline, na komputerze studenta.\n\nTo jest laboratorium, w którym uczymy się parsowania HTML, crawlingu, obsługi sesji — bez ryzyka i z pełną powtarzalnością.\n\n\nfrom flask import Flask, jsonify, request\n\napp = Flask(__name__)\n\n# Symulowane dane\nALL_ITEMS = [{\"id\": i, \"name\": f\"Element {i}\"} for i in range(1, 51)]\n\n@app.route(\"/api/items\")\ndef items():\n    page = request.args.get(\"page\", 1, type=int)\n    per_page = request.args.get(\"per_page\", 10, type=int)\n    \n    start = (page - 1) * per_page\n    end = start + per_page\n    page_items = ALL_ITEMS[start:end]\n    \n    response = {\n        \"data\": page_items,\n        \"meta\": {\"total\": len(ALL_ITEMS), \"page\": page, \"per_page\": per_page},\n    }\n    \n    if end &lt; len(ALL_ITEMS):\n        response[\"links\"] = {\"next\": f\"/api/items?page={page+1}&per_page={per_page}\"}\n    \n    return jsonify(response)\nTen serwer zachowuje się dokładnie jak API dane.gov.pl — ma paginację, meta, links.next — ale działa lokalnie i ma 50 elementów zamiast tysięcy.\n\n\n\n@app.route(\"/api/flaky\")\ndef flaky():\n    import random\n    if random.random() &lt; 0.3:\n        return jsonify({\"error\": \"Server overloaded\"}), 503\n    return jsonify({\"status\": \"ok\"})\nPrzydatny do testowania logiki retry z Labu 2 — bez czekania, aż prawdziwy serwer się „zepsuje”."
+  },
+  {
+    "objectID": "wyklady/wyklady_2.html#strony-z-linkami-przygotowanie-do-crawlingu",
+    "href": "wyklady/wyklady_2.html#strony-z-linkami-przygotowanie-do-crawlingu",
+    "title": "Wykład 2: Serwer HTTP — od http.server do Flask",
+    "section": "",
+    "text": "Kluczową aplikacją serwera lokalnego w tym kursie jest tworzenie sieci stron połączonych hiperłączami. To jest materiał, na którym będziemy ćwiczyć crawling (Lab 4).\n\n\nCiąg Collatza (problem 3n+1) generuje dla danej liczby naturalnej sekwencję:\n\njeśli n jest parzyste → n/2,\njeśli n jest nieparzyste → 3n+1,\nkoniec, gdy n = 1.\n\nKażdą liczbę możemy przedstawić jako stronę HTML, a przejście do następnej — jako link:\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route(\"/collatz/&lt;int:n&gt;\")\ndef collatz(n):\n    if n == 1:\n        return \"\"\"\n        &lt;html&gt;&lt;body&gt;\n            &lt;h1&gt;1&lt;/h1&gt;\n            &lt;p&gt;Koniec ciągu!&lt;/p&gt;\n            &lt;a href=\"/collatz/7\"&gt;Rozpocznij od 7&lt;/a&gt;\n        &lt;/body&gt;&lt;/html&gt;\n        \"\"\"\n    \n    if n % 2 == 0:\n        next_n = n // 2\n    else:\n        next_n = 3 * n + 1\n    \n    return f\"\"\"\n    &lt;html&gt;&lt;body&gt;\n        &lt;h1&gt;{n}&lt;/h1&gt;\n        &lt;p&gt;Następna liczba: {next_n}&lt;/p&gt;\n        &lt;a href=\"/collatz/{next_n}\"&gt;Przejdź do {next_n}&lt;/a&gt;\n        &lt;br&gt;\n        &lt;a href=\"/collatz/1\"&gt;Idź do 1 (koniec)&lt;/a&gt;\n    &lt;/body&gt;&lt;/html&gt;\n    \"\"\"\nZ perspektywy klienta: GET /collatz/6 zwraca HTML z linkiem do /collatz/3, ten do /collatz/10, itd. Program, który automatycznie podąża za tymi linkami, to crawler."
+  },
+  {
+    "objectID": "wyklady/wyklady_2.html#intuicja-grafowa-strony-i-linki",
+    "href": "wyklady/wyklady_2.html#intuicja-grafowa-strony-i-linki",
+    "title": "Wykład 2: Serwer HTTP — od http.server do Flask",
+    "section": "",
+    "text": "Zanim napiszemy crawler (Lab 4), potrzebujemy jednego pojęcia ze świata grafów. Nie będziemy formalizować teorii — wystarczy intuicja.\n\n\nWyobraź sobie serwer, który ma 5 stron. Każda strona zawiera linki do niektórych innych:\nStrona A  →  Strona B, Strona C\nStrona B  →  Strona A, Strona D\nStrona C  →  Strona D\nStrona D  →  Strona E\nStrona E  →  Strona A\nTo jest graf skierowany:\n\nwierzchołki = strony (A, B, C, D, E),\nkrawędzie = linki (A→B oznacza: „strona A zawiera link do strony B”).\n\n\n\n\nCrawler to program, który:\n\nzaczyna od strony startowej (np. A),\npobiera jej HTML,\nwyciąga z niej linki (np. B i C),\ndodaje je do kolejki „do odwiedzenia”,\npowtarza — pobiera następną stronę z kolejki, wyciąga linki, itd.\n\nKluczowy problem: unikanie cykli. W powyższym grafie A→B→A→B→… to pętla nieskończona. Rozwiązanie: pamiętaj zbiór odwiedzonych URL-ów i nie odwiedzaj ich ponownie.\nvisited = {A}\nqueue = [B, C]         # linki z A\n\nvisit B → visited = {A, B}, queue = [C, D]     # A już odwiedzone, pomijamy\nvisit C → visited = {A, B, C}, queue = [D]     # D już w kolejce? to zależy od implementacji\nvisit D → visited = {A, B, C, D}, queue = [E]\nvisit E → visited = {A, B, C, D, E}, queue = [] # A odwiedzone, pomijamy\n\nKoniec — wszystkie strony odwiedzone.\nTo jest algorytm BFS (przeszukiwanie wszerz), ale nie musisz znać tej nazwy — wystarczy wzorzec: kolejka + zbiór odwiedzonych.\n\n\n\nW Labie 4 napiszemy crawler, który:\n\npobiera stronę HTML z lokalnego serwera (requests.get),\nwyciąga z niej linki (na razie regex lub str.split — bez BeautifulSoup, bo to Wykład 3),\nfiltruje linki (tylko te prowadzące do naszego serwera),\ndodaje nieodwiedzone do kolejki,\npowtarza, aż kolejka jest pusta lub osiągnie limit.\n\nTo będzie nasz pierwszy „robot” automatycznie przechodzący po stronach."
+  },
+  {
+    "objectID": "wyklady/wyklady_2.html#flask-generowanie-odpowiedzi-szczegóły",
+    "href": "wyklady/wyklady_2.html#flask-generowanie-odpowiedzi-szczegóły",
+    "title": "Wykład 2: Serwer HTTP — od http.server do Flask",
+    "section": "",
+    "text": "Poniżej zestawienie technik, które będą przydatne w labach.\n\n\nfrom flask import Flask, make_response\n\n@app.route(\"/custom\")\ndef custom():\n    resp = make_response(\"Treść odpowiedzi\")\n    resp.headers[\"X-Custom-Header\"] = \"wartość\"\n    resp.headers[\"Content-Type\"] = \"text/plain; charset=utf-8\"\n    resp.status_code = 200\n    return resp\nmake_response() daje pełną kontrolę nad odpowiedzią — analogicznie do ręcznych send_header w http.server, ale wygodniej.\n\n\n\nfrom flask import redirect\n\n@app.route(\"/old-page\")\ndef old_page():\n    return redirect(\"/new-page\", code=301)\n\n@app.route(\"/new-page\")\ndef new_page():\n    return \"To jest nowa strona.\"\nTest:\ncurl -i http://localhost:5000/old-page\n# HTTP/1.1 301 MOVED PERMANENTLY\n# Location: /new-page\n\ncurl -L http://localhost:5000/old-page\n# To jest nowa strona.\nStudent widzi przekierowanie (301 + Location:) z obu stron — i wie, dlaczego curl -L lub requests (które domyślnie podąża za przekierowaniami) trafia na właściwą stronę.\n\n\n\nfrom flask import send_file\n\n@app.route(\"/download/data.csv\")\ndef download_csv():\n    return send_file(\"data/sample.csv\", as_attachment=True)\nPrzydatne, gdy serwer ma serwować pliki danych — analogicznie do Download URL z API dane.gov.pl (Lab 2).\n\n\n\nfrom flask import abort\n\n@app.route(\"/items/&lt;int:item_id&gt;\")\ndef item(item_id):\n    if item_id not in ITEMS_DB:\n        abort(404)\n    return jsonify(ITEMS_DB[item_id])\nabort(404) przerywa obsługę żądania i zwraca odpowiedź z kodem 404. Można też zdefiniować własne strony błędów:\n@app.errorhandler(404)\ndef not_found(error):\n    return jsonify({\"error\": \"Nie znaleziono\"}), 404"
+  },
+  {
+    "objectID": "wyklady/wyklady_2.html#serwer-i-klient-dwie-strony-dialogu",
+    "href": "wyklady/wyklady_2.html#serwer-i-klient-dwie-strony-dialogu",
+    "title": "Wykład 2: Serwer HTTP — od http.server do Flask",
+    "section": "",
+    "text": "Po tym wykładzie student widzi pełny obraz komunikacji HTTP:\n     KLIENT                                SERWER\n     ──────                                ──────\n     requests.get(                         @app.route(\"/items\",\n       \"/items\",                              methods=[\"GET\"])\n       params={\"page\": 2}                  def items():\n     )                                        page = request.args.get(\"page\")\n                          ─── GET /items?page=2 ───►\n                          ◄── 200 OK, JSON ────\n     \n     r.status_code  ←  200                 return jsonify(data), 200\n     r.json()       ←  {\"data\": [...]}     jsonify(data)\n     r.headers      ←  Content-Type: ...   (automatycznie)\nTo jest ta sama wymiana komunikatów, którą widzieliśmy w curl -v na Wykładzie 1 — tyle że teraz rozumiemy obie strony."
+  },
+  {
+    "objectID": "wyklady/wyklady_2.html#uruchamianie-serwera-flask-praktyczne-uwagi",
+    "href": "wyklady/wyklady_2.html#uruchamianie-serwera-flask-praktyczne-uwagi",
+    "title": "Wykład 2: Serwer HTTP — od http.server do Flask",
+    "section": "",
+    "text": "app.run(debug=True, port=5000)\ndebug=True włącza:\n\nauto-reload — serwer restartuje się po zmianie kodu (nie trzeba ręcznie go zatrzymywać i uruchamiać),\ndebugger — przy błędzie w kodzie serwera, w przeglądarce pojawia się szczegółowy traceback.\n\nW labach zawsze używamy debug=True. W produkcji — nigdy.\n\n\n\nDomyślnie Flask używa portu 5000. Jeśli jest zajęty, podaj inny:\napp.run(debug=True, port=8080)\n\n\n\nTypowy workflow w labie:\n\nTerminal 1: uruchomiony serwer (python server.py),\nTerminal 2: klient — curl, skrypt Pythona z requests, albo Jupyter Notebook.\n\nSerwer musi działać w tle, gdy wysyłasz do niego żądania. To jest naturalna konsekwencja modelu klient–serwer."
+  },
+  {
+    "objectID": "wyklady/wyklady_2.html#podsumowanie",
+    "href": "wyklady/wyklady_2.html#podsumowanie",
+    "title": "Wykład 2: Serwer HTTP — od http.server do Flask",
+    "section": "",
+    "text": "Na tym wykładzie:\n\nzobaczyliśmy serwer HTTP „od środka” — od http.server (nisko, jawnie) do Flask (wygodnie, z mapowaniem na pojęcia HTTP),\npoznaliśmy Flask jako narzędzie do budowania kontrolowanych środowisk dydaktycznych,\nnauczyliśmy się generować HTML z linkami — podstawa do crawlingu,\nzbudowaliśmy intuicję grafową (strony = wierzchołki, linki = krawędzie, crawler = przeszukiwanie grafu).\n\nCo dalej:\n\nLab 3: budujemy serwer Flask — strony z linkami (ciąg Collatza), mini-API, testowanie klientami (curl, requests, przeglądarka).\nLab 4: piszemy crawlera w requests, który automatycznie przechodzi po stronach serwera z Labu 3, zbiera dane i zapisuje je do pliku."
+  },
+  {
+    "objectID": "laby/lab_2.html",
+    "href": "laby/lab_2.html",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "",
+    "text": "Zakres materiału:\n\nprzechodzenie pełnego pipeline’u: wyszukanie datasetu → pobranie metadanych → pobranie realnego pliku danych,\niteracja po stronach wyników API (stronicowanie w pętli),\nzapisywanie pobranych danych do plików (JSON, CSV, binarne),\nbudowanie funkcji opakowujących zapytania HTTP z obsługą błędów.\n\nWymagania wstępne: ukończony Lab 1 (umiesz wysłać GET przez requests, znasz strukturę JSON:API, korzystałeś ze Swaggera)."
+  },
+  {
+    "objectID": "laby/lab_2.html#przygotowanie",
+    "href": "laby/lab_2.html#przygotowanie",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "2.1 Przygotowanie",
+    "text": "2.1 Przygotowanie\nUtwórz folder roboczy i otwórz notatnik Jupyter lub skrypt .py.\nimport requests\nfrom pathlib import Path\n\nAPI = \"https://api.dane.gov.pl/1.4\"\nHEADERS = {\"Accept\": \"application/vnd.api+json\"}\nTIMEOUT = 15\n\n# folder na pobrane pliki\nOUT = Path(\"lab_2_output\")\nOUT.mkdir(exist_ok=True)\nStałe API, HEADERS, TIMEOUT definiujemy raz — dzięki temu nie powtarzamy ich w każdym zapytaniu."
+  },
+  {
+    "objectID": "laby/lab_2.html#szybki-test-połączenia",
+    "href": "laby/lab_2.html#szybki-test-połączenia",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "2.2 Szybki test połączenia",
+    "text": "2.2 Szybki test połączenia\nr = requests.get(f\"{API}/datasets\", params={\"page\": 1, \"per_page\": 1},\n                 headers=HEADERS, timeout=TIMEOUT)\nr.raise_for_status()\nprint(\"OK, status:\", r.status_code)\n\nCheckpoint: Jeśli widzisz OK, status: 200 — środowisko działa. Jeśli nie — sprawdź połączenie z internetem i poprawność URL-a."
+  },
+  {
+    "objectID": "laby/lab_2.html#krok-1-wyszukiwanie",
+    "href": "laby/lab_2.html#krok-1-wyszukiwanie",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "4.1 Krok 1: wyszukiwanie",
+    "text": "4.1 Krok 1: wyszukiwanie\nSzukamy datasetów związanych z wybranym tematem. Parametr wyszukiwania to q (możesz to sprawdzić w Swaggerze).\nquery = \"jakość powietrza\"\n\ndata = api_get(\"/datasets\", {\"q\": query, \"per_page\": 5})\nresults = data[\"data\"]\n\nprint(f\"Znaleziono {data['meta']['count']} wyników, wyświetlam {len(results)}:\\n\")\nfor ds in results:\n    a = ds[\"attributes\"]\n    print(f\"  [{ds['id']}] {a['title']}\")\n    print(f\"       kategoria: {a.get('category', '?')}, \"\n          f\"zasoby: {a.get('resources_count', '?')}\")\n    print()\nWybierz dataset, który ma przynajmniej kilka zasobów (resources_count &gt; 0)."
+  },
+  {
+    "objectID": "laby/lab_2.html#krok-2-szczegóły-datasetu",
+    "href": "laby/lab_2.html#krok-2-szczegóły-datasetu",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "4.2 Krok 2: szczegóły datasetu",
+    "text": "4.2 Krok 2: szczegóły datasetu\nDATASET_ID = \"...\"  # ← wklej id z kroku 1\n\nds_data = api_get(f\"/datasets/{DATASET_ID}\")\nds = ds_data[\"data\"]\nattrs = ds[\"attributes\"]\n\nprint(\"Tytuł:\", attrs[\"title\"])\nprint(\"Opis:\", attrs.get(\"notes\", \"(brak)\")[:300])\nprint(\"Licencja:\", attrs.get(\"license_condition_db_or_copyrighted\"))"
+  },
+  {
+    "objectID": "laby/lab_2.html#krok-3-lista-zasobów",
+    "href": "laby/lab_2.html#krok-3-lista-zasobów",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "4.3 Krok 3: lista zasobów",
+    "text": "4.3 Krok 3: lista zasobów\nres_data = api_get(f\"/datasets/{DATASET_ID}/resources\")\nresources = res_data[\"data\"]\n\nprint(f\"Zasoby ({len(resources)}):\\n\")\nfor res in resources:\n    ra = res[\"attributes\"]\n    print(f\"  [{res['id']}] {ra.get('title', '(bez tytułu)')}\")\n    print(f\"       format: {ra.get('format', '?')}, \"\n          f\"rozmiar: {ra.get('file_size', '?')}\")\n    print()"
+  },
+  {
+    "objectID": "laby/lab_2.html#krok-4-metadane-zasobów-jako-csv",
+    "href": "laby/lab_2.html#krok-4-metadane-zasobów-jako-csv",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "4.4 Krok 4: metadane zasobów jako CSV",
+    "text": "4.4 Krok 4: metadane zasobów jako CSV\nAPI dane.gov.pl umożliwia pobranie metadanych zasobów jako plik CSV. To nie jest odpowiedź JSON:API — to zwykły plik CSV.\ncsv_url = f\"{API}/datasets/{DATASET_ID}/resources/metadata.csv\"\n\nr = requests.get(csv_url, params={\"lang\": \"en\"}, timeout=TIMEOUT)\nr.raise_for_status()\n\ncsv_path = OUT / f\"resources_{DATASET_ID}_metadata.csv\"\ncsv_path.write_text(r.text, encoding=\"utf-8\")\nprint(f\"Zapisano: {csv_path} ({len(r.text)} znaków)\")\nPodgląd:\nimport pandas as pd\n\ndf = pd.read_csv(csv_path, sep=\";\")\nprint(\"Kolumny:\", list(df.columns))\nprint(f\"Wiersze: {len(df)}\\n\")\ndf[[\"Resource title\", \"File format\", \"File size\", \"Download URL\"]].head()\n\nCheckpoint: Czy widzisz kolumnę Download URL z adresami do pobrania plików? Jeśli kolumna jest pusta albo nie istnieje — wybierz inny dataset z kroku 1 i powtórz od kroku 2."
+  },
+  {
+    "objectID": "laby/lab_2.html#krok-5-pobranie-realnego-pliku-danych",
+    "href": "laby/lab_2.html#krok-5-pobranie-realnego-pliku-danych",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "4.5 Krok 5: pobranie realnego pliku danych",
+    "text": "4.5 Krok 5: pobranie realnego pliku danych\nWybierz jeden adres z kolumny Download URL:\ndownload_url = df[\"Download URL\"].dropna().iloc[0]\nprint(\"Pobieram:\", download_url)\nPobieranie pliku binarnego (z obsługą przekierowań — requests robi to domyślnie):\nr = requests.get(download_url, timeout=30)\nr.raise_for_status()\n\n# nazwa pliku z nagłówka lub z URL-a\nfilename = download_url.split(\"/\")[-1] or \"downloaded_file\"\nfile_path = OUT / filename\n\nfile_path.write_bytes(r.content)\nprint(f\"Zapisano: {file_path} ({len(r.content)} bajtów)\")\n\nUwaga o dużych plikach. Powyższy kod wczytuje cały plik do pamięci (r.content). Dla plików większych niż ~100 MB lepiej pobierać strumieniowo:\nwith requests.get(download_url, stream=True, timeout=30) as r:\n    r.raise_for_status()\n    with open(file_path, \"wb\") as f:\n        for chunk in r.iter_content(chunk_size=8192):\n            f.write(chunk)\nNa potrzeby tego labu zwykłe pobranie wystarczy.\n\n\nCheckpoint: Przeszedłeś pełny pipeline: wyszukiwanie → dataset → zasoby → metadane CSV → pobranie pliku. To jest rdzeń automatycznego pozyskiwania danych z API."
+  },
+  {
+    "objectID": "laby/lab_2.html#podejście-1-pętla-po-numerach-stron",
+    "href": "laby/lab_2.html#podejście-1-pętla-po-numerach-stron",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "5.1 Podejście 1: pętla po numerach stron",
+    "text": "5.1 Podejście 1: pętla po numerach stron\npage = 1\nper_page = 5\nall_datasets = []\n\nwhile True:\n    data = api_get(\"/datasets\", {\"page\": page, \"per_page\": per_page})\n    items = data[\"data\"]\n    \n    if not items:\n        break\n    \n    all_datasets.extend(items)\n    print(f\"Strona {page}: pobrano {len(items)} datasetów \"\n          f\"(łącznie: {len(all_datasets)})\")\n    \n    # sprawdź, czy jest następna strona\n    next_link = data.get(\"links\", {}).get(\"next\")\n    if next_link is None:\n        break\n    \n    page += 1\n    \n    # bezpiecznik: nie pobieraj więcej niż 5 stron w tym ćwiczeniu\n    if page &gt; 5:\n        print(\"Przerwano po 5 stronach (bezpiecznik).\")\n        break\n\nprint(f\"\\nPobrano łącznie: {len(all_datasets)} datasetów\")"
+  },
+  {
+    "objectID": "laby/lab_2.html#podejście-2-podążanie-za-linkiem-next",
+    "href": "laby/lab_2.html#podejście-2-podążanie-za-linkiem-next",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "5.2 Podejście 2: podążanie za linkiem next",
+    "text": "5.2 Podejście 2: podążanie za linkiem next\nZamiast ręcznie zwiększać page, można podążać za adresem next z odpowiedzi. To jest bardziej odporny wzorzec — nie zakłada, że numeracja stron zaczyna się od 1 ani że jest ciągła.\nurl = f\"{API}/datasets\"\nparams = {\"per_page\": 5}\nall_datasets = []\npage_count = 0\n\nwhile url is not None:\n    r = requests.get(url, params=params, headers=HEADERS, timeout=TIMEOUT)\n    r.raise_for_status()\n    data = r.json()\n    \n    all_datasets.extend(data[\"data\"])\n    page_count += 1\n    print(f\"Strona {page_count}: +{len(data['data'])} \"\n          f\"(łącznie: {len(all_datasets)})\")\n    \n    # następna strona — link jest pełnym URL-em\n    url = data.get(\"links\", {}).get(\"next\")\n    params = None  # parametry są już wbudowane w URL z linku next\n    \n    if page_count &gt;= 5:\n        print(\"Przerwano po 5 stronach (bezpiecznik).\")\n        break\n\nBezpiecznik (if page &gt;= N: break) jest ważny przy nauce i debugowaniu. API dane.gov.pl ma tysiące datasetów — bez limitu pętla potrwa bardzo długo i obciąży serwer. W kodzie produkcyjnym bezpiecznik zastąpisz właściwym warunkiem stopu (np. „pobierz wszystkie do 2024 roku”).\n\n\nCheckpoint: Czy obie metody dały te same id datasetów? Porównaj:\n# zakładając, że wyniki z podejścia 1 są w all_datasets_v1,\n# a z podejścia 2 w all_datasets_v2:\nids_v1 = [d[\"id\"] for d in all_datasets_v1]\nids_v2 = [d[\"id\"] for d in all_datasets_v2]\nprint(\"Identyczne:\", ids_v1 == ids_v2)"
+  },
+  {
+    "objectID": "laby/lab_2.html#prosta-funkcja-z-retry",
+    "href": "laby/lab_2.html#prosta-funkcja-z-retry",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "6.1 Prosta funkcja z retry",
+    "text": "6.1 Prosta funkcja z retry\nimport time\n\ndef api_get_retry(endpoint, params=None, max_retries=3, backoff=2.0):\n    \"\"\"GET z automatycznym ponawianiem przy błędach przejściowych.\"\"\"\n    url = f\"{API}{endpoint}\"\n    \n    for attempt in range(1, max_retries + 1):\n        try:\n            r = requests.get(url, params=params, headers=HEADERS, timeout=TIMEOUT)\n            \n            if r.status_code == 429:\n                wait = float(r.headers.get(\"Retry-After\", backoff * attempt))\n                print(f\"  429 Too Many Requests, czekam {wait}s...\")\n                time.sleep(wait)\n                continue\n            \n            r.raise_for_status()\n            return r.json()\n        \n        except requests.exceptions.Timeout:\n            print(f\"  Timeout (próba {attempt}/{max_retries})\")\n            if attempt &lt; max_retries:\n                time.sleep(backoff * attempt)\n        \n        except requests.exceptions.HTTPError as e:\n            if r.status_code &gt;= 500:\n                print(f\"  Błąd serwera {r.status_code} (próba {attempt}/{max_retries})\")\n                if attempt &lt; max_retries:\n                    time.sleep(backoff * attempt)\n            else:\n                raise  # 4xx (poza 429) — nie ponawiamy\n    \n    raise RuntimeError(f\"Nie udało się pobrać {url} po {max_retries} próbach\")\nKluczowe elementy:\n\n429 (Too Many Requests) — serwer mówi „za szybko”; czekamy tyle, ile każe nagłówek Retry-After (lub domyślnie),\n5xx (błąd serwera) — problem po stronie serwera, warto spróbować ponownie,\n4xx (poza 429) — błąd klienta (np. 404), ponawianie nie pomoże, od razu rzucamy wyjątek,\nbackoff — czas oczekiwania rośnie z każdą próbą (2s, 4s, 6s), żeby nie zalewać serwera.\n\nTest:\n# powinno działać normalnie\ndata = api_get_retry(\"/datasets\", {\"page\": 1, \"per_page\": 2})\nprint(\"OK:\", data[\"data\"][0][\"attributes\"][\"title\"])\n\n# powinno rzucić wyjątek (404, nie ponawiamy)\ntry:\n    api_get_retry(\"/datasets/999999999\")\nexcept requests.exceptions.HTTPError as e:\n    print(\"Błąd (zgodnie z oczekiwaniem):\", e)\n\nCheckpoint: Czy rozumiesz, dlaczego 404 nie jest ponawiane, a 503 tak? W automatyzacji to rozróżnienie decyduje o tym, czy skrypt „zawiesza się” na godzinę, czy szybko informuje o prawdziwym problemie."
+  },
+  {
+    "objectID": "laby/lab_2.html#zadanie-a-zbierz-tytuły-z-n-stron",
+    "href": "laby/lab_2.html#zadanie-a-zbierz-tytuły-z-n-stron",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "7.1 Zadanie A: zbierz tytuły z N stron",
+    "text": "7.1 Zadanie A: zbierz tytuły z N stron\nNapisz funkcję collect_titles(n_pages, per_page=10), która:\n\nPobiera n_pages stron listy datasetów.\nZwraca listę słowników {\"id\": ..., \"title\": ...} ze wszystkich pobranych wyników.\nUżywa api_get lub api_get_retry.\n\nPrzetestuj z n_pages=3, per_page=10 i wypisz wyniki."
+  },
+  {
+    "objectID": "laby/lab_2.html#zadanie-b-pipeline-wyszukiwanie-pobranie-pliku",
+    "href": "laby/lab_2.html#zadanie-b-pipeline-wyszukiwanie-pobranie-pliku",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "7.2 Zadanie B: pipeline wyszukiwanie → pobranie pliku",
+    "text": "7.2 Zadanie B: pipeline wyszukiwanie → pobranie pliku\nNapisz skrypt (lub funkcję), który:\n\nWyszukuje datasety po wybranym słowie kluczowym (q=...).\nDla pierwszego znalezionego datasetu pobiera listę zasobów.\nWybiera pierwszy zasób w formacie CSV (lub innym, który ma Download URL).\nPobiera plik i zapisuje go do katalogu lab_2_output/.\nWypisuje podsumowanie: tytuł datasetu, tytuł zasobu, rozmiar pobranego pliku.\n\nWskazówka: metadane w CSV (metadata.csv?lang=en) zawierają kolumnę Download URL. Możesz z niej skorzystać lub znaleźć URL w odpowiedzi JSON zasobów (pole link w attributes)."
+  },
+  {
+    "objectID": "laby/lab_2.html#zadanie-c-stronicowanie-z-warunkiem-stopu",
+    "href": "laby/lab_2.html#zadanie-c-stronicowanie-z-warunkiem-stopu",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "7.3 Zadanie C: stronicowanie z warunkiem stopu",
+    "text": "7.3 Zadanie C: stronicowanie z warunkiem stopu\nNapisz funkcję search_all(query, max_results=50), która:\n\nWyszukuje datasety po frazie query.\nIteruje po stronach, aż zbierze max_results wyników lub skończą się strony.\nZwraca listę zebranych datasetów.\n\nPrzetestuj na kilku frazach i porównaj meta[\"count\"] (ile jest łącznie) z liczbą faktycznie pobranych wyników."
+  },
+  {
+    "objectID": "laby/lab_2.html#zadanie-d-dodatkowe-pobranie-wielu-plików",
+    "href": "laby/lab_2.html#zadanie-d-dodatkowe-pobranie-wielu-plików",
+    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "section": "7.4 Zadanie D (dodatkowe): pobranie wielu plików",
+    "text": "7.4 Zadanie D (dodatkowe): pobranie wielu plików\nRozszerz pipeline z Zadania B:\n\nDla wybranego datasetu pobierz wszystkie zasoby (nie tylko pierwszy).\nKażdy zasób zapisz do osobnego pliku w lab_2_output/{dataset_id}/.\nNa końcu wypisz tabelę podsumowującą: tytuł zasobu, format, rozmiar pobranego pliku, status (OK / błąd).\nDodaj obsługę błędów — jeśli pobranie jednego zasobu się nie uda, kontynuuj z następnym."
+  },
+  {
+    "objectID": "laby/lab_0.html",
+    "href": "laby/lab_0.html",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "",
+    "text": "Zakres materiału:\n\nPoruszanie się po zagnieżdżonych słownikach i listach (struktury danych spotykane w odpowiedziach JSON),\nPisanie funkcji z parametrami domyślnymi,\nObsługa wyjątków (try / except),\nPraca z plikami i katalogami (pathlib, json),\nSterowanie przepływem: pętla for, while z break, f-stringi.\n\nNarzędzia: Python 3, Thonny.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#thonny",
+    "href": "laby/lab_0.html#thonny",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "2.1 Thonny",
+    "text": "2.1 Thonny\nNa dzisiejszych zajęciach korzystamy z Thonny — lekkiego edytora Pythona z wbudowanym interpreterem, oknem zmiennych i debuggerem. Thonny nie podpowiada kodu automatycznie, co jest zaletą na etapie powtórki — zmusza do samodzielnego pisania.\nOtwórz Thonny. Upewnij się, że w prawym dolnym rogu widoczna jest wersja Pythona 3.10 lub nowsza. Jeśli nie — zgłoś.\nW Thonnym będziemy pracować w dwóch trybach:\n\nEdytor (górny panel) — tu piszesz skrypty i uruchamiasz je klawiszem F5 (lub przyciskiem ▶).\nShell (dolny panel) — tu widzisz wyniki i możesz wpisywać pojedyncze polecenia.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#szybki-test",
+    "href": "laby/lab_0.html#szybki-test",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "2.2 Szybki test",
+    "text": "2.2 Szybki test\nUtwórz nowy plik (File → New), wpisz:\nimport sys\nprint(\"Python\", sys.version)\nprint(\"Wszystko działa!\")\nZapisz plik jako lab0_test.py i uruchom (F5).\n\nCheckpoint: Czy widzisz w Shellu wersję Pythona i komunikat „Wszystko działa!“? Jeśli nie — zgłoś, zanim przejdziesz dalej.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#instalacja-pakietu",
+    "href": "laby/lab_0.html#instalacja-pakietu",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "2.3 Instalacja pakietu",
+    "text": "2.3 Instalacja pakietu\nNa tym labie nie potrzebujemy zewnętrznych pakietów, ale przećwiczmy instalację — to umiejętność, która będzie potrzebna na kolejnych zajęciach.\nW Thonnym: Tools → Manage packages…, wpisz requests, kliknij Install.\nSprawdź, czy instalacja się powiodła:\nimport requests\nprint(\"requests\", requests.__version__)\nJeśli widzisz wersję (np. 2.31.0) — gotowe. Jeśli ModuleNotFoundError — wróć do Manage packages.\n\nInstalacja pakietów — powtarzalna czynność. Thonny ma menedżer pakietów (Manage packages), który pod spodem używa pip. W terminalu odpowiednikiem jest polecenie pip install requests. Komputery w pracowni mogą resetować zainstalowane pakiety między sesjami — dlatego na początku każdego labu trzeba sprawdzić, czy potrzebne biblioteki są dostępne, i w razie potrzeby zainstalować je ponownie.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#słownik-przypomnienie",
+    "href": "laby/lab_0.html#słownik-przypomnienie",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "3.1 Słownik — przypomnienie",
+    "text": "3.1 Słownik — przypomnienie\nSłownik przechowuje pary klucz–wartość:\nstudent = {\n    \"imie\": \"Anna\",\n    \"nazwisko\": \"Kowalska\",\n    \"rok\": 2\n}\n\nprint(student[\"imie\"])          # Anna\nprint(student[\"rok\"])           # 2\nDodawanie i nadpisywanie:\nstudent[\"email\"] = \"anna@example.com\"\nstudent[\"rok\"] = 3\nprint(student)",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#dostęp-do-zagnieżdżonych-struktur",
+    "href": "laby/lab_0.html#dostęp-do-zagnieżdżonych-struktur",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "3.2 Dostęp do zagnieżdżonych struktur",
+    "text": "3.2 Dostęp do zagnieżdżonych struktur\nW praktyce dane rzadko są płaskie. Oto słownik zagnieżdżony — takie struktury będą się pojawiać w kursie regularnie:\ndataset = {\n    \"id\": \"830\",\n    \"type\": \"dataset\",\n    \"attributes\": {\n        \"title\": \"Wykaz szkół i placówek oświatowych\",\n        \"category\": \"Education\",\n        \"modified\": \"2025-01-15\"\n    }\n}\n\n# Dostęp do tytułu — dwa poziomy w głąb:\nprint(dataset[\"attributes\"][\"title\"])\n\n# Dostęp do kategorii:\nprint(dataset[\"attributes\"][\"category\"])\nCzytaj od lewej do prawej: dataset[\"attributes\"] zwraca wewnętrzny słownik, a [\"title\"] wyciąga z niego wartość.\n\nCheckpoint: Wypisz datę modyfikacji (modified) ze słownika dataset. Czy potrzebujesz jednego czy dwóch poziomów indeksowania?",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#bezpieczny-dostęp-.get",
+    "href": "laby/lab_0.html#bezpieczny-dostęp-.get",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "3.3 Bezpieczny dostęp: .get()",
+    "text": "3.3 Bezpieczny dostęp: .get()\nCo się stanie, gdy klucz nie istnieje?\nprint(dataset[\"attributes\"][\"description\"])\n# → KeyError: 'description'\nProgram się wysypie. Metoda .get() pozwala podać wartość domyślną:\nopis = dataset[\"attributes\"].get(\"description\", \"(brak opisu)\")\nprint(opis)  # (brak opisu)\nJeśli klucz istnieje — .get() zwróci jego wartość. Jeśli nie — zwróci to, co podasz jako drugi argument (tutaj: \"(brak opisu)\"). Bez drugiego argumentu zwróci None.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#lista-słowników",
+    "href": "laby/lab_0.html#lista-słowników",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "3.4 Lista słowników",
+    "text": "3.4 Lista słowników\nOdpowiedź API to zwykle słownik, który pod jednym z kluczy zawiera listę wyników. Każdy wynik to kolejny słownik. Zobaczmy samą listę — taką, jaką znajdziesz pod kluczem \"data\" w odpowiedzi:\ndatasets = [\n    {\"id\": \"1\", \"attributes\": {\"title\": \"Jakość powietrza\", \"category\": \"Environment\"}},\n    {\"id\": \"2\", \"attributes\": {\"title\": \"Szkoły w Warszawie\", \"category\": \"Education\"}},\n    {\"id\": \"3\", \"attributes\": {\"title\": \"Rozkłady jazdy\", \"category\": \"Transport\"}},\n]\nDostęp do pojedynczego elementu:\nprint(datasets[0][\"attributes\"][\"title\"])   # Jakość powietrza\nprint(datasets[2][\"id\"])                     # 3\nIteracja po wszystkich:\nfor ds in datasets:\n    title = ds[\"attributes\"][\"title\"]\n    cat = ds[\"attributes\"].get(\"category\", \"?\")\n    print(f\"  [{ds['id']}] {title} ({cat})\")",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#ćwiczenie-zagnieżdżona-struktura-danych",
+    "href": "laby/lab_0.html#ćwiczenie-zagnieżdżona-struktura-danych",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "3.5 Ćwiczenie: zagnieżdżona struktura danych",
+    "text": "3.5 Ćwiczenie: zagnieżdżona struktura danych\nPoniższy słownik imituje typową odpowiedź sieciowego źródła danych. Wklej go do nowego pliku w Thonnym:\nresponse = {\n    \"data\": [\n        {\n            \"id\": \"101\",\n            \"type\": \"dataset\",\n            \"attributes\": {\n                \"title\": \"Dane meteorologiczne\",\n                \"category\": \"Environment\",\n                \"resources_count\": 5\n            }\n        },\n        {\n            \"id\": \"202\",\n            \"type\": \"dataset\",\n            \"attributes\": {\n                \"title\": \"Budżety gmin\",\n                \"category\": \"Finance\",\n                \"resources_count\": 12\n            }\n        },\n        {\n            \"id\": \"303\",\n            \"type\": \"dataset\",\n            \"attributes\": {\n                \"title\": \"Lista szkół podstawowych\",\n                \"category\": \"Education\"\n            }\n        },\n    ],\n    \"meta\": {\n        \"count\": 1500\n    }\n}\nNapisz kod, który:\n\nWypisuje łączną liczbę zbiorów z pola meta → count.\nWypisuje tytuły i kategorie wszystkich datasetów z listy data.\nWypisuje resources_count każdego datasetu. Uwaga: trzeci element nie ma tego pola — użyj .get().\n\nSpodziewany wynik:\nŁączna liczba zbiorów: 1500\n\n  [101] Dane meteorologiczne (Environment), zasoby: 5\n  [202] Budżety gmin (Finance), zasoby: 12\n  [303] Lista szkół podstawowych (Education), zasoby: ?\n\nCheckpoint: Czy Twój kod wypisuje trzy linie z danymi i nie rzuca KeyError na trzecim elemencie? Jeśli tak — potrafisz nawigować po zagnieżdżonych słownikach i listach.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#podstawowa-funkcja",
+    "href": "laby/lab_0.html#podstawowa-funkcja",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "4.1 Podstawowa funkcja",
+    "text": "4.1 Podstawowa funkcja\ndef greet(name):\n    \"\"\"Zwraca powitanie.\"\"\"\n    return f\"Cześć, {name}!\"\n\nmsg = greet(\"Anna\")\nprint(msg)  # Cześć, Anna!\nZwróć uwagę:\n\ndef definiuje funkcję,\nname to parametr — zmienna lokalna, której wartość podajemy przy wywołaniu,\nreturn zwraca wynik — bez niego funkcja zwraca None,\ntekst w potrójnych cudzysłowach pod def to docstring — opis, co funkcja robi.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#parametry-domyślne",
+    "href": "laby/lab_0.html#parametry-domyślne",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "4.2 Parametry domyślne",
+    "text": "4.2 Parametry domyślne\nParametr może mieć wartość domyślną. Wtedy podanie go przy wywołaniu jest opcjonalne:\ndef greet(name, greeting=\"Cześć\"):\n    \"\"\"Zwraca powitanie z konfigurowalną formą.\"\"\"\n    return f\"{greeting}, {name}!\"\n\nprint(greet(\"Anna\"))              # Cześć, Anna!\nprint(greet(\"Anna\", \"Witaj\"))     # Witaj, Anna!\nTen wzorzec pojawi się często — np. funkcja z domyślnym timeoutem lub limitem wyników:\ndef fetch_data(url, timeout=10):\n    ...",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#ćwiczenie-funkcja-wyciągająca-tytuły",
+    "href": "laby/lab_0.html#ćwiczenie-funkcja-wyciągająca-tytuły",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "4.3 Ćwiczenie: funkcja wyciągająca tytuły",
+    "text": "4.3 Ćwiczenie: funkcja wyciągająca tytuły\nWróć do słownika response z poprzedniej sekcji. Napisz funkcję:\ndef extract_titles(response_data):\n    \"\"\"Wyciąga tytuły datasetów z odpowiedzi API.\n    \n    Parameters\n    ----------\n    response_data : dict\n        Słownik z kluczem \"data\" zawierającym listę datasetów.\n    \n    Returns\n    -------\n    list\n        Lista tytułów (stringów).\n    \"\"\"\n    # Twój kod tutaj\nPrzetestuj:\ntitles = extract_titles(response)\nprint(titles)\n# → ['Dane meteorologiczne', 'Budżety gmin', 'Lista szkół podstawowych']\n\nDlaczego warto zamykać kod w funkcjach? Bo eliminujesz powtórzenia. Wzorzec jest prosty: weź powtarzający się blok → zamknij w def → parametryzuj to, co się zmienia.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#for-iteracja-po-kolekcji",
+    "href": "laby/lab_0.html#for-iteracja-po-kolekcji",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "5.1 for — iteracja po kolekcji",
+    "text": "5.1 for — iteracja po kolekcji\nTo już znasz z ćwiczeń ze słownikami. Uzupełnijmy o enumerate:\nowoce = [\"jabłko\", \"banan\", \"cytryna\"]\n\nfor i, owoc in enumerate(owoce, start=1):\n    print(f\"{i}. {owoc}\")\nWynik:\n1. jabłko\n2. banan\n3. cytryna\nenumerate daje parę (indeks, element) — przydatne, gdy chcesz numerować wyniki.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#while-z-break",
+    "href": "laby/lab_0.html#while-z-break",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "5.2 while z break",
+    "text": "5.2 while z break\nCzęsty wzorzec w automatyzacji: pobieramy dane porcjami (strona po stronie), aż się skończą. Mechanizm: while True + warunek break.\nSymulacja: mamy „strony” danych, pusta strona oznacza koniec:\npages = [\n    [\"Anna\", \"Bartek\", \"Celina\"],   # strona 1\n    [\"Dawid\", \"Ewa\", \"Filip\"],       # strona 2\n    [\"Greta\"],                        # strona 3\n    [],                               # strona 4 — pusta, koniec\n]\n\nall_names = []\npage_num = 0\n\nwhile page_num &lt; len(pages):\n    page = pages[page_num]\n    \n    if not page:\n        print(\"Pusta strona — koniec.\")\n        break\n    \n    all_names.extend(page)\n    print(f\"Strona {page_num + 1}: pobrano {len(page)} nazwisk \"\n          f\"(łącznie: {len(all_names)})\")\n    \n    page_num += 1\n\nprint(f\"\\nWszystkie nazwiska: {all_names}\")\n\nextend vs append. extend dodaje elementy listy do listy (spłaszcza jeden poziom). append dodaje całą listę jako jeden element. Porównaj:\na = [1, 2]\na.extend([3, 4])   # a == [1, 2, 3, 4]\n\nb = [1, 2]\nb.append([3, 4])   # b == [1, 2, [3, 4]]\nPrzy zbieraniu wyników ze stron prawie zawsze chcesz extend.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#ćwiczenie-zbieranie-z-limitem",
+    "href": "laby/lab_0.html#ćwiczenie-zbieranie-z-limitem",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "5.3 Ćwiczenie: zbieranie z limitem",
+    "text": "5.3 Ćwiczenie: zbieranie z limitem\nZmodyfikuj powyższy kod tak, żeby pobieranie zatrzymało się po zebraniu co najmniej 4 nazwisk (nawet jeśli są jeszcze kolejne strony). Wypisz zebrane nazwiska i numer ostatniej pobranej strony.\nWskazówka: extend dodaje całą stronę naraz, więc łączna liczba może przekroczyć limit — to normalne. Ważne, żeby pętla nie przechodziła do kolejnych stron.\n\nCheckpoint: Czy Twój kod zatrzymuje się po stronie 2 (zebrano 6 nazwisk — przekroczono limit 4) i nie przetwarza strony 3? Strona 3 zawiera dane, więc to limit — a nie pusta strona — powoduje zatrzymanie.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#wyjątek-bez-obsługi",
+    "href": "laby/lab_0.html#wyjątek-bez-obsługi",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "6.1 Wyjątek bez obsługi",
+    "text": "6.1 Wyjątek bez obsługi\nnumbers = [10, 20, 30]\nprint(numbers[5])\nWynik: IndexError: list index out of range. Program się kończy.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#try-except",
+    "href": "laby/lab_0.html#try-except",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "6.2 try / except",
+    "text": "6.2 try / except\nnumbers = [10, 20, 30]\n\ntry:\n    print(numbers[5])\nexcept IndexError:\n    print(\"Nie ma elementu o takim indeksie!\")\nProgram wypisuje komunikat zamiast się wysypywać.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#łapanie-kilku-typów-wyjątków",
+    "href": "laby/lab_0.html#łapanie-kilku-typów-wyjątków",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "6.3 Łapanie kilku typów wyjątków",
+    "text": "6.3 Łapanie kilku typów wyjątków\nW praktyce w jednym bloku try może wystąpić kilka różnych problemów:\ndef get_value(data, key):\n    \"\"\"Pobiera wartość ze słownika i zamienia na int.\"\"\"\n    try:\n        raw = data[key]\n        return int(raw)\n    except KeyError:\n        print(f\"Brak klucza: {key}\")\n        return None\n    except ValueError:\n        print(f\"Wartość '{data[key]}' nie jest liczbą\")\n        return None\n\ntest = {\"a\": \"42\", \"b\": \"xyz\"}\nprint(get_value(test, \"a\"))    # 42\nprint(get_value(test, \"b\"))    # Wartość 'xyz' nie jest liczbą → None\nprint(get_value(test, \"c\"))    # Brak klucza: c → None",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#wzorzec-z-raise",
+    "href": "laby/lab_0.html#wzorzec-z-raise",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "6.4 Wzorzec z raise",
+    "text": "6.4 Wzorzec z raise\nCzasem chcesz złapać wyjątek, wypisać komunikat i rzucić go dalej (lub rzucić nowy):\ndef safe_divide(a, b):\n    \"\"\"Dzieli a przez b z obsługą dzielenia przez zero.\"\"\"\n    try:\n        return a / b\n    except ZeroDivisionError:\n        print(f\"Nie można dzielić {a} przez 0\")\n        raise  # przekazuje wyjątek wyżej\n\n# safe_divide(10, 0)  # wypisze komunikat I rzuci ZeroDivisionError\n\nWzorzec minimalny — zapamiętaj go, bo będzie wszędzie:\ntry:\n    # operacja, która może się nie udać\n    result = risky_operation()\nexcept SpecificError as e:\n    print(f\"Błąd: {e}\")\nexcept Exception as e:\n    print(f\"Nieoczekiwany błąd: {e}\")\nW kursie risky_operation() to będzie np. zapytanie do serwera, parsowanie danych albo zapis pliku.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#ćwiczenie",
+    "href": "laby/lab_0.html#ćwiczenie",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "6.5 Ćwiczenie",
+    "text": "6.5 Ćwiczenie\nNapisz funkcję parse_ids(raw_list), która:\n\nprzyjmuje listę stringów, np. [\"1\", \"abc\", \"3\", \"\", \"5\"],\npróbuje zamienić każdy element na int,\nelementy, które się nie konwertują — pomija (łapie ValueError),\nzwraca listę intów.\n\nresult = parse_ids([\"1\", \"abc\", \"3\", \"\", \"5\"])\nprint(result)  # [1, 3, 5]\n\nCheckpoint: Czy Twoja funkcja radzi sobie z pustymi stringami i tekstem, zwracając tylko poprawne liczby? Jeśli tak — umiesz obsługiwać błędy w pętli, co jest kluczowe przy automatycznym przetwarzaniu danych.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#pathlib-praca-ze-ścieżkami",
+    "href": "laby/lab_0.html#pathlib-praca-ze-ścieżkami",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "7.1 pathlib — praca ze ścieżkami",
+    "text": "7.1 pathlib — praca ze ścieżkami\nModuł pathlib jest częścią biblioteki standardowej (nie trzeba instalować). Ścieżki są obiektami, nie stringami — dzięki temu kod jest czytelniejszy i działa na różnych systemach:\nfrom pathlib import Path\n\n# Utwórz katalog (jeśli jeszcze nie istnieje)\noutput = Path(\"lab0_output\")\noutput.mkdir(exist_ok=True)\n\nprint(f\"Katalog: {output}\")\nprint(f\"Istnieje: {output.exists()}\")\nexist_ok=True oznacza: nie rzucaj błędu, jeśli katalog już istnieje.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#zapis-i-odczyt-tekstu",
+    "href": "laby/lab_0.html#zapis-i-odczyt-tekstu",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "7.2 Zapis i odczyt tekstu",
+    "text": "7.2 Zapis i odczyt tekstu\nfile_path = output / \"hello.txt\"\n\n# Zapis\nfile_path.write_text(\"Pierwsza linia\\nDruga linia\\n\", encoding=\"utf-8\")\nprint(f\"Zapisano: {file_path}\")\n\n# Odczyt\ncontent = file_path.read_text(encoding=\"utf-8\")\nprint(content)\nOperator / łączy fragmenty ścieżki — to odpowiednik os.path.join(), ale czytelniejszy.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#zapis-danych-jako-json",
+    "href": "laby/lab_0.html#zapis-danych-jako-json",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "7.3 Zapis danych jako JSON",
+    "text": "7.3 Zapis danych jako JSON\nFormat JSON jest standardem wymiany danych. Moduł json (biblioteka standardowa) pozwala konwertować struktury Pythona (słowniki, listy) na tekst JSON i odwrotnie:\nimport json\n\ndata = [\n    {\"id\": \"1\", \"title\": \"Jakość powietrza\"},\n    {\"id\": \"2\", \"title\": \"Szkoły w Warszawie\"},\n    {\"id\": \"3\", \"title\": \"Rozkłady jazdy\"},\n]\n\njson_path = output / \"datasets.json\"\n\n# Zapis\njson_text = json.dumps(data, ensure_ascii=False, indent=2)\njson_path.write_text(json_text, encoding=\"utf-8\")\nprint(f\"Zapisano: {json_path}\")\nParametr ensure_ascii=False zachowuje polskie znaki (zamiast \\u0142 zobaczysz ł). Parametr indent=2 formatuje JSON z wcięciami — czytelny dla człowieka.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#odczyt-json-z-pliku",
+    "href": "laby/lab_0.html#odczyt-json-z-pliku",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "7.4 Odczyt JSON z pliku",
+    "text": "7.4 Odczyt JSON z pliku\nloaded = json.loads(json_path.read_text(encoding=\"utf-8\"))\n\nprint(type(loaded))       # &lt;class 'list'&gt;\nprint(len(loaded))        # 3\nprint(loaded[0][\"title\"])  # Jakość powietrza\njson.dumps() zamienia obiekt Pythona → tekst JSON. json.loads() zamienia tekst JSON → obiekt Pythona.\n\nCheckpoint: Sprawdź, czy plik się zapisał. Wczytaj go z powrotem do Pythona i wypisz zawartość:\ncheck = json.loads(json_path.read_text(encoding=\"utf-8\"))\nprint(check)\nCzy widzisz listę trzech słowników z polskimi znakami (ł, ś, ó)?",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#podstawy",
+    "href": "laby/lab_0.html#podstawy",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "8.1 Podstawy",
+    "text": "8.1 Podstawy\nname = \"Anna\"\nage = 23\nprint(f\"Studentka {name}, wiek: {age}\")\nWewnątrz {} może być dowolne wyrażenie Pythona:\nitems = [1, 2, 3, 4, 5]\nprint(f\"Elementów: {len(items)}, suma: {sum(items)}\")",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#f-stringi-ze-słownikami",
+    "href": "laby/lab_0.html#f-stringi-ze-słownikami",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "8.2 f-stringi ze słownikami",
+    "text": "8.2 f-stringi ze słownikami\nPrzy pracy z danymi będziesz często wypisywać pola słownika:\nds = {\"id\": \"830\", \"attributes\": {\"title\": \"Wykaz szkół\"}}\n\nprint(f\"  [{ds['id']}] {ds['attributes']['title']}\")\nZwróć uwagę na cudzysłowy: f-string jest w podwójnych (\"), więc klucze słownika muszą być w pojedynczych ('). Można też odwrotnie.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#formatowanie-liczb",
+    "href": "laby/lab_0.html#formatowanie-liczb",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "8.3 Formatowanie liczb",
+    "text": "8.3 Formatowanie liczb\nsize = 1234567\nprint(f\"Rozmiar: {size:,} bajtów\")     # 1,234,567 bajtów\n\nratio = 0.8567\nprint(f\"Postęp: {ratio:.1%}\")          # 85.7%",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#zadanie",
+    "href": "laby/lab_0.html#zadanie",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "9.1 Zadanie",
+    "text": "9.1 Zadanie\nDana jest lista records symulująca dane pobrane z sieci:\nrecords = {\n    \"data\": [\n        {\"id\": \"10\", \"attributes\": {\"title\": \"Pomiary hałasu\", \"format\": \"CSV\"}},\n        {\"id\": \"20\", \"attributes\": {\"title\": \"Emisje CO2\"}},\n        {\"id\": \"30\", \"attributes\": {\"title\": \"Stacje pogodowe\", \"format\": \"JSON\"}},\n        {\"id\": \"40\", \"attributes\": {\"title\": \"Zużycie wody\", \"format\": \"XML\"}},\n        {\"id\": \"50\", \"attributes\": {\"title\": \"Jakość gleby\", \"format\": \"CSV\"}},\n    ],\n    \"meta\": {\"count\": 200}\n}\nNapisz funkcję save_summary(response, output_dir, max_items=None):\n\nParametr response to słownik jak wyżej.\nParametr output_dir to ścieżka katalogu wyjściowego (string lub Path).\nParametr max_items (domyślnie None = bez limitu) ogranicza liczbę przetwarzanych elementów.\nFunkcja iteruje po elementach z response[\"data\"] (najwyżej max_items, jeśli podany).\nDla każdego elementu tworzy słownik {\"id\": ..., \"title\": ..., \"format\": ...}, wyciągając dane z attributes. Brak klucza format → wartość domyślna \"unknown\".\nZbiera słowniki w listę i zapisuje do pliku summary.json w output_dir.\nObsługuje ewentualny KeyError (gdyby attributes nie było) — pomija taki element i wypisuje ostrzeżenie.\nZwraca liczbę zapisanych elementów.\n\nPrzetestuj:\nfrom pathlib import Path\n\noutput = Path(\"lab0_output\")\noutput.mkdir(exist_ok=True)\n\nn = save_summary(records, output)\nprint(f\"Zapisano {n} elementów\")\n\nn = save_summary(records, output, max_items=3)\nprint(f\"Zapisano {n} elementów (z limitem)\")\nSpodziewany wynik:\nZapisano 5 elementów\nZapisano 3 elementów (z limitem)\nSprawdź plik lab0_output/summary.json — powinien zawierać listę słowników z polami id, title, format.\n\nCheckpoint: Czy Twoja funkcja poprawnie obsługuje brak klucza format (→ \"unknown\"), limit max_items i zapis do JSON? Jeśli tak — masz solidne podstawy Pythona do dalszej pracy w kursie.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#zadanie-a-list-comprehension",
+    "href": "laby/lab_0.html#zadanie-a-list-comprehension",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "10.1 Zadanie A: list comprehension",
+    "text": "10.1 Zadanie A: list comprehension\nPrzepisz funkcję extract_titles z sekcji „Funkcje” tak, żeby używała list comprehension zamiast pętli:\ndef extract_titles(response_data):\n    return [...]  # jedna linia\nRozszerzenie: napisz wersję, która zwraca tylko tytuły datasetów z kategorii \"Environment\".",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#zadanie-b-słownik-z-listy",
+    "href": "laby/lab_0.html#zadanie-b-słownik-z-listy",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "10.2 Zadanie B: słownik z listy",
+    "text": "10.2 Zadanie B: słownik z listy\nMając listę records[\"data\"], utwórz słownik mapujący id → title:\n# Spodziewany wynik:\n# {\"10\": \"Pomiary hałasu\", \"20\": \"Emisje CO2\", ...}\nUżyj dict comprehension.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "laby/lab_0.html#zadanie-c-obsługa-wielu-plików",
+    "href": "laby/lab_0.html#zadanie-c-obsługa-wielu-plików",
+    "title": "Lab 0: Python — powtórka przed kursem",
+    "section": "10.3 Zadanie C: obsługa wielu plików",
+    "text": "10.3 Zadanie C: obsługa wielu plików\nNapisz funkcję save_per_format(response, output_dir), która:\n\nGrupuje datasety według formatu (CSV, JSON, XML, unknown).\nDla każdego formatu zapisuje osobny plik, np. CSV.json, JSON.json, unknown.json.\nZwraca słownik {format: count}.\n\nWskazówka: użyj dict z listami jako wartościami albo collections.defaultdict(list).",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 0: Python — powtórka przed kursem"
+    ]
+  },
+  {
+    "objectID": "index.html#wykłady",
+    "href": "index.html#wykłady",
+    "title": "Automatyczne pozyskiwanie danych",
+    "section": "2 Wykłady",
+    "text": "2 Wykłady\n\nWykład 1",
+    "crumbs": [
+      "Automatyczne pozyskiwanie danych"
+    ]
+  },
+  {
+    "objectID": "index.html#laboratoria",
+    "href": "index.html#laboratoria",
+    "title": "Automatyczne pozyskiwanie danych",
+    "section": "3 Laboratoria",
+    "text": "3 Laboratoria\n\nLaboratorium 0\nLaboratorium 1",
+    "crumbs": [
+      "Automatyczne pozyskiwanie danych"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html",
+    "href": "laby/lab_1.html",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "",
+    "text": "Zakres materiału:\n\nWysyłanie żądań HTTP do publicznego API i odbieranie odpowiedzi w Pythonie,\nRozpoznawanie w odpowiedzi kodu statusu, nagłówków i ciała (JSON),\nKorzystanie z interaktywnej dokumentacji API (Swagger),\nPoruszanie się po strukturze JSON:API: listy, obiekty, pola data, attributes, links.\n\nNarzędzia: Python (requests), curl (krótko, jako narzędzie diagnostyczne), przeglądarka.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#portal-i-api",
+    "href": "laby/lab_1.html#portal-i-api",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "2.1 Portal i API",
+    "text": "2.1 Portal i API\ndane.gov.pl to polski portal otwartych danych publicznych. Publikuje zbiory danych (datasety) udostępniane przez instytucje państwowe — od jakości powietrza, przez rejestry szkół, po rozkłady jazdy.\nPortal udostępnia API (Application Programming Interface) — interfejs, przez który program komputerowy może pobierać te same dane, które widzisz na stronie, ale w formacie nadającym się do automatycznego przetwarzania (JSON zamiast HTML).\nAdres bazowy API: https://api.dane.gov.pl/1.4\nNumer 1.4 to wersja API. Gdyby się zmieniła, wystarczy podmienić go w jednym miejscu.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#mapa-zasobów-api",
+    "href": "laby/lab_1.html#mapa-zasobów-api",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "2.2 Mapa zasobów API",
+    "text": "2.2 Mapa zasobów API\nAPI dane.gov.pl organizuje dane w hierarchię, którą najłatwiej zrozumieć jako zagnieżdżone kolekcje:\n/datasets                        ← kolekcja: lista wszystkich zbiorów danych\n/datasets/{id}                   ← element: szczegóły jednego zbioru\n/datasets/{id}/resources         ← kolekcja zagnieżdżona: zasoby (pliki) w zbiorze\n/datasets/{id}/resources/{rid}   ← element: metadane jednego zasobu\nTo jest dokładnie wzorzec kolekcja / element / podzasób, który poznałeś na wykładzie.\nPrzykładowo:\n\nGET /1.4/datasets?page=1&per_page=5 — pobierz pierwszych 5 zbiorów (kolekcja, stronicowana),\nGET /1.4/datasets/830 — pobierz szczegóły zbioru o id = 830,\nGET /1.4/datasets/830/resources — pobierz listę zasobów zbioru 830.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#format-odpowiedzi-jsonapi",
+    "href": "laby/lab_1.html#format-odpowiedzi-jsonapi",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "2.3 Format odpowiedzi: JSON:API",
+    "text": "2.3 Format odpowiedzi: JSON:API\nAPI dane.gov.pl używa standardu JSON:API (specyfikacja: jsonapi.org). W praktyce oznacza to, że odpowiedzi mają stałą strukturę:\n{\n  \"data\": [\n    {\n      \"id\": \"830\",\n      \"type\": \"dataset\",\n      \"attributes\": {\n        \"title\": \"Wykaz szkół i placówek oświatowych\",\n        \"notes\": \"Rejestr Szkół i Placówek Oświatowych ...\",\n        \"category\": \"Education\",\n        \"modified\": \"2025-01-15T10:32:00Z\"\n      },\n      \"relationships\": { ... },\n      \"links\": {\n        \"self\": \"https://api.dane.gov.pl/1.4/datasets/830\"\n      }\n    },\n    ...\n  ],\n  \"links\": {\n    \"self\":  \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=5\",\n    \"next\":  \"https://api.dane.gov.pl/1.4/datasets?page=2&per_page=5\",\n    \"last\":  \"https://api.dane.gov.pl/1.4/datasets?page=...\"\n  },\n  \"meta\": {\n    \"count\": 12345\n  }\n}\nCo warto zapamiętać:\n\ndata — lista (lub pojedynczy obiekt) z wynikami; to jest główna część odpowiedzi,\nid i type — identyfikator i typ zasobu,\nattributes — słownik z właściwymi danymi (tytuł, opis, kategoria itd.),\nlinks — adresy do nawigacji (stronicowanie, powiązane zasoby),\nmeta — metadane (np. łączna liczba wyników).\n\nNagłówek Accept: application/vnd.api+json informuje serwer, że klient oczekuje odpowiedzi w formacie JSON:API. Jeśli go nie podasz, serwer dane.gov.pl i tak zwróci JSON — ale dobrą praktyką jest podawać go jawnie.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#dokumentacja-interaktywna-swagger",
+    "href": "laby/lab_1.html#dokumentacja-interaktywna-swagger",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "2.4 Dokumentacja interaktywna (Swagger)",
+    "text": "2.4 Dokumentacja interaktywna (Swagger)\nZanim napiszesz pierwsze zapytanie, warto wiedzieć gdzie szukać informacji o endpointach, parametrach i formatach odpowiedzi.\nAPI dane.gov.pl ma dokumentację Swagger pod adresem:\n\nhttps://api.dane.gov.pl/doc\n\nSwagger UI to interaktywna strona, na której możesz:\n\nprzeglądać listę endpointów (pogrupowanych tematycznie),\nsprawdzić jakie parametry przyjmuje dany endpoint,\nwypróbować zapytanie bezpośrednio w przeglądarce (przycisk Try it out → Execute).\n\n\n2.4.1 Czytanie Swaggera\nOtwórz w przeglądarce https://api.dane.gov.pl/doc i wykonaj po kolei:\n\nZnajdź sekcję dotyczącą Datasets.\nRozwiń endpoint GET /1.4/datasets.\nPrzejrzyj listę parametrów. Zwróć uwagę na:\n\npage — numer strony,\nper_page — liczba wyników na stronę,\nq — fraza wyszukiwania,\nsort — kryterium sortowania.\n\nKliknij Try it out.\nUstaw per_page na 2, wyczyść pozostałe pola, jeśli Swagger coś w nich dopisał automatycznie (zobacz uwagę poniżej).\nKliknij Execute.\nW sekcji Response body zobaczysz odpowiedź JSON. Zwróć uwagę na strukturę data → [{ id, type, attributes }].\nW sekcji Curl Swagger pokaże polecenie curl:\n\njeśli jest bardzo długie (z parametrami typu id[gt], id[lt], title[...], description[...] itd.), potraktuj je jako „szablon” i usuń z URL-a wszystkie te automatycznie dodane filtry, zostawiając tylko to, co ustawiłeś ręcznie (np. page i per_page).\n\n\n\nUwaga: Swagger często wypełnia „pusty formularz” przykładowymi wartościami we wszystkich polach naraz (zwłaszcza tam, gdzie parametr jest obiektem filtrów typu term/terms/gt/lt/gte/lte/...). To jest artefakt UI, nie wymaganie API. W praktyce zostawiasz tylko te pola, których faktycznie chcesz użyć (zwykle: page, per_page; ewentualnie jeden operator na pole).\n\n\nCheckpoint: Czy widzisz pole data z listą obiektów? Czy potrafisz wskazać id i title pierwszego datasetu? Zapisz sobie jedno id — przyda się za chwilę.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#przygotowanie",
+    "href": "laby/lab_1.html#przygotowanie",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.1 Przygotowanie",
+    "text": "3.1 Przygotowanie\nSprawdź, czy masz curl (w terminalu / PowerShell):\ncurl --version\nUwaga (Windows): jeśli pracujesz w PowerShell, używaj curl.exe zamiast curl (które bywa aliasem do innego polecenia).",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#surowa-odpowiedź-http",
+    "href": "laby/lab_1.html#surowa-odpowiedź-http",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.2 Surowa odpowiedź HTTP",
+    "text": "3.2 Surowa odpowiedź HTTP\nPobierz stronę i wyświetl nagłówki + ciało razem:\ncurl -i \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2\"\nNa ekranie zobaczysz coś w rodzaju:\nHTTP/2 200\ncontent-type: application/vnd.api+json\n...\n\n{\"data\":[{\"id\":\"...\", ...}], ...}\n\nCo widzisz: linię statusu (HTTP/2 200), nagłówki odpowiedzi (w tym content-type), pustą linię, a potem ciało odpowiedzi (JSON). To jest dokładnie struktura odpowiedzi HTTP z wykładu.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#tryb-diagnostyczny",
+    "href": "laby/lab_1.html#tryb-diagnostyczny",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.3 Tryb diagnostyczny",
+    "text": "3.3 Tryb diagnostyczny\nDodaj flagę -v (verbose), żeby zobaczyć też żądanie, które wysłał twój klient:\ncurl -v \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\"\nW trybie -v curl oznacza różne typy linii prefiksami:\n\nLinie zaczynające się od * to informacje diagnostyczne klienta (np. rozwiązywanie DNS, próba połączenia, TLS/HTTPS handshake, negocjacja HTTP/2, przekierowania, uwagi typu „Connection #0 left intact”).\nLinie zaczynające się od &gt; to żądanie wysyłane przez ciebie (linia GET ... oraz nagłówki żądania).\nLinie zaczynające się od &lt; to odpowiedź serwera (status i nagłówki odpowiedzi).\n\nUwaga: ciało odpowiedzi (np. JSON) zwykle pojawia się jako „zwykły” tekst bez prefiksów &gt;, &lt;, * — jest wypisywane na standardowe wyjście, podczas gdy log -v idzie na standardowy błąd. Dlatego w terminalu widzisz to wymieszane czasowo, ale logicznie to są dwa strumienie.\nZnajdź w części &gt; linię GET /1.4/datasets?... oraz nagłówek Host:. W części &lt; znajdź content-type: i kod statusu (np. 200).",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#sama-odpowiedź-ładnie-sformatowana",
+    "href": "laby/lab_1.html#sama-odpowiedź-ładnie-sformatowana",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.4 Sama odpowiedź, ładnie sformatowana",
+    "text": "3.4 Sama odpowiedź, ładnie sformatowana\ncurl -s \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2\" | python3 -m json.tool | head -40\nPipe przez python3 -m json.tool formatuje JSON z wcięciami. Flaga -s wycisza pasek postępu.\n\nCheckpoint: Potrafisz wskazać w wyjściu curl -i kod statusu, Content-Type i początek ciała JSON?",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#instalacja-jeśli-potrzeba",
+    "href": "laby/lab_1.html#instalacja-jeśli-potrzeba",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "4.1 Instalacja (jeśli potrzeba)",
+    "text": "4.1 Instalacja (jeśli potrzeba)\nBiblioteka requests jest standardem do wysyłania zapytań HTTP w Pythonie, nie jest jednak częścią biblioteki standardowej, więc może wymagać instalacji:\npip install requests",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#pierwsze-żądanie-get",
+    "href": "laby/lab_1.html#pierwsze-żądanie-get",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "4.2 Pierwsze żądanie GET",
+    "text": "4.2 Pierwsze żądanie GET\nimport requests\n\nurl = \"https://example.com\"\nr = requests.get(url)\n\nprint(\"Status:\", r.status_code)\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\nprint(\"Treść (100 znaków):\", r.text[:100])\nObiekt r (obiekt klasy Response) zawiera całą odpowiedź HTTP:\n\nr.status_code — kod statusu (int, np. 200),\nr.headers — słownik nagłówków odpowiedzi,\nr.text — ciało jako tekst (str),\nr.content — ciało jako bajty (bytes),\nr.json() — ciało sparsowane z JSON do dict/list.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#parametry-zapytania-query-string",
+    "href": "laby/lab_1.html#parametry-zapytania-query-string",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "4.3 Parametry zapytania (query string)",
+    "text": "4.3 Parametry zapytania (query string)\nZamiast sklejać URL ręcznie, podaj parametry jako słownik:\nr = requests.get(\n    \"https://httpbin.org/get\",\n    params={\"q\": \"python\", \"page\": 1}\n)\nprint(\"Pełny URL:\", r.url)\n# → https://httpbin.org/get?q=python&page=1\nrequests sam zakoduje wartości i doda ?...&... do URL.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#nagłówki-żądania",
+    "href": "laby/lab_1.html#nagłówki-żądania",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "4.4 Nagłówki żądania",
+    "text": "4.4 Nagłówki żądania\nNagłówki podajesz przez parametr headers:\nr = requests.get(\n    \"https://httpbin.org/headers\",\n    headers={\"Accept\": \"application/json\", \"User-Agent\": \"MojSkrypt/1.0\"}\n)\nprint(r.json())",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#odbieranie-json",
+    "href": "laby/lab_1.html#odbieranie-json",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "4.5 Odbieranie JSON",
+    "text": "4.5 Odbieranie JSON\nr = requests.get(\"https://httpbin.org/json\")\n\nprint(\"Status:\", r.status_code)\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\n\ndata = r.json()           # parsuje JSON → dict\nprint(\"Typ:\", type(data))\nprint(\"Klucze:\", list(data.keys()))\n\nWażne: r.json() rzuci wyjątek, jeśli ciało odpowiedzi nie jest poprawnym JSON-em (np. gdy serwer zwrócił HTML ze stroną błędu). Dlatego przed parsowaniem warto sprawdzić r.status_code lub użyć r.raise_for_status().",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#bezpieczny-wzorzec-sprawdzaj-przed-parsowaniem",
+    "href": "laby/lab_1.html#bezpieczny-wzorzec-sprawdzaj-przed-parsowaniem",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "4.6 Bezpieczny wzorzec: sprawdzaj przed parsowaniem",
+    "text": "4.6 Bezpieczny wzorzec: sprawdzaj przed parsowaniem\nr = requests.get(\"https://httpbin.org/json\", timeout=10)\nr.raise_for_status()  # rzuci wyjątek przy 4xx / 5xx\ndata = r.json()\nMetoda raise_for_status() zamienia kody błędów na wyjątek Pythona — dzięki temu nie próbujesz parsować odpowiedzi z błędem.\n\nCheckpoint: Wykonaj requests.get(\"https://httpbin.org/json\") i wypisz status_code, Content-Type z nagłówków, oraz klucze (keys) sparsowanego JSON-a. Czy wszystko się zgadza?",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#krok-1-lista-datasetów",
+    "href": "laby/lab_1.html#krok-1-lista-datasetów",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "5.1 Krok 1: lista datasetów",
+    "text": "5.1 Krok 1: lista datasetów\nimport requests\n\nAPI = \"https://api.dane.gov.pl/1.4\"\n\nr = requests.get(\n    f\"{API}/datasets\",\n    params={\"page\": 1, \"per_page\": 5},\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\nr.raise_for_status()\n\ndata = r.json()\nprint(\"Klucze odpowiedzi:\", list(data.keys()))\nSpodziewane klucze: data, links, meta (ewentualnie included).",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#krok-2-eksploracja-struktury",
+    "href": "laby/lab_1.html#krok-2-eksploracja-struktury",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "5.2 Krok 2: eksploracja struktury",
+    "text": "5.2 Krok 2: eksploracja struktury\n# Ile datasetów na tej stronie?\ndatasets = data[\"data\"]\nprint(\"Liczba datasetów:\", len(datasets))\n\n# Pierwszy dataset — co zawiera?\nfirst = datasets[0]\nprint(\"Klucze obiektu:\", list(first.keys()))\nprint(\"ID:\", first[\"id\"])\nprint(\"Typ:\", first[\"type\"])\nprint(\"Tytuł:\", first[\"attributes\"][\"title\"])",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#krok-3-przegląd-wszystkich-wyników",
+    "href": "laby/lab_1.html#krok-3-przegląd-wszystkich-wyników",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "5.3 Krok 3: przegląd wszystkich wyników",
+    "text": "5.3 Krok 3: przegląd wszystkich wyników\nfor ds in datasets:\n    ds_id = ds[\"id\"]\n    title = ds[\"attributes\"][\"title\"]\n    print(f\"  [{ds_id}] {title}\")",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#krok-4-linki-nawigacyjne-stronicowanie",
+    "href": "laby/lab_1.html#krok-4-linki-nawigacyjne-stronicowanie",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "5.4 Krok 4: linki nawigacyjne (stronicowanie)",
+    "text": "5.4 Krok 4: linki nawigacyjne (stronicowanie)\nprint(\"Linki:\", data.get(\"links\", {}))\nprint(\"Meta:\", data.get(\"meta\", {}))\nW polu links powinien pojawić się klucz next z URL-em następnej strony. W polu meta — łączna liczba zbiorów (count).\n\nCheckpoint: Czy widzisz listę 5 datasetów z ich id i tytułami? Czy w links jest adres next? Zapisz id jednego datasetu, który wydaje ci się ciekawy.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#krok-5-szczegóły-wybranego-datasetu",
+    "href": "laby/lab_1.html#krok-5-szczegóły-wybranego-datasetu",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "5.5 Krok 5: szczegóły wybranego datasetu",
+    "text": "5.5 Krok 5: szczegóły wybranego datasetu\nPodstaw id z poprzedniego kroku:\nDATASET_ID = \"...\"   # ← wklej tu swoje id\n\nr = requests.get(\n    f\"{API}/datasets/{DATASET_ID}\",\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\nr.raise_for_status()\n\nds = r.json()[\"data\"]\nattrs = ds[\"attributes\"]\n\nprint(\"Tytuł:\", attrs[\"title\"])\nprint(\"Opis:\", attrs.get(\"notes\", \"(brak)\")[:200])\nprint(\"Kategoria:\", attrs.get(\"category\"))\nprint(\"Modyfikacja:\", attrs.get(\"modified\"))\nZwróć uwagę: dla kolekcji data jest listą, a dla pojedynczego elementu — słownikiem.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#krok-6-zasoby-resources-datasetu",
+    "href": "laby/lab_1.html#krok-6-zasoby-resources-datasetu",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "5.6 Krok 6: zasoby (resources) datasetu",
+    "text": "5.6 Krok 6: zasoby (resources) datasetu\nr = requests.get(\n    f\"{API}/datasets/{DATASET_ID}/resources\",\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\nr.raise_for_status()\n\nresources = r.json()[\"data\"]\nprint(f\"Liczba zasobów: {len(resources)}\\n\")\n\nfor res in resources:\n    res_attrs = res[\"attributes\"]\n    print(f\"  [{res['id']}] {res_attrs.get('title', '(bez tytułu)')}\")\n    print(f\"       format: {res_attrs.get('format', '?')}\")\n    print()\nJeśli lista zasobów jest pusta, wybierz inny dataset i powtórz od kroku 5.\n\nCheckpoint: Czy widzisz listę zasobów z ich id, tytułami i formatami? Jeśli tak — udało ci się przejść pełny łańcuch: kolekcja → element → podzasoby. To jest główna umiejętność tego labu.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#błąd-404-nieistniejący-zasób",
+    "href": "laby/lab_1.html#błąd-404-nieistniejący-zasób",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "6.1 Błąd 404: nieistniejący zasób",
+    "text": "6.1 Błąd 404: nieistniejący zasób\nr = requests.get(\n    f\"{API}/datasets/999999999\",\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\n\nprint(\"Status:\", r.status_code)\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\nprint(\"Treść:\", r.text[:300])\nSerwer powinien zwrócić 404. Zwróć uwagę, że odpowiedź nadal ma ciało — serwer wysyła komunikat o błędzie (zwykle w JSON).",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#co-robi-raise_for_status-przy-404",
+    "href": "laby/lab_1.html#co-robi-raise_for_status-przy-404",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "6.2 Co robi raise_for_status() przy 404?",
+    "text": "6.2 Co robi raise_for_status() przy 404?\ntry:\n    r.raise_for_status()\nexcept requests.exceptions.HTTPError as e:\n    print(\"Wyjątek:\", e)",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#timeout",
+    "href": "laby/lab_1.html#timeout",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "6.3 Timeout",
+    "text": "6.3 Timeout\ntry:\n    r = requests.get(f\"{API}/datasets\", params={\"page\": 1}, timeout=0.001)\nexcept requests.exceptions.Timeout:\n    print(\"Przekroczono limit czasu!\")\nexcept requests.exceptions.RequestException as e:\n    print(\"Inny błąd:\", e)\nUstawiamy absurdalnie krótki timeout (0.001 s), żeby wymusić błąd. W praktyce sensowna wartość to 5–30 sekund.\n\nWzorzec minimalny do zapamiętania:\ntry:\n    r = requests.get(url, timeout=10)\n    r.raise_for_status()\n    data = r.json()\nexcept requests.exceptions.Timeout:\n    print(\"Timeout\")\nexcept requests.exceptions.HTTPError as e:\n    print(\"Błąd HTTP:\", e)\nexcept requests.exceptions.RequestException as e:\n    print(\"Błąd połączenia:\", e)\n\n\nCheckpoint: Czy umiesz rozróżnić trzy sytuacje: odpowiedź 200 (sukces), odpowiedź 404 (błąd serwera w sensie „nie znaleziono”), wyjątek Timeout (brak odpowiedzi)? To jest kluczowe w automatyzacji.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#zadanie-a-wyszukiwanie-datasetów",
+    "href": "laby/lab_1.html#zadanie-a-wyszukiwanie-datasetów",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "7.1 Zadanie A: wyszukiwanie datasetów",
+    "text": "7.1 Zadanie A: wyszukiwanie datasetów\nW dokumentacji Swagger (https://api.dane.gov.pl/doc) znajdź parametr, który pozwala wyszukiwać datasety po frazie (słowie kluczowym).\n\nWykonaj wyszukiwanie po wybranym słowie (np. \"transport\", \"szkoły\", \"powietrze\").\nWypisz id i title wyników.\nWybierz jeden dataset z wyników i pobierz jego szczegóły (/datasets/{id}).\nPobierz listę zasobów tego datasetu (/datasets/{id}/resources).\nWypisz tytuły i formaty zasobów.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#zadanie-b-porównanie-dwóch-stron-wyników",
+    "href": "laby/lab_1.html#zadanie-b-porównanie-dwóch-stron-wyników",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "7.2 Zadanie B: porównanie dwóch stron wyników",
+    "text": "7.2 Zadanie B: porównanie dwóch stron wyników\n\nPobierz stronę 1 i stronę 2 listy datasetów (np. per_page=5).\nWypisz id datasetów z obu stron.\nSprawdź (programowo lub ręcznie), że zbiory id się nie pokrywają.\nWypisz adres next z linków pierwszej strony i porównaj go z URL-em, który sam skonstruowałeś dla strony 2.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#zadanie-c-dodatkowe-metadane-zasobów-w-csv",
+    "href": "laby/lab_1.html#zadanie-c-dodatkowe-metadane-zasobów-w-csv",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "7.3 Zadanie C (dodatkowe): metadane zasobów w CSV",
+    "text": "7.3 Zadanie C (dodatkowe): metadane zasobów w CSV\nAPI dane.gov.pl pozwala pobrać metadane zasobów danego datasetu jako CSV:\nGET /1.4/datasets/{id}/resources/metadata.csv?lang=en\n\nPobierz ten plik za pomocą requests (uwaga: to nie jest JSON, tylko CSV — użyj r.text zamiast r.json()).\nZapisz odpowiedź do pliku .csv.\nWczytaj plik do pandas.DataFrame i wypisz nazwy kolumn.\nZnajdź kolumnę Download URL — zawiera adresy do pobrania realnych plików danych.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html",
+    "href": "wyklady/wyklad_1.html",
+    "title": "Wykład 1: HTTP i klienci HTTP",
+    "section": "",
+    "text": "Celem wykładu jest wprowadzenie do komunikacji klient–serwer w oparciu o HTTP jako protokół wymiany żądań i odpowiedzi. Zakres obejmuje strukturę żądania (metoda, URL, nagłówki, body) oraz strukturę odpowiedzi (kod statusu, nagłówki, body). Pokazujemy też, jak te elementy przekładają się na realne interakcje z API, w tym pracę z danymi JSON oraz typowe sytuacje błędów i diagnostyki na poziomie protokołu.\n\n\n\nInternet jest globalną infrastrukturą umożliwiającą komunikację pomiędzy procesami działającymi na różnych komputerach. Komunikacja ta odbywa się zgodnie z ustalonymi protokołami, z których każdy definiuje sposób wymiany danych, format komunikatów oraz reguły ich interpretacji.\nJedną z najważniejszych usług działających w Internecie jest World Wide Web (WWW). WWW opiera się głównie na protokole HTTP i umożliwia pobieranie zasobów takich jak dokumenty tekstowe, obrazy, pliki czy dane w formatach strukturalnych (JSON, XML).\nZ punktu widzenia automatycznego pozyskiwania danych:\n\nstrona WWW,\nendpoint API,\nplik CSV,\nodpowiedź JSON\n\nsą tym samym zjawiskiem technicznym: odpowiedzią HTTP przesyłaną z serwera do klienta.\n\n\n\nKomunikacja w WWW odbywa się w modelu klient–serwer.\nKlient to program, który inicjuje połączenie, wysyła żądanie, odbiera odpowiedź i interpretuje otrzymane dane. Przykłady klientów:\n\nprzeglądarka internetowa,\nnarzędzie wiersza poleceń (curl),\nskrypt w Pythonie (requests),\nprogram automatycznie pobierający dane (crawler, bot).\n\nSerwer to program, który nasłuchuje żądań, przetwarza je i generuje odpowiedzi. Kluczowa cecha: serwer nie inicjuje komunikacji – zawsze reaguje na żądanie klienta.\nHTTP (Hypertext Transfer Protocol) jest protokołem warstwy aplikacji, zaprojektowanym jako mechanizm wymiany komunikatów typu żądanie → odpowiedź.\n\n\nHTTP jest protokołem bezstanowym – każde żądanie jest niezależne. W praktyce „stan” bywa symulowany przez:\n\nidentyfikatory sesji (np. cookies),\ntokeny autoryzacyjne przesyłane w nagłówkach (np. Authorization).\n\nNa tym etapie wystarczy rozumieć konsekwencję: jeśli serwer ma wykonać akcję zależną od kontekstu, to kontekst musi przyjść w żądaniu.\n\n\n\n\n\n\n\nURL (np. https://example.com/search?q=python) opisuje gdzie wysłać żądanie.\nZasób to „co” chcemy pobrać (np. /index.html, /api/patients).\nEndpoint API to zwykle zasób, który zwraca dane (często JSON), np. /api/v1/items.\n\nW praktyce będziemy operować na trzech częściach URL:\n\nhost: example.com\nścieżka: /search\nparametry zapytania (query string): q=python\n\n\n\n\nKażde żądanie HTTP składa się z:\n\nlinii startowej (metoda, zasób, wersja protokołu),\nnagłówków (pary klucz–wartość),\nciała (opcjonalnie).\n\nPrzykład (HTTP/1.1, zapis tekstowy):\nGET /index.html HTTP/1.1\nHost: example.com\nUser-Agent: curl/8.0\nAccept: */*\n\n\n\nOdpowiedź HTTP składa się z:\n\nlinii statusu,\nnagłówków,\nciała odpowiedzi.\n\nPrzykład:\nHTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 1256\n\n&lt;html&gt;...&lt;/html&gt;\n\n\n\nPoniżej zestaw minimum, które warto kojarzyć od początku.\nTypowe nagłówki w żądaniu (request):\n\n\n\n\n\n\n\n\nNagłówek\nPo co?\nPrzykład\n\n\n\n\nHost\nwskazuje host (w HTTP/1.1 obowiązkowy)\nHost: example.com\n\n\nUser-Agent\nidentyfikacja klienta\nUser-Agent: curl/8.0\n\n\nAccept\njakie formaty akceptuje klient\nAccept: application/json\n\n\nContent-Type\nformat ciała żądania (gdy wysyłasz dane)\nContent-Type: application/json\n\n\nAuthorization\nuwierzytelnianie (token)\nAuthorization: Bearer …\n\n\n\nTypowe nagłówki w odpowiedzi (response):\n\n\n\n\n\n\n\n\nNagłówek\nPo co?\nPrzykład\n\n\n\n\nContent-Type\nformat treści\napplication/json; charset=utf-8\n\n\nContent-Length\nrozmiar odpowiedzi (bajty)\n1256\n\n\nLocation\ncel przekierowania (3xx)\nLocation: /new-path\n\n\nSet-Cookie\nustawienie cookies (stan/sesja)\nSet-Cookie: session=…\n\n\nRetry-After\nkiedy próbować ponownie (np. po 429/503)\nRetry-After: 120\n\n\n\nWarto odróżniać:\n\nAccept: co klient chciałby dostać (preferencja),\nContent-Type: co faktycznie jest wysyłane/otrzymane (format ciała komunikatu).\n\nSerwer może zignorować Accept albo nie być w stanie spełnić preferencji — dlatego finalnie zawsze ufamy Content-Type w odpowiedzi.\n\n\n\nNajczęściej spotkasz:\n\nGET – pobieranie zasobów (nie powinno zmieniać stanu serwera),\nPOST – wysyłanie danych do serwera (często tworzenie zasobów lub uruchomienie akcji),\nHEAD – jak GET, ale bez ciała odpowiedzi (przydatne do sprawdzenia nagłówków i rozmiaru).\n\n\n\n\nKody statusu informują o wyniku żądania:\n\n2xx – sukces (np. 200 OK)\n3xx – przekierowanie (np. 301, 302)\n4xx – błąd po stronie klienta (np. 404 Not Found, 403 Forbidden, 429 Too Many Requests)\n5xx – błąd serwera (np. 500, 503)\n\nW automatycznym pobieraniu danych kod statusu jest sygnałem sterującym: odpowiedź 200 i 404 wymagają zupełnie innego postępowania.\n\n\n\n\nZanim przejdziemy do klientów HTTP, warto najpierw wyjaśnić, czym jest URL.\n\n\nURL (Uniform Resource Locator) to adres zasobu w sieci. W kontekście HTTP najczęściej ma postać:\nscheme://host[:port]/path?query#fragment\nPrzykład: https://api.example.org/v1/users/123?verbose=1#section2\n\n\nSchemat (scheme)\nZwykle http lub https. https to HTTP z szyfrowaniem (TLS).\nHost (host)\nDomena lub IP, np. example.com, api.example.org, 192.0.2.10.\nPort (:port)\nOpcjonalny. Domyślnie 80 dla http i 443 dla https. Jeśli jest inny, pojawia się jawnie, np. http://localhost:8000/....\nŚcieżka (/path)\nIdentyfikuje zasób lub “trasę” w API, np. /v1/users/123.\nQuery (?query)\nParametry w formacie klucz=wartość, rozdzielane &, np. ?page=2&sort=name. Typowe zastosowania: filtrowanie, paginacja, sortowanie. (Format odpowiedzi często lepiej negocjować nagłówkiem Accept niż parametrem query.)\nFragment (#fragment)\nskazuje miejsce w dokumencie po stronie klienta (np. sekcję w HTML). Kluczowe: część #... nie jest wysyłana do serwera w żądaniu HTTP.\n\n\n\nTo rozróżnienie jest konwencją spotykaną w API (zwłaszcza REST). Wynika głównie z nazewnictwa, a nie ze specjalnej składni; ostatecznie znaczenie definiuje serwer.\nKolekcja (zbiór elementów)\nNajczęściej rzeczownik w liczbie mnogiej, np. /users, /orders. Typowo: GET /users zwraca listę, a POST /users tworzy nowy element.\nElement (konkretna instancja zasobu)\nNajczęściej kolekcja + identyfikator, np. /users/123. Typowo: GET /users/123 zwraca szczegóły, PUT/PATCH aktualizuje, DELETE usuwa.\nKolekcje zagnieżdżone\nNp. /users/123/posts (kolekcja zależna) i /users/123/posts/9 (konkretny element).\nUwaga: bez dokumentacji lub odpowiedzi serwera nie da się zawsze pewnie stwierdzić, co autor API miał na myśli (to tylko heurystyka).\n\n\n\nNie wszystkie znaki mogą występować w URL wprost (np. spacje, znaki diakrytyczne). Wtedy stosuje się kodowanie procentowe, np. spacja jako %20. W praktyce: nie koduj ręcznie, tylko korzystaj z narzędzi/bibliotek, które poprawnie kodują parametry.\n\n\n\n\nUżycie ? więcej niż raz:\n\n✅ /search?q=abc&lang=pl\n❌ /search?q=abc?lang=pl\n\nMylenie & (kolejny parametr) z # (fragment po stronie klienta).\nRęczne sklejanie parametrów bez kodowania znaków (spacje, &, = wewnątrz wartości).\n\n\n\n\n\nCharakterystyka. curl to uniwersalne narzędzie do wykonywania żądań HTTP z terminala. Jest świetne do nauki, bo nie ukrywa szczegółów (nagłówków, kodów statusu, przekierowań) i pozwala precyzyjnie kontrolować żądanie.\n\nNajczęściej używane opcje (co robią):\n\n-X &lt;METODA&gt; – wymusza metodę HTTP (np. GET, POST, PUT, DELETE). Uwaga: samo -d/--data zwykle powoduje użycie POST nawet bez -X.\n-H \"Nagłówek: wartość\" – dodaje nagłówek do żądania (możesz używać wielokrotnie).\n-d '...' / --data '...' – wysyła body jako dane formularza (application/x-www-form-urlencoded), o ile nie ustawisz innego Content-Type.\n--data-urlencode \"k=v\" – jak --data, ale z poprawnym URL-encodingiem (bezpieczne dla spacji, znaków specjalnych).\n-G – traktuje dane z --data/--data-urlencode jako parametry query (czyli robi GET ?k=v zamiast body).\n-i – wypisuje nagłówki odpowiedzi + body (nagłówki na początku).\n-I – wysyła HEAD i wypisuje same nagłówki odpowiedzi (bez body).\n-v – tryb diagnostyczny: pokazuje szczegóły połączenia, wysyłane nagłówki itd. (na stderr).\n-s – tryb “silent”: wycisza pasek postępu i część komunikatów.\n-S – gdy używasz -s, to -S wymusza wypisanie błędów (sensowne połączenie: -sS).\n-L – podąża za przekierowaniami (3xx Location:).\n-o &lt;plik&gt; – zapisuje body do pliku (OS-agnostyczne).\n-w \"&lt;format&gt;\" – dopisuje na końcu własne podsumowanie (np. kod statusu, czas odpowiedzi).\n--max-time &lt;sek&gt; – limit czasu całego żądania.\n--connect-timeout &lt;sek&gt; – limit czasu na nawiązanie połączenia.\n--fail – traktuje odpowiedzi &gt;=400 jako błąd (przydatne w skryptach).\n\n\nPodstawowe żądanie GET\ncurl https://example.com\nGET z parametrami query (bez ręcznego kodowania znaków)\ncurl -G \"https://httpbin.org/get\" --data-urlencode \"q=ala ma kota\" --data-urlencode \"page=1\"\nWyświetlenie samych nagłówków odpowiedzi\ncurl -I https://example.com\nNagłówki + body (czytelne do szybkiego “co zwróciło API?”)\ncurl -i https://httpbin.org/json\nTryb diagnostyczny (co dokładnie wysyłasz i co serwer odpowiada)\ncurl -v https://example.com\nPodążanie za przekierowaniami (np. http → https)\ncurl -L https://example.com\n\nPobieranie JSON i “ładne” formatowanie\ncurl -sS -H \"Accept: application/json\" https://httpbin.org/json | python -m json.tool\n\n-H \"Accept: application/json\" mówi serwerowi: “preferuję odpowiedź w JSON”.\npython -m json.tool formatuje JSON i sprawdza poprawność składni.\n\n\nWysyłanie JSON (POST) + kontrola nagłówków\ncurl -sS -X POST https://httpbin.org/post \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Accept: application/json\" \\\n  -d '{\"name\":\"Ala\",\"score\":42}'\n\nContent-Type opisuje format body, które wysyłasz.\nAccept opisuje format odpowiedzi, którego oczekujesz.\n\n\nStatus code + zapis odpowiedzi do pliku\nZapisz body do pliku i wypisz sam kod:\ncurl -sS -o response.txt -w \"%{http_code}\\n\" https://example.com\n\n-o response.txt zapisuje treść odpowiedzi do pliku (działa na każdym OS).\n-w \"%{http_code}\\n\" wypisuje kod statusu na stdout.\n\nWariant dla API (np. JSON):\ncurl -sS -o response.json -w \"%{http_code}\\n\" https://httpbin.org/json\n-w/--write-out przyjmuje szablon tekstowy: zwykłe znaki są wypisywane dosłownie, a fragmenty w postaci %{...} są podmieniane na wartości zmierzone/znane dla danego żądania (kod statusu, czas, rozmiar itd.). To jest bardzo podobne ideowo do f-stringa w Pythonie: wstawki “specjalne” są interpolowane w zwykły tekst.\n\n\nSkładnia:\n\npo -w podajesz łańcuch, np. \"HTTP=%{http_code} time=%{time_total}s\\n\"\ncurl wypisze ten tekst po zakończeniu żądania, zastępując:\n\n%{http_code} → np. 200\n%{time_total} → np. 0.123456\n\n\nPrzykład 1: tylko kod statusu\ncurl -sS -o response.txt -w \"HTTP=%{http_code}\\n\" https://example.com\nPrzykład 2: kod + typ treści\ncurl -sS -o response.txt -w \"HTTP=%{http_code} CT=%{content_type}\\n\" https://httpbin.org/json\nPrzykład 3: kod + czas\ncurl -sS -o response.txt -w \"HTTP=%{http_code} time=%{time_total}s\\n\" https://example.com\nNajczęściej używane wstawki %{...}:\n\n%{http_code} – kod statusu HTTP\n%{content_type} – Content-Type odpowiedzi\n%{time_total} – całkowity czas wykonania żądania (sekundy)\n%{size_download} – liczba pobranych bajtów\n%{url_effective} – finalny URL (po przekierowaniach, jeśli użyto -L)\n\n\nNajczęstsze błędy i jak je szybko zdiagnozować\n\n“Nie wiem czemu nie działa” → dodaj -v (zobaczysz nagłówki i przekierowania).\n“Skrypt ma działać niezawodnie” → użyj -sS --fail --max-time 10.\n“Serwer zwraca HTML zamiast JSON” → dodaj -H \"Accept: application/json\" i sprawdź Content-Type w odpowiedzi (-i albo -v).\n\n\n\n\n\nCharakterystyka. requests to wysokopoziomowa biblioteka Pythona do HTTP:\n\nupraszcza składnię,\nautomatycznie obsługuje część szczegółów (np. przekierowania),\ndobrze współpracuje z JSON-em.\n\nProste żądanie GET (tekst)\nimport requests\n\nr = requests.get(\"https://example.com\")\nprint(r.status_code)\nprint(r.text[:200])\nDostęp do nagłówków\nr.headers  # słownik-podobny obiekt\nSprawdzanie kodu statusu\nif r.status_code == 200:\n    print(\"Sukces\")\nelse:\n    print(\"Błąd\", r.status_code)\nPobieranie danych binarnych (np. obraz)\nr = requests.get(\"https://example.com/image.png\")\nwith open(\"image.png\", \"wb\") as f:\n    f.write(r.content)\nParametry zapytania (query string)\nparams = {\"q\": \"python\", \"page\": 2}\nr = requests.get(\"https://example.com/search\", params=params)\nWysyłanie danych POST (formularz)\npayload = {\"name\": \"Jan\", \"age\": 30}\nr = requests.post(\"https://httpbin.org/post\", data=payload)\nWysyłanie JSON\nr = requests.post(\n    \"https://httpbin.org/post\",\n    json={\"name\": \"Jan\", \"age\": 30}\n)\nOdbieranie JSON\nNajprostsza ścieżka:\nimport requests\n\nr = requests.get(\"https://httpbin.org/json\", timeout=5)\nr.raise_for_status()  # zamienia 4xx/5xx na wyjątek\n\ndata = r.json()       # parsowanie JSON -&gt; dict/list\nprint(type(data))\nprint(data.keys() if isinstance(data, dict) else len(data))\nTypowy błąd początkujących: serwer zwraca HTML (np. stronę błędu), a kod próbuje to parsować jako JSON. Dwie praktyczne zasady:\n\nsprawdzaj r.status_code (albo używaj r.raise_for_status()),\nsprawdzaj r.headers.get(\"Content-Type\") przed r.json().\n\nObsługa wyjątków (minimalny wzorzec)\nimport requests\n\ntry:\n    r = requests.get(\"https://example.com\", timeout=5)\n    r.raise_for_status()\nexcept requests.exceptions.Timeout:\n    print(\"Timeout\")\nexcept requests.exceptions.RequestException as e:\n    print(\"Błąd HTTP:\", e)\n\n\n\nDotychczas patrzyliśmy na HTTP od strony klienta. Po drugiej stronie jest serwer HTTP: program, który odbiera żądanie, interpretuje je i zwraca odpowiedź w standardowej strukturze:\n\nlinia statusu (np. HTTP/1.1 200 OK)\nnagłówki\nciało (opcjonalnie: HTML/JSON/binarne dane)\n\nZ perspektywy protokołu serwer jest “czarną skrzynką”, ale technicznie wykonuje zwykle te kroki:\n1) Parsowanie żądania\n\nmetoda (GET/POST/...), ścieżka (/path), parametry query (?a=1&b=2)\nnagłówki (np. Accept, Authorization, User-Agent)\nciało (np. JSON) + typ z Content-Type\n\n2) Routing i logika\n\nwybór “handlera” na podstawie metody i ścieżki (np. GET /users/123)\nwalidacja danych wejściowych (typy, zakresy, brakujące pola)\nautoryzacja/uwierzytelnienie (jeśli dotyczy)\n\n3) Budowa odpowiedzi\n\ndobór kodu statusu\nustawienie nagłówków\nserializacja danych (np. do JSON) lub zwrot błędu w ustalonym formacie\n\n\n\nNajbardziej informacyjne elementy odpowiedzi (to one sterują zachowaniem klienta):\n\nStatus code – podstawowa informacja o wyniku:\n\n2xx sukces, 3xx przekierowanie, 4xx błąd po stronie klienta, 5xx błąd serwera\n\nContent-Type – w jakim formacie jest body (np. application/json; charset=utf-8)\nLocation – gdzie przekierować lub gdzie znajduje się utworzony zasób (często przy 201 Created)\nCache-Control / ETag – czy i jak można cachować odpowiedź\nRetry-After – kiedy spróbować ponownie (często przy limitach/rate limit)\nWWW-Authenticate – informacja o wymaganym uwierzytelnieniu (np. przy 401)",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: HTTP i klienci HTTP"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#cele-i-zakres",
+    "href": "wyklady/wyklad_1.html#cele-i-zakres",
+    "title": "Wykład 1: HTTP i klienci HTTP",
+    "section": "",
+    "text": "Celem wykładu jest wprowadzenie do komunikacji klient–serwer w oparciu o HTTP jako protokół wymiany żądań i odpowiedzi. Zakres obejmuje strukturę żądania (metoda, URL, nagłówki, body) oraz strukturę odpowiedzi (kod statusu, nagłówki, body). Pokazujemy też, jak te elementy przekładają się na realne interakcje z API, w tym pracę z danymi JSON oraz typowe sytuacje błędów i diagnostyki na poziomie protokołu.",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: HTTP i klienci HTTP"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#internet-www-i-komunikacja-sieciowa",
+    "href": "wyklady/wyklad_1.html#internet-www-i-komunikacja-sieciowa",
+    "title": "Wykład 1: HTTP i klienci HTTP",
+    "section": "",
+    "text": "Internet jest globalną infrastrukturą umożliwiającą komunikację pomiędzy procesami działającymi na różnych komputerach. Komunikacja ta odbywa się zgodnie z ustalonymi protokołami, z których każdy definiuje sposób wymiany danych, format komunikatów oraz reguły ich interpretacji.\nJedną z najważniejszych usług działających w Internecie jest World Wide Web (WWW). WWW opiera się głównie na protokole HTTP i umożliwia pobieranie zasobów takich jak dokumenty tekstowe, obrazy, pliki czy dane w formatach strukturalnych (JSON, XML).\nZ punktu widzenia automatycznego pozyskiwania danych:\n\nstrona WWW,\nendpoint API,\nplik CSV,\nodpowiedź JSON\n\nsą tym samym zjawiskiem technicznym: odpowiedzią HTTP przesyłaną z serwera do klienta.",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: HTTP i klienci HTTP"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#model-klientserwer-i-rola-http",
+    "href": "wyklady/wyklad_1.html#model-klientserwer-i-rola-http",
+    "title": "Wykład 1: HTTP i klienci HTTP",
+    "section": "",
+    "text": "Komunikacja w WWW odbywa się w modelu klient–serwer.\nKlient to program, który inicjuje połączenie, wysyła żądanie, odbiera odpowiedź i interpretuje otrzymane dane. Przykłady klientów:\n\nprzeglądarka internetowa,\nnarzędzie wiersza poleceń (curl),\nskrypt w Pythonie (requests),\nprogram automatycznie pobierający dane (crawler, bot).\n\nSerwer to program, który nasłuchuje żądań, przetwarza je i generuje odpowiedzi. Kluczowa cecha: serwer nie inicjuje komunikacji – zawsze reaguje na żądanie klienta.\nHTTP (Hypertext Transfer Protocol) jest protokołem warstwy aplikacji, zaprojektowanym jako mechanizm wymiany komunikatów typu żądanie → odpowiedź.\n\n\nHTTP jest protokołem bezstanowym – każde żądanie jest niezależne. W praktyce „stan” bywa symulowany przez:\n\nidentyfikatory sesji (np. cookies),\ntokeny autoryzacyjne przesyłane w nagłówkach (np. Authorization).\n\nNa tym etapie wystarczy rozumieć konsekwencję: jeśli serwer ma wykonać akcję zależną od kontekstu, to kontekst musi przyjść w żądaniu.",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: HTTP i klienci HTTP"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#komunikaty-http-żądanie-i-odpowiedź",
+    "href": "wyklady/wyklad_1.html#komunikaty-http-żądanie-i-odpowiedź",
+    "title": "Wykład 1: HTTP i klienci HTTP",
+    "section": "",
+    "text": "URL (np. https://example.com/search?q=python) opisuje gdzie wysłać żądanie.\nZasób to „co” chcemy pobrać (np. /index.html, /api/patients).\nEndpoint API to zwykle zasób, który zwraca dane (często JSON), np. /api/v1/items.\n\nW praktyce będziemy operować na trzech częściach URL:\n\nhost: example.com\nścieżka: /search\nparametry zapytania (query string): q=python\n\n\n\n\nKażde żądanie HTTP składa się z:\n\nlinii startowej (metoda, zasób, wersja protokołu),\nnagłówków (pary klucz–wartość),\nciała (opcjonalnie).\n\nPrzykład (HTTP/1.1, zapis tekstowy):\nGET /index.html HTTP/1.1\nHost: example.com\nUser-Agent: curl/8.0\nAccept: */*\n\n\n\nOdpowiedź HTTP składa się z:\n\nlinii statusu,\nnagłówków,\nciała odpowiedzi.\n\nPrzykład:\nHTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 1256\n\n&lt;html&gt;...&lt;/html&gt;\n\n\n\nPoniżej zestaw minimum, które warto kojarzyć od początku.\nTypowe nagłówki w żądaniu (request):\n\n\n\n\n\n\n\n\nNagłówek\nPo co?\nPrzykład\n\n\n\n\nHost\nwskazuje host (w HTTP/1.1 obowiązkowy)\nHost: example.com\n\n\nUser-Agent\nidentyfikacja klienta\nUser-Agent: curl/8.0\n\n\nAccept\njakie formaty akceptuje klient\nAccept: application/json\n\n\nContent-Type\nformat ciała żądania (gdy wysyłasz dane)\nContent-Type: application/json\n\n\nAuthorization\nuwierzytelnianie (token)\nAuthorization: Bearer …\n\n\n\nTypowe nagłówki w odpowiedzi (response):\n\n\n\n\n\n\n\n\nNagłówek\nPo co?\nPrzykład\n\n\n\n\nContent-Type\nformat treści\napplication/json; charset=utf-8\n\n\nContent-Length\nrozmiar odpowiedzi (bajty)\n1256\n\n\nLocation\ncel przekierowania (3xx)\nLocation: /new-path\n\n\nSet-Cookie\nustawienie cookies (stan/sesja)\nSet-Cookie: session=…\n\n\nRetry-After\nkiedy próbować ponownie (np. po 429/503)\nRetry-After: 120\n\n\n\nWarto odróżniać:\n\nAccept: co klient chciałby dostać (preferencja),\nContent-Type: co faktycznie jest wysyłane/otrzymane (format ciała komunikatu).\n\nSerwer może zignorować Accept albo nie być w stanie spełnić preferencji — dlatego finalnie zawsze ufamy Content-Type w odpowiedzi.\n\n\n\nNajczęściej spotkasz:\n\nGET – pobieranie zasobów (nie powinno zmieniać stanu serwera),\nPOST – wysyłanie danych do serwera (często tworzenie zasobów lub uruchomienie akcji),\nHEAD – jak GET, ale bez ciała odpowiedzi (przydatne do sprawdzenia nagłówków i rozmiaru).\n\n\n\n\nKody statusu informują o wyniku żądania:\n\n2xx – sukces (np. 200 OK)\n3xx – przekierowanie (np. 301, 302)\n4xx – błąd po stronie klienta (np. 404 Not Found, 403 Forbidden, 429 Too Many Requests)\n5xx – błąd serwera (np. 500, 503)\n\nW automatycznym pobieraniu danych kod statusu jest sygnałem sterującym: odpowiedź 200 i 404 wymagają zupełnie innego postępowania.",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: HTTP i klienci HTTP"
+    ]
+  },
+  {
+    "objectID": "wyklady/wyklad_1.html#klienci-http",
+    "href": "wyklady/wyklad_1.html#klienci-http",
+    "title": "Wykład 1: HTTP i klienci HTTP",
+    "section": "",
+    "text": "Zanim przejdziemy do klientów HTTP, warto najpierw wyjaśnić, czym jest URL.\n\n\nURL (Uniform Resource Locator) to adres zasobu w sieci. W kontekście HTTP najczęściej ma postać:\nscheme://host[:port]/path?query#fragment\nPrzykład: https://api.example.org/v1/users/123?verbose=1#section2\n\n\nSchemat (scheme)\nZwykle http lub https. https to HTTP z szyfrowaniem (TLS).\nHost (host)\nDomena lub IP, np. example.com, api.example.org, 192.0.2.10.\nPort (:port)\nOpcjonalny. Domyślnie 80 dla http i 443 dla https. Jeśli jest inny, pojawia się jawnie, np. http://localhost:8000/....\nŚcieżka (/path)\nIdentyfikuje zasób lub “trasę” w API, np. /v1/users/123.\nQuery (?query)\nParametry w formacie klucz=wartość, rozdzielane &, np. ?page=2&sort=name. Typowe zastosowania: filtrowanie, paginacja, sortowanie. (Format odpowiedzi często lepiej negocjować nagłówkiem Accept niż parametrem query.)\nFragment (#fragment)\nskazuje miejsce w dokumencie po stronie klienta (np. sekcję w HTML). Kluczowe: część #... nie jest wysyłana do serwera w żądaniu HTTP.\n\n\n\nTo rozróżnienie jest konwencją spotykaną w API (zwłaszcza REST). Wynika głównie z nazewnictwa, a nie ze specjalnej składni; ostatecznie znaczenie definiuje serwer.\nKolekcja (zbiór elementów)\nNajczęściej rzeczownik w liczbie mnogiej, np. /users, /orders. Typowo: GET /users zwraca listę, a POST /users tworzy nowy element.\nElement (konkretna instancja zasobu)\nNajczęściej kolekcja + identyfikator, np. /users/123. Typowo: GET /users/123 zwraca szczegóły, PUT/PATCH aktualizuje, DELETE usuwa.\nKolekcje zagnieżdżone\nNp. /users/123/posts (kolekcja zależna) i /users/123/posts/9 (konkretny element).\nUwaga: bez dokumentacji lub odpowiedzi serwera nie da się zawsze pewnie stwierdzić, co autor API miał na myśli (to tylko heurystyka).\n\n\n\nNie wszystkie znaki mogą występować w URL wprost (np. spacje, znaki diakrytyczne). Wtedy stosuje się kodowanie procentowe, np. spacja jako %20. W praktyce: nie koduj ręcznie, tylko korzystaj z narzędzi/bibliotek, które poprawnie kodują parametry.\n\n\n\n\nUżycie ? więcej niż raz:\n\n✅ /search?q=abc&lang=pl\n❌ /search?q=abc?lang=pl\n\nMylenie & (kolejny parametr) z # (fragment po stronie klienta).\nRęczne sklejanie parametrów bez kodowania znaków (spacje, &, = wewnątrz wartości).\n\n\n\n\n\nCharakterystyka. curl to uniwersalne narzędzie do wykonywania żądań HTTP z terminala. Jest świetne do nauki, bo nie ukrywa szczegółów (nagłówków, kodów statusu, przekierowań) i pozwala precyzyjnie kontrolować żądanie.\n\nNajczęściej używane opcje (co robią):\n\n-X &lt;METODA&gt; – wymusza metodę HTTP (np. GET, POST, PUT, DELETE). Uwaga: samo -d/--data zwykle powoduje użycie POST nawet bez -X.\n-H \"Nagłówek: wartość\" – dodaje nagłówek do żądania (możesz używać wielokrotnie).\n-d '...' / --data '...' – wysyła body jako dane formularza (application/x-www-form-urlencoded), o ile nie ustawisz innego Content-Type.\n--data-urlencode \"k=v\" – jak --data, ale z poprawnym URL-encodingiem (bezpieczne dla spacji, znaków specjalnych).\n-G – traktuje dane z --data/--data-urlencode jako parametry query (czyli robi GET ?k=v zamiast body).\n-i – wypisuje nagłówki odpowiedzi + body (nagłówki na początku).\n-I – wysyła HEAD i wypisuje same nagłówki odpowiedzi (bez body).\n-v – tryb diagnostyczny: pokazuje szczegóły połączenia, wysyłane nagłówki itd. (na stderr).\n-s – tryb “silent”: wycisza pasek postępu i część komunikatów.\n-S – gdy używasz -s, to -S wymusza wypisanie błędów (sensowne połączenie: -sS).\n-L – podąża za przekierowaniami (3xx Location:).\n-o &lt;plik&gt; – zapisuje body do pliku (OS-agnostyczne).\n-w \"&lt;format&gt;\" – dopisuje na końcu własne podsumowanie (np. kod statusu, czas odpowiedzi).\n--max-time &lt;sek&gt; – limit czasu całego żądania.\n--connect-timeout &lt;sek&gt; – limit czasu na nawiązanie połączenia.\n--fail – traktuje odpowiedzi &gt;=400 jako błąd (przydatne w skryptach).\n\n\nPodstawowe żądanie GET\ncurl https://example.com\nGET z parametrami query (bez ręcznego kodowania znaków)\ncurl -G \"https://httpbin.org/get\" --data-urlencode \"q=ala ma kota\" --data-urlencode \"page=1\"\nWyświetlenie samych nagłówków odpowiedzi\ncurl -I https://example.com\nNagłówki + body (czytelne do szybkiego “co zwróciło API?”)\ncurl -i https://httpbin.org/json\nTryb diagnostyczny (co dokładnie wysyłasz i co serwer odpowiada)\ncurl -v https://example.com\nPodążanie za przekierowaniami (np. http → https)\ncurl -L https://example.com\n\nPobieranie JSON i “ładne” formatowanie\ncurl -sS -H \"Accept: application/json\" https://httpbin.org/json | python -m json.tool\n\n-H \"Accept: application/json\" mówi serwerowi: “preferuję odpowiedź w JSON”.\npython -m json.tool formatuje JSON i sprawdza poprawność składni.\n\n\nWysyłanie JSON (POST) + kontrola nagłówków\ncurl -sS -X POST https://httpbin.org/post \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Accept: application/json\" \\\n  -d '{\"name\":\"Ala\",\"score\":42}'\n\nContent-Type opisuje format body, które wysyłasz.\nAccept opisuje format odpowiedzi, którego oczekujesz.\n\n\nStatus code + zapis odpowiedzi do pliku\nZapisz body do pliku i wypisz sam kod:\ncurl -sS -o response.txt -w \"%{http_code}\\n\" https://example.com\n\n-o response.txt zapisuje treść odpowiedzi do pliku (działa na każdym OS).\n-w \"%{http_code}\\n\" wypisuje kod statusu na stdout.\n\nWariant dla API (np. JSON):\ncurl -sS -o response.json -w \"%{http_code}\\n\" https://httpbin.org/json\n-w/--write-out przyjmuje szablon tekstowy: zwykłe znaki są wypisywane dosłownie, a fragmenty w postaci %{...} są podmieniane na wartości zmierzone/znane dla danego żądania (kod statusu, czas, rozmiar itd.). To jest bardzo podobne ideowo do f-stringa w Pythonie: wstawki “specjalne” są interpolowane w zwykły tekst.\n\n\nSkładnia:\n\npo -w podajesz łańcuch, np. \"HTTP=%{http_code} time=%{time_total}s\\n\"\ncurl wypisze ten tekst po zakończeniu żądania, zastępując:\n\n%{http_code} → np. 200\n%{time_total} → np. 0.123456\n\n\nPrzykład 1: tylko kod statusu\ncurl -sS -o response.txt -w \"HTTP=%{http_code}\\n\" https://example.com\nPrzykład 2: kod + typ treści\ncurl -sS -o response.txt -w \"HTTP=%{http_code} CT=%{content_type}\\n\" https://httpbin.org/json\nPrzykład 3: kod + czas\ncurl -sS -o response.txt -w \"HTTP=%{http_code} time=%{time_total}s\\n\" https://example.com\nNajczęściej używane wstawki %{...}:\n\n%{http_code} – kod statusu HTTP\n%{content_type} – Content-Type odpowiedzi\n%{time_total} – całkowity czas wykonania żądania (sekundy)\n%{size_download} – liczba pobranych bajtów\n%{url_effective} – finalny URL (po przekierowaniach, jeśli użyto -L)\n\n\nNajczęstsze błędy i jak je szybko zdiagnozować\n\n“Nie wiem czemu nie działa” → dodaj -v (zobaczysz nagłówki i przekierowania).\n“Skrypt ma działać niezawodnie” → użyj -sS --fail --max-time 10.\n“Serwer zwraca HTML zamiast JSON” → dodaj -H \"Accept: application/json\" i sprawdź Content-Type w odpowiedzi (-i albo -v).\n\n\n\n\n\nCharakterystyka. requests to wysokopoziomowa biblioteka Pythona do HTTP:\n\nupraszcza składnię,\nautomatycznie obsługuje część szczegółów (np. przekierowania),\ndobrze współpracuje z JSON-em.\n\nProste żądanie GET (tekst)\nimport requests\n\nr = requests.get(\"https://example.com\")\nprint(r.status_code)\nprint(r.text[:200])\nDostęp do nagłówków\nr.headers  # słownik-podobny obiekt\nSprawdzanie kodu statusu\nif r.status_code == 200:\n    print(\"Sukces\")\nelse:\n    print(\"Błąd\", r.status_code)\nPobieranie danych binarnych (np. obraz)\nr = requests.get(\"https://example.com/image.png\")\nwith open(\"image.png\", \"wb\") as f:\n    f.write(r.content)\nParametry zapytania (query string)\nparams = {\"q\": \"python\", \"page\": 2}\nr = requests.get(\"https://example.com/search\", params=params)\nWysyłanie danych POST (formularz)\npayload = {\"name\": \"Jan\", \"age\": 30}\nr = requests.post(\"https://httpbin.org/post\", data=payload)\nWysyłanie JSON\nr = requests.post(\n    \"https://httpbin.org/post\",\n    json={\"name\": \"Jan\", \"age\": 30}\n)\nOdbieranie JSON\nNajprostsza ścieżka:\nimport requests\n\nr = requests.get(\"https://httpbin.org/json\", timeout=5)\nr.raise_for_status()  # zamienia 4xx/5xx na wyjątek\n\ndata = r.json()       # parsowanie JSON -&gt; dict/list\nprint(type(data))\nprint(data.keys() if isinstance(data, dict) else len(data))\nTypowy błąd początkujących: serwer zwraca HTML (np. stronę błędu), a kod próbuje to parsować jako JSON. Dwie praktyczne zasady:\n\nsprawdzaj r.status_code (albo używaj r.raise_for_status()),\nsprawdzaj r.headers.get(\"Content-Type\") przed r.json().\n\nObsługa wyjątków (minimalny wzorzec)\nimport requests\n\ntry:\n    r = requests.get(\"https://example.com\", timeout=5)\n    r.raise_for_status()\nexcept requests.exceptions.Timeout:\n    print(\"Timeout\")\nexcept requests.exceptions.RequestException as e:\n    print(\"Błąd HTTP:\", e)\n\n\n\nDotychczas patrzyliśmy na HTTP od strony klienta. Po drugiej stronie jest serwer HTTP: program, który odbiera żądanie, interpretuje je i zwraca odpowiedź w standardowej strukturze:\n\nlinia statusu (np. HTTP/1.1 200 OK)\nnagłówki\nciało (opcjonalnie: HTML/JSON/binarne dane)\n\nZ perspektywy protokołu serwer jest “czarną skrzynką”, ale technicznie wykonuje zwykle te kroki:\n1) Parsowanie żądania\n\nmetoda (GET/POST/...), ścieżka (/path), parametry query (?a=1&b=2)\nnagłówki (np. Accept, Authorization, User-Agent)\nciało (np. JSON) + typ z Content-Type\n\n2) Routing i logika\n\nwybór “handlera” na podstawie metody i ścieżki (np. GET /users/123)\nwalidacja danych wejściowych (typy, zakresy, brakujące pola)\nautoryzacja/uwierzytelnienie (jeśli dotyczy)\n\n3) Budowa odpowiedzi\n\ndobór kodu statusu\nustawienie nagłówków\nserializacja danych (np. do JSON) lub zwrot błędu w ustalonym formacie\n\n\n\nNajbardziej informacyjne elementy odpowiedzi (to one sterują zachowaniem klienta):\n\nStatus code – podstawowa informacja o wyniku:\n\n2xx sukces, 3xx przekierowanie, 4xx błąd po stronie klienta, 5xx błąd serwera\n\nContent-Type – w jakim formacie jest body (np. application/json; charset=utf-8)\nLocation – gdzie przekierować lub gdzie znajduje się utworzony zasób (często przy 201 Created)\nCache-Control / ETag – czy i jak można cachować odpowiedź\nRetry-After – kiedy spróbować ponownie (często przy limitach/rate limit)\nWWW-Authenticate – informacja o wymaganym uwierzytelnieniu (np. przy 401)",
+    "crumbs": [
+      "Wykłady",
+      "Wykład 1: HTTP i klienci HTTP"
+    ]
+  }
+]
