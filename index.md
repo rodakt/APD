@@ -13,7 +13,7 @@ Kurs uczy automatycznego pozyskiwania danych z sieci. Zaczynamy od protokołu HT
 ## Laboratoria
 
 - [Laboratorium 0: Python — podstawy](laby/lab_0.md)
-- [Laboratorium 1: HTTP i klienci HTTP](laby/lab_1.md)
+<!-- - [Laboratorium 1: HTTP i klienci HTTP](laby/lab_1.md) -->
 
 ## Zaliczenie
 
