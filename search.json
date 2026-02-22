@@ -204,7 +204,7 @@
     "href": "laby/lab_0.html#thonny",
     "title": "Lab 0: Python — odświeżenie podstaw",
     "section": "2.1 Thonny",
-    "text": "2.1 Thonny\nNa dzisiejszych zajęciach korzystamy z Thonny — lekkiego edytora Pythona z wbudowanym interpreterem, oknem zmiennych i debuggerem. , Otwórz Thonny. Upewnij się, że w prawym dolnym rogu widoczna jest wersja Pythona 3.10 lub nowsza. Jeśli nie — zgłoś.\nW Thonnym będziemy pracować w dwóch trybach:\n\nEdytor (górny panel) — tu piszesz skrypty i uruchamiasz je klawiszem F5 (lub przyciskiem ▶).\nShell (dolny panel) — tu widzisz wyniki i możesz wpisywać pojedyncze polecenia.",
+    "text": "2.1 Thonny\nNa dzisiejszych zajęciach korzystamy z Thonny — lekkiego edytora Pythona z wbudowanym interpreterem, oknem zmiennych i debuggerem.\nOtwórz Thonny. Upewnij się, że w prawym dolnym rogu widoczna jest wersja Pythona 3.10 lub nowsza.\nW Thonnym będziemy pracować w dwóch trybach:\n\nEdytor (górny panel) — tu piszesz skrypty i uruchamiasz je klawiszem F5 (lub przyciskiem ▶).\nShell (dolny panel) — tu widzisz wyniki i możesz wpisywać pojedyncze polecenia.",
     "crumbs": [
       "Laboratoria",
       "Lab 0: Python — odświeżenie podstaw"
@@ -215,7 +215,7 @@
     "href": "laby/lab_0.html#szybki-test",
     "title": "Lab 0: Python — odświeżenie podstaw",
     "section": "2.2 Szybki test",
-    "text": "2.2 Szybki test\nUtwórz nowy plik (File → New), wpisz:\nimport sys\nprint(\"Python\", sys.version)\nprint(\"Wszystko działa!\")\nZapisz plik jako lab0_test.py i uruchom (F5).\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy widzisz w Shellu wersję Pythona i komunikat „Wszystko działa!“? Jeśli nie — zgłoś, zanim przejdziesz dalej.",
+    "text": "2.2 Szybki test\nUtwórz nowy plik (File → New), wpisz:\nimport sys\nprint(\"Python\", sys.version)\nprint(\"Wszystko działa!\")\nZapisz plik jako lab0_test.py i uruchom (F5).\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy widzisz w Shellu wersję Pythona i komunikat „Wszystko działa!“?",
     "crumbs": [
       "Laboratoria",
       "Lab 0: Python — odświeżenie podstaw"
@@ -281,7 +281,7 @@
     "href": "laby/lab_0.html#ćwiczenie-zagnieżdżona-struktura-danych",
     "title": "Lab 0: Python — odświeżenie podstaw",
     "section": "3.5 Ćwiczenie: zagnieżdżona struktura danych",
-    "text": "3.5 Ćwiczenie: zagnieżdżona struktura danych\nPoniższy słownik imituje typową odpowiedź sieciowego źródła danych. Wklej go do nowego pliku w Thonnym:\nresponse = {\n    \"data\": [\n        {\n            \"id\": \"101\",\n            \"type\": \"dataset\",\n            \"attributes\": {\n                \"title\": \"Dane meteorologiczne\",\n                \"category\": \"Environment\",\n                \"resources_count\": 5\n            }\n        },\n        {\n            \"id\": \"202\",\n            \"type\": \"dataset\",\n            \"attributes\": {\n                \"title\": \"Budżety gmin\",\n                \"category\": \"Finance\",\n                \"resources_count\": 12\n            }\n        },\n        {\n            \"id\": \"303\",\n            \"type\": \"dataset\",\n            \"attributes\": {\n                \"title\": \"Lista szkół podstawowych\",\n                \"category\": \"Education\"\n            }\n        },\n    ],\n    \"meta\": {\n        \"count\": 1500\n    }\n}\nNapisz kod, który:\n\nWypisuje łączną liczbę zbiorów z pola meta → count.\nWypisuje tytuły i kategorie wszystkich datasetów z listy data.\nWypisuje resources_count każdego datasetu. Uwaga: trzeci element nie ma tego pola — użyj .get().\n\nSpodziewany wynik:\nŁączna liczba zbiorów: 1500\n\n  [101] Dane meteorologiczne (Environment), zasoby: 5\n  [202] Budżety gmin (Finance), zasoby: 12\n  [303] Lista szkół podstawowych (Education), zasoby: ?\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy Twój kod wypisuje trzy linie z danymi i nie rzuca KeyError na trzecim elemencie? Jeśli tak — poprawnie nawigujesz po zagnieżdżonych słownikach i listach.",
+    "text": "3.5 Ćwiczenie: zagnieżdżona struktura danych\nPoniższy słownik imituje typową odpowiedź sieciowego źródła danych. Wklej go do nowego pliku w Thonnym:\nresponse = {\n    \"data\": [\n        {\n            \"id\": \"101\",\n            \"type\": \"dataset\",\n            \"attributes\": {\n                \"title\": \"Dane meteorologiczne\",\n                \"category\": \"Environment\",\n                \"resources_count\": 5\n            }\n        },\n        {\n            \"id\": \"202\",\n            \"type\": \"dataset\",\n            \"attributes\": {\n                \"title\": \"Budżety gmin\",\n                \"category\": \"Finance\",\n                \"resources_count\": 12\n            }\n        },\n        {\n            \"id\": \"303\",\n            \"type\": \"dataset\",\n            \"attributes\": {\n                \"title\": \"Lista szkół podstawowych\",\n                \"category\": \"Education\"\n            }\n        },\n    ],\n    \"meta\": {\n        \"count\": 1500\n    }\n}\nNapisz kod, który:\n\nWypisuje łączną liczbę zbiorów z pola meta → count.\nWypisuje tytuły i kategorie wszystkich datasetów z listy data.\nWypisuje resources_count każdego datasetu. Uwaga: trzeci element nie ma tego pola — użyj .get().\n\nSpodziewany wynik:\nŁączna liczba zbiorów: 1500\n\n  [101] Dane meteorologiczne (Environment), zasoby: 5\n  [202] Budżety gmin (Finance), zasoby: 12\n  [303] Lista szkół podstawowych (Education), zasoby: ?\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy Twój kod wypisuje trzy linie z danymi i nie rzuca KeyError na trzecim elemencie?",
     "crumbs": [
       "Laboratoria",
       "Lab 0: Python — odświeżenie podstaw"
@@ -347,7 +347,7 @@
     "href": "laby/lab_0.html#ćwiczenie-zbieranie-z-limitem",
     "title": "Lab 0: Python — odświeżenie podstaw",
     "section": "5.3 Ćwiczenie: zbieranie z limitem",
-    "text": "5.3 Ćwiczenie: zbieranie z limitem\nZmodyfikuj powyższy kod tak, żeby pobieranie zatrzymało się po zebraniu co najmniej 4 nazwisk (nawet jeśli są jeszcze kolejne strony). Wypisz zebrane nazwiska i numer ostatniej pobranej strony.\nWskazówka: extend dodaje całą stronę naraz, więc łączna liczba może przekroczyć limit — to normalne. Ważne, żeby pętla nie przechodziła do kolejnych stron.\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy Twój kod zatrzymuje się po stronie 2 (zebrano 6 nazwisk — przekroczono limit 4) i nie przetwarza strony 3? Strona 3 zawiera dane, więc to limit — a nie pusta strona — powoduje zatrzymanie.",
+    "text": "5.3 Ćwiczenie: zbieranie z limitem\nZmodyfikuj powyższy kod tak, żeby pobieranie zatrzymało się po zebraniu co najmniej 4 nazwisk (nawet jeśli są jeszcze kolejne strony). Wypisz zebrane nazwiska i numer ostatniej pobranej strony.\nWskazówka: extend dodaje całą stronę naraz, więc łączna liczba może przekroczyć limit.\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy Twój kod zatrzymuje się po stronie 2 (zebrano 6 nazwisk — przekroczono limit 4) i nie przetwarza strony 3? Strona 3 zawiera dane, więc to limit — a nie pusta strona — powoduje zatrzymanie.",
     "crumbs": [
       "Laboratoria",
       "Lab 0: Python — odświeżenie podstaw"
@@ -501,29 +501,29 @@
     "href": "laby/lab_0.html#zadanie-a-list-comprehension",
     "title": "Lab 0: Python — odświeżenie podstaw",
     "section": "10.1 Zadanie A: list comprehension",
-    "text": "10.1 Zadanie A: list comprehension\nPrzepisz funkcję extract_titles z sekcji „Funkcje” tak, żeby używała list comprehension zamiast pętli:\ndef extract_titles(response_data):\n    return [...]  # jedna linia\nRozszerzenie: napisz wersję, która zwraca tylko tytuły datasetów z kategorii \"Environment\".",
+    "text": "10.1 Zadanie A: list comprehension\nDany jest słownik:\nitems = [\n    {\"id\": \"1\", \"name\": \"Alfa\", \"score\": 80},\n    {\"id\": \"2\", \"name\": \"Beta\", \"score\": 45},\n    {\"id\": \"3\", \"name\": \"Gamma\", \"score\": 92},\n    {\"id\": \"4\", \"name\": \"Delta\", \"score\": 61},\n]\n\nWyciągnij listę wszystkich nazw (name) za pomocą list comprehension — w jednej linii.\nWyciągnij listę nazw tylko tych elementów, które mają score &gt; 70.",
     "crumbs": [
       "Laboratoria",
       "Lab 0: Python — odświeżenie podstaw"
     ]
   },
   {
-    "objectID": "laby/lab_0.html#zadanie-b-słownik-z-listy",
-    "href": "laby/lab_0.html#zadanie-b-słownik-z-listy",
+    "objectID": "laby/lab_0.html#zadanie-b-dict-comprehension",
+    "href": "laby/lab_0.html#zadanie-b-dict-comprehension",
     "title": "Lab 0: Python — odświeżenie podstaw",
-    "section": "10.2 Zadanie B: słownik z listy",
-    "text": "10.2 Zadanie B: słownik z listy\nMając listę records[\"data\"], utwórz słownik mapujący id → title:\n# Spodziewany wynik:\n# {\"10\": \"Pomiary hałasu\", \"20\": \"Emisje CO2\", ...}\nUżyj dict comprehension.",
+    "section": "10.2 Zadanie B: dict comprehension",
+    "text": "10.2 Zadanie B: dict comprehension\nMając tę samą listę items co w Zadaniu A, utwórz słownik mapujący id → name:\n# Spodziewany wynik:\n# {\"1\": \"Alfa\", \"2\": \"Beta\", \"3\": \"Gamma\", \"4\": \"Delta\"}\nUżyj dict comprehension.",
     "crumbs": [
       "Laboratoria",
       "Lab 0: Python — odświeżenie podstaw"
     ]
   },
   {
-    "objectID": "laby/lab_0.html#zadanie-c-obsługa-wielu-plików",
-    "href": "laby/lab_0.html#zadanie-c-obsługa-wielu-plików",
+    "objectID": "laby/lab_0.html#zadanie-c-grupowanie-danych",
+    "href": "laby/lab_0.html#zadanie-c-grupowanie-danych",
     "title": "Lab 0: Python — odświeżenie podstaw",
-    "section": "10.3 Zadanie C: obsługa wielu plików",
-    "text": "10.3 Zadanie C: obsługa wielu plików\nNapisz funkcję save_per_format(response, output_dir), która:\n\nGrupuje datasety według formatu (CSV, JSON, XML, unknown).\nDla każdego formatu zapisuje osobny plik, np. CSV.json, JSON.json, unknown.json.\nZwraca słownik {format: count}.\n\nWskazówka: użyj dict z listami jako wartościami albo collections.defaultdict(list).",
+    "section": "10.3 Zadanie C: grupowanie danych",
+    "text": "10.3 Zadanie C: grupowanie danych\nNapisz funkcję group_by_key(items, key), która:\n\nPrzyjmuje listę słowników i nazwę klucza.\nZwraca słownik, w którym kluczami są unikalne wartości tego pola, a wartościami — listy elementów z tą wartością.\n\nPrzykład:\nproducts = [\n    {\"name\": \"Mleko\", \"category\": \"Nabiał\"},\n    {\"name\": \"Ser\", \"category\": \"Nabiał\"},\n    {\"name\": \"Chleb\", \"category\": \"Pieczywo\"},\n    {\"name\": \"Bułka\", \"category\": \"Pieczywo\"},\n    {\"name\": \"Jogurt\", \"category\": \"Nabiał\"},\n]\n\ngrouped = group_by_key(products, \"category\")\nprint(grouped)\n# {\n#   \"Nabiał\": [{\"name\": \"Mleko\", ...}, {\"name\": \"Ser\", ...}, {\"name\": \"Jogurt\", ...}],\n#   \"Pieczywo\": [{\"name\": \"Chleb\", ...}, {\"name\": \"Bułka\", ...}]\n# }\nWskazówka: zacznij od pustego słownika. Dla każdego elementu sprawdź, czy klucz już istnieje — jeśli nie, utwórz pustą listę. Alternatywnie: collections.defaultdict(list).",
     "crumbs": [
       "Laboratoria",
       "Lab 0: Python — odświeżenie podstaw"
@@ -564,7 +564,7 @@
     "href": "index.html#laboratoria",
     "title": "Automatyczne pozyskiwanie danych",
     "section": "3 Laboratoria",
-    "text": "3 Laboratoria\n\nLaboratorium 0: Python — podstawy",
+    "text": "3 Laboratoria\n\nLaboratorium 0: Python — odświeżenie podstaw",
     "crumbs": [
       "Automatyczne pozyskiwanie danych"
     ]

@@ -247,8 +247,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#zadania-dodatkowe" id="toc-zadania-dodatkowe" class="nav-link" data-scroll-target="#zadania-dodatkowe"><span class="header-section-number">10</span> Zadania dodatkowe</a>
   <ul class="collapse">
   <li><a href="#zadanie-a-list-comprehension" id="toc-zadanie-a-list-comprehension" class="nav-link" data-scroll-target="#zadanie-a-list-comprehension"><span class="header-section-number">10.1</span> Zadanie A: list comprehension</a></li>
-  <li><a href="#zadanie-b-słownik-z-listy" id="toc-zadanie-b-słownik-z-listy" class="nav-link" data-scroll-target="#zadanie-b-słownik-z-listy"><span class="header-section-number">10.2</span> Zadanie B: słownik z listy</a></li>
-  <li><a href="#zadanie-c-obsługa-wielu-plików" id="toc-zadanie-c-obsługa-wielu-plików" class="nav-link" data-scroll-target="#zadanie-c-obsługa-wielu-plików"><span class="header-section-number">10.3</span> Zadanie C: obsługa wielu plików</a></li>
+  <li><a href="#zadanie-b-dict-comprehension" id="toc-zadanie-b-dict-comprehension" class="nav-link" data-scroll-target="#zadanie-b-dict-comprehension"><span class="header-section-number">10.2</span> Zadanie B: dict comprehension</a></li>
+  <li><a href="#zadanie-c-grupowanie-danych" id="toc-zadanie-c-grupowanie-danych" class="nav-link" data-scroll-target="#zadanie-c-grupowanie-danych"><span class="header-section-number">10.3</span> Zadanie C: grupowanie danych</a></li>
   </ul></li>
   <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">11</span> Podsumowanie</a></li>
   </ul>
@@ -300,7 +300,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1 data-number="2"><span class="header-section-number">2</span> Przygotowanie środowiska</h1>
 <section id="thonny" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="thonny"><span class="header-section-number">2.1</span> Thonny</h2>
-<p>Na dzisiejszych zajęciach korzystamy z <strong>Thonny</strong> — lekkiego edytora Pythona z wbudowanym interpreterem, oknem zmiennych i debuggerem. , Otwórz Thonny. Upewnij się, że w prawym dolnym rogu widoczna jest wersja Pythona <strong>3.10</strong> lub nowsza. Jeśli nie — zgłoś.</p>
+<p>Na dzisiejszych zajęciach korzystamy z <strong>Thonny</strong> — lekkiego edytora Pythona z wbudowanym interpreterem, oknem zmiennych i debuggerem.</p>
+<p>Otwórz Thonny. Upewnij się, że w prawym dolnym rogu widoczna jest wersja Pythona <strong>3.10</strong> lub nowsza.</p>
 <p>W Thonnym będziemy pracować w dwóch trybach:</p>
 <ul>
 <li><strong>Edytor</strong> (górny panel) — tu piszesz skrypty i uruchamiasz je klawiszem <strong>F5</strong> (lub przyciskiem ▶).</li>
@@ -324,7 +325,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Czy widzisz w Shellu wersję Pythona i komunikat „Wszystko działa!“? Jeśli nie — zgłoś, zanim przejdziesz dalej.</p>
+<p>Czy widzisz w Shellu wersję Pythona i komunikat „Wszystko działa!“?</p>
 </div>
 </div>
 </section>
@@ -489,7 +490,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Czy Twój kod wypisuje trzy linie z danymi i nie rzuca <code>KeyError</code> na trzecim elemencie? Jeśli tak — poprawnie nawigujesz po zagnieżdżonych słownikach i listach.</p>
+<p>Czy Twój kod wypisuje trzy linie z danymi i nie rzuca <code>KeyError</code> na trzecim elemencie?</p>
 </div>
 </div>
 <hr>
@@ -497,7 +498,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="funkcje" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Funkcje</h1>
-<p>W dalszej części kursu będziemy zamykać powtarzalne operacje w funkcjach. Przygotujmy się do tego.</p>
+<p>Powtarzalne operacje należy zamykać w funkcjach.</p>
 <section id="podstawowa-funkcja" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="podstawowa-funkcja"><span class="header-section-number">4.1</span> Podstawowa funkcja</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> greet(name):</span>
@@ -630,7 +631,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="ćwiczenie-zbieranie-z-limitem" class="level2" data-number="5.3">
 <h2 data-number="5.3" class="anchored" data-anchor-id="ćwiczenie-zbieranie-z-limitem"><span class="header-section-number">5.3</span> Ćwiczenie: zbieranie z limitem</h2>
 <p>Zmodyfikuj powyższy kod tak, żeby pobieranie zatrzymało się po zebraniu <strong>co najmniej 4 nazwisk</strong> (nawet jeśli są jeszcze kolejne strony). Wypisz zebrane nazwiska i numer ostatniej pobranej strony.</p>
-<p>Wskazówka: <code>extend</code> dodaje całą stronę naraz, więc łączna liczba może przekroczyć limit — to normalne. Ważne, żeby pętla nie przechodziła do kolejnych stron.</p>
+<p>Wskazówka: <code>extend</code> dodaje całą stronę naraz, więc łączna liczba może przekroczyć limit.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -914,27 +915,48 @@ Zapisano 3 elementów (z limitem)</code></pre>
 <p>Poniższe zadania poruszają tematy, które przydadzą się w dalszej części kursu.</p>
 <section id="zadanie-a-list-comprehension" class="level2" data-number="10.1">
 <h2 data-number="10.1" class="anchored" data-anchor-id="zadanie-a-list-comprehension"><span class="header-section-number">10.1</span> Zadanie A: list comprehension</h2>
-<p>Przepisz funkcję <code>extract_titles</code> z sekcji „Funkcje” tak, żeby używała list comprehension zamiast pętli:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_titles(response_data):</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [...]  <span class="co"># jedna linia</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Rozszerzenie: napisz wersję, która zwraca tylko tytuły datasetów z kategorii <code>"Environment"</code>.</p>
+<p>Dany jest słownik:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>items <span class="op">=</span> [</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"id"</span>: <span class="st">"1"</span>, <span class="st">"name"</span>: <span class="st">"Alfa"</span>, <span class="st">"score"</span>: <span class="dv">80</span>},</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"id"</span>: <span class="st">"2"</span>, <span class="st">"name"</span>: <span class="st">"Beta"</span>, <span class="st">"score"</span>: <span class="dv">45</span>},</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"id"</span>: <span class="st">"3"</span>, <span class="st">"name"</span>: <span class="st">"Gamma"</span>, <span class="st">"score"</span>: <span class="dv">92</span>},</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"id"</span>: <span class="st">"4"</span>, <span class="st">"name"</span>: <span class="st">"Delta"</span>, <span class="st">"score"</span>: <span class="dv">61</span>},</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ol type="1">
+<li>Wyciągnij listę wszystkich nazw (<code>name</code>) za pomocą list comprehension — w jednej linii.</li>
+<li>Wyciągnij listę nazw tylko tych elementów, które mają <code>score</code> &gt; 70.</li>
+</ol>
 </section>
-<section id="zadanie-b-słownik-z-listy" class="level2" data-number="10.2">
-<h2 data-number="10.2" class="anchored" data-anchor-id="zadanie-b-słownik-z-listy"><span class="header-section-number">10.2</span> Zadanie B: słownik z listy</h2>
-<p>Mając listę <code>records["data"]</code>, utwórz słownik mapujący <code>id → title</code>:</p>
+<section id="zadanie-b-dict-comprehension" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="zadanie-b-dict-comprehension"><span class="header-section-number">10.2</span> Zadanie B: dict comprehension</h2>
+<p>Mając tę samą listę <code>items</code> co w Zadaniu A, utwórz słownik mapujący <code>id → name</code>:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Spodziewany wynik:</span></span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co"># {"10": "Pomiary hałasu", "20": "Emisje CO2", ...}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co"># {"1": "Alfa", "2": "Beta", "3": "Gamma", "4": "Delta"}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Użyj dict comprehension.</p>
 </section>
-<section id="zadanie-c-obsługa-wielu-plików" class="level2" data-number="10.3">
-<h2 data-number="10.3" class="anchored" data-anchor-id="zadanie-c-obsługa-wielu-plików"><span class="header-section-number">10.3</span> Zadanie C: obsługa wielu plików</h2>
-<p>Napisz funkcję <code>save_per_format(response, output_dir)</code>, która:</p>
+<section id="zadanie-c-grupowanie-danych" class="level2" data-number="10.3">
+<h2 data-number="10.3" class="anchored" data-anchor-id="zadanie-c-grupowanie-danych"><span class="header-section-number">10.3</span> Zadanie C: grupowanie danych</h2>
+<p>Napisz funkcję <code>group_by_key(items, key)</code>, która:</p>
 <ol type="1">
-<li>Grupuje datasety według formatu (<code>CSV</code>, <code>JSON</code>, <code>XML</code>, <code>unknown</code>).</li>
-<li>Dla każdego formatu zapisuje osobny plik, np. <code>CSV.json</code>, <code>JSON.json</code>, <code>unknown.json</code>.</li>
-<li>Zwraca słownik <code>{format: count}</code>.</li>
+<li>Przyjmuje listę słowników i nazwę klucza.</li>
+<li>Zwraca słownik, w którym kluczami są unikalne wartości tego pola, a wartościami — listy elementów z tą wartością.</li>
 </ol>
-<p>Wskazówka: użyj <code>dict</code> z listami jako wartościami albo <code>collections.defaultdict(list)</code>.</p>
+<p>Przykład:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>products <span class="op">=</span> [</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Mleko"</span>, <span class="st">"category"</span>: <span class="st">"Nabiał"</span>},</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Ser"</span>, <span class="st">"category"</span>: <span class="st">"Nabiał"</span>},</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Chleb"</span>, <span class="st">"category"</span>: <span class="st">"Pieczywo"</span>},</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Bułka"</span>, <span class="st">"category"</span>: <span class="st">"Pieczywo"</span>},</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Jogurt"</span>, <span class="st">"category"</span>: <span class="st">"Nabiał"</span>},</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>grouped <span class="op">=</span> group_by_key(products, <span class="st">"category"</span>)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(grouped)</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a><span class="co"># {</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   "Nabiał": [{"name": "Mleko", ...}, {"name": "Ser", ...}, {"name": "Jogurt", ...}],</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   "Pieczywo": [{"name": "Chleb", ...}, {"name": "Bułka", ...}]</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a><span class="co"># }</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wskazówka: zacznij od pustego słownika. Dla każdego elementu sprawdź, czy klucz już istnieje — jeśli nie, utwórz pustą listę. Alternatywnie: <code>collections.defaultdict(list)</code>.</p>
 <hr>
 </section>
 </section>
@@ -946,7 +968,7 @@ Zapisano 3 elementów (z limitem)</code></pre>
 <li>przećwiczyłeś nawigację po zagnieżdżonych słownikach i listach — klucz do pracy z danymi w formacie JSON,</li>
 <li>napisałeś funkcje z parametrami domyślnymi i docstringami,</li>
 <li>opanowałeś pętle <code>for</code> i <code>while</code> z <code>break</code> i <code>extend</code>,</li>
-<li>obsłużyłeś wyjątki (<code>try</code> / <code>except</code>) — bez tego żaden skrypt automatyzujący nie przetrwa kontaktu z rzeczywistością,</li>
+<li>obsłużyłeś wyjątki (<code>try</code> / <code>except</code>)</li>
 <li>zapisałeś dane do pliku JSON z użyciem <code>pathlib</code>.</li>
 </ul>
 <p>Na następnych zajęciach wykorzystamy te umiejętności w praktyce — zaczniemy pobierać dane z sieci.</p>
