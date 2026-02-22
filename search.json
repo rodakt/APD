@@ -534,7 +534,7 @@
     "href": "index.html",
     "title": "Automatyczne pozyskiwanie danych",
     "section": "",
-    "text": "Kurs uczy automatycznego pozyskiwania danych z sieci. Zaczynamy od protokołu HTTP i pracy z API, przechodzimy przez parsowanie HTML i crawling, kończymy na asynchronicznym pobieraniu danych, Scrapy i Selenium.",
+    "text": "Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z sieci. Zaczynamy od protokołu HTTP i pracy z API, przechodzimy przez parsowanie HTML i crawling, kończymy na asynchronicznym pobieraniu danych, Scrapy i Selenium.",
     "crumbs": [
       "Automatyczne pozyskiwanie danych"
     ]
@@ -544,7 +544,7 @@
     "href": "index.html#opis-przedmiotu",
     "title": "Automatyczne pozyskiwanie danych",
     "section": "",
-    "text": "Kurs uczy automatycznego pozyskiwania danych z sieci. Zaczynamy od protokołu HTTP i pracy z API, przechodzimy przez parsowanie HTML i crawling, kończymy na asynchronicznym pobieraniu danych, Scrapy i Selenium.",
+    "text": "Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z sieci. Zaczynamy od protokołu HTTP i pracy z API, przechodzimy przez parsowanie HTML i crawling, kończymy na asynchronicznym pobieraniu danych, Scrapy i Selenium.",
     "crumbs": [
       "Automatyczne pozyskiwanie danych"
     ]
@@ -584,297 +584,189 @@
     "href": "laby/lab_1.html",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "",
-    "text": "Zakres materiału:\n\nWysyłanie żądań HTTP do publicznego API i odbieranie odpowiedzi w Pythonie,\nRozpoznawanie w odpowiedzi kodu statusu, nagłówków i ciała (JSON),\nKorzystanie z interaktywnej dokumentacji API (Swagger),\nPoruszanie się po strukturze JSON:API: listy, obiekty, pola data, attributes, links.\n\nNarzędzia: Python (requests), curl (krótko, jako narzędzie diagnostyczne), przeglądarka.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "Zakres materiału:\n\nWysyłanie żądań HTTP do publicznego API i odbieranie odpowiedzi w Pythonie,\nRozpoznawanie w odpowiedzi kodu statusu, nagłówków i ciała (JSON),\nKorzystanie z interaktywnej dokumentacji API (Swagger),\nPoruszanie się po strukturze JSON:API: listy, obiekty, pola data, attributes, links.\n\nNarzędzia: Python (requests), curl (krótko, jako narzędzie diagnostyczne), przeglądarka."
   },
   {
     "objectID": "laby/lab_1.html#portal-i-api",
     "href": "laby/lab_1.html#portal-i-api",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "2.1 Portal i API",
-    "text": "2.1 Portal i API\ndane.gov.pl to polski portal otwartych danych publicznych. Publikuje zbiory danych (datasety) udostępniane przez instytucje państwowe — od jakości powietrza, przez rejestry szkół, po rozkłady jazdy.\nPortal udostępnia API (Application Programming Interface) — interfejs, przez który program komputerowy może pobierać te same dane, które widzisz na stronie, ale w formacie nadającym się do automatycznego przetwarzania (JSON zamiast HTML).\nAdres bazowy API: https://api.dane.gov.pl/1.4\nNumer 1.4 to wersja API. Gdyby się zmieniła, wystarczy podmienić go w jednym miejscu.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "2.1 Portal i API\ndane.gov.pl to polski portal otwartych danych publicznych. Publikuje zbiory danych (datasety) udostępniane przez instytucje państwowe — od jakości powietrza, przez rejestry szkół, po rozkłady jazdy.\nPortal udostępnia API (Application Programming Interface) — interfejs, przez który program komputerowy może pobierać te same dane, które widzisz na stronie, ale w formacie nadającym się do automatycznego przetwarzania (JSON zamiast HTML).\nAdres bazowy API: https://api.dane.gov.pl/1.4\nNumer 1.4 to wersja API. Gdyby się zmieniła, wystarczy podmienić go w jednym miejscu."
   },
   {
     "objectID": "laby/lab_1.html#mapa-zasobów-api",
     "href": "laby/lab_1.html#mapa-zasobów-api",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "2.2 Mapa zasobów API",
-    "text": "2.2 Mapa zasobów API\nAPI dane.gov.pl organizuje dane w hierarchię, którą najłatwiej zrozumieć jako zagnieżdżone kolekcje:\n/datasets                        ← kolekcja: lista wszystkich zbiorów danych\n/datasets/{id}                   ← element: szczegóły jednego zbioru\n/datasets/{id}/resources         ← kolekcja zagnieżdżona: zasoby (pliki) w zbiorze\n/datasets/{id}/resources/{rid}   ← element: metadane jednego zasobu\nTo jest dokładnie wzorzec kolekcja / element / podzasób, który poznałeś na wykładzie.\nPrzykładowo:\n\nGET /1.4/datasets?page=1&per_page=5 — pobierz pierwszych 5 zbiorów (kolekcja, stronicowana),\nGET /1.4/datasets/830 — pobierz szczegóły zbioru o id = 830,\nGET /1.4/datasets/830/resources — pobierz listę zasobów zbioru 830.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "2.2 Mapa zasobów API\nAPI dane.gov.pl organizuje dane w hierarchię, którą najłatwiej zrozumieć jako zagnieżdżone kolekcje:\n/datasets                        ← kolekcja: lista wszystkich zbiorów danych\n/datasets/{id}                   ← element: szczegóły jednego zbioru\n/datasets/{id}/resources         ← kolekcja zagnieżdżona: zasoby (pliki) w zbiorze\n/datasets/{id}/resources/{rid}   ← element: metadane jednego zasobu\nTo jest dokładnie wzorzec kolekcja / element / podzasób, który poznałeś na wykładzie.\nPrzykładowo:\n\nGET /1.4/datasets?page=1&per_page=5 — pobierz pierwszych 5 zbiorów (kolekcja, stronicowana),\nGET /1.4/datasets/830 — pobierz szczegóły zbioru o id = 830,\nGET /1.4/datasets/830/resources — pobierz listę zasobów zbioru 830."
   },
   {
     "objectID": "laby/lab_1.html#format-odpowiedzi-jsonapi",
     "href": "laby/lab_1.html#format-odpowiedzi-jsonapi",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "2.3 Format odpowiedzi: JSON:API",
-    "text": "2.3 Format odpowiedzi: JSON:API\nAPI dane.gov.pl używa standardu JSON:API (specyfikacja: jsonapi.org). W praktyce oznacza to, że odpowiedzi mają stałą strukturę:\n{\n  \"data\": [\n    {\n      \"id\": \"830\",\n      \"type\": \"dataset\",\n      \"attributes\": {\n        \"title\": \"Wykaz szkół i placówek oświatowych\",\n        \"notes\": \"Rejestr Szkół i Placówek Oświatowych ...\",\n        \"category\": \"Education\",\n        \"modified\": \"2025-01-15T10:32:00Z\"\n      },\n      \"relationships\": { ... },\n      \"links\": {\n        \"self\": \"https://api.dane.gov.pl/1.4/datasets/830\"\n      }\n    },\n    ...\n  ],\n  \"links\": {\n    \"self\":  \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=5\",\n    \"next\":  \"https://api.dane.gov.pl/1.4/datasets?page=2&per_page=5\",\n    \"last\":  \"https://api.dane.gov.pl/1.4/datasets?page=...\"\n  },\n  \"meta\": {\n    \"count\": 12345\n  }\n}\nCo warto zapamiętać:\n\ndata — lista (lub pojedynczy obiekt) z wynikami; to jest główna część odpowiedzi,\nid i type — identyfikator i typ zasobu,\nattributes — słownik z właściwymi danymi (tytuł, opis, kategoria itd.),\nlinks — adresy do nawigacji (stronicowanie, powiązane zasoby),\nmeta — metadane (np. łączna liczba wyników).\n\nNagłówek Accept: application/vnd.api+json informuje serwer, że klient oczekuje odpowiedzi w formacie JSON:API. Jeśli go nie podasz, serwer dane.gov.pl i tak zwróci JSON — ale dobrą praktyką jest podawać go jawnie.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "2.3 Format odpowiedzi: JSON:API\nAPI dane.gov.pl używa standardu JSON:API (specyfikacja: jsonapi.org). W praktyce oznacza to, że odpowiedzi mają stałą strukturę:\n{\n  \"data\": [\n    {\n      \"id\": \"830\",\n      \"type\": \"dataset\",\n      \"attributes\": {\n        \"title\": \"Wykaz szkół i placówek oświatowych\",\n        \"notes\": \"Rejestr Szkół i Placówek Oświatowych ...\",\n        \"category\": \"Education\",\n        \"modified\": \"2025-01-15T10:32:00Z\"\n      },\n      \"relationships\": { ... },\n      \"links\": {\n        \"self\": \"https://api.dane.gov.pl/1.4/datasets/830\"\n      }\n    },\n    ...\n  ],\n  \"links\": {\n    \"self\":  \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=5\",\n    \"next\":  \"https://api.dane.gov.pl/1.4/datasets?page=2&per_page=5\",\n    \"last\":  \"https://api.dane.gov.pl/1.4/datasets?page=...\"\n  },\n  \"meta\": {\n    \"count\": 12345\n  }\n}\nCo warto zapamiętać:\n\ndata — lista (lub pojedynczy obiekt) z wynikami; to jest główna część odpowiedzi,\nid i type — identyfikator i typ zasobu,\nattributes — słownik z właściwymi danymi (tytuł, opis, kategoria itd.),\nlinks — adresy do nawigacji (stronicowanie, powiązane zasoby),\nmeta — metadane (np. łączna liczba wyników).\n\nNagłówek Accept: application/vnd.api+json informuje serwer, że klient oczekuje odpowiedzi w formacie JSON:API. Jeśli go nie podasz, serwer dane.gov.pl i tak zwróci JSON — ale dobrą praktyką jest podawać go jawnie."
   },
   {
     "objectID": "laby/lab_1.html#dokumentacja-interaktywna-swagger",
     "href": "laby/lab_1.html#dokumentacja-interaktywna-swagger",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "2.4 Dokumentacja interaktywna (Swagger)",
-    "text": "2.4 Dokumentacja interaktywna (Swagger)\nZanim napiszesz pierwsze zapytanie, warto wiedzieć gdzie szukać informacji o endpointach, parametrach i formatach odpowiedzi.\nAPI dane.gov.pl ma dokumentację Swagger pod adresem:\n\nhttps://api.dane.gov.pl/doc\n\nSwagger UI to interaktywna strona, na której możesz:\n\nprzeglądać listę endpointów (pogrupowanych tematycznie),\nsprawdzić jakie parametry przyjmuje dany endpoint,\nwypróbować zapytanie bezpośrednio w przeglądarce (przycisk Try it out → Execute).\n\n\n2.4.1 Czytanie Swaggera\nOtwórz w przeglądarce https://api.dane.gov.pl/doc i wykonaj po kolei:\n\nZnajdź sekcję dotyczącą Datasets.\nRozwiń endpoint GET /1.4/datasets.\nPrzejrzyj listę parametrów. Zwróć uwagę na:\n\npage — numer strony,\nper_page — liczba wyników na stronę,\nq — fraza wyszukiwania,\nsort — kryterium sortowania.\n\nKliknij Try it out.\nUstaw per_page na 2, wyczyść pozostałe pola, jeśli Swagger coś w nich dopisał automatycznie (zobacz uwagę poniżej).\nKliknij Execute.\nW sekcji Response body zobaczysz odpowiedź JSON. Zwróć uwagę na strukturę data → [{ id, type, attributes }].\nW sekcji Curl Swagger pokaże polecenie curl:\n\njeśli jest bardzo długie (z parametrami typu id[gt], id[lt], title[...], description[...] itd.), potraktuj je jako „szablon” i usuń z URL-a wszystkie te automatycznie dodane filtry, zostawiając tylko to, co ustawiłeś ręcznie (np. page i per_page).\n\n\n\n\n\n\n\n\nWarningUwaga dotycząca Swaggera\n\n\n\nSwagger często wypełnia „pusty formularz” przykładowymi wartościami we wszystkich polach naraz (zwłaszcza tam, gdzie parametr jest obiektem filtrów typu term/terms/gt/lt/gte/lte/...). To jest artefakt UI, nie wymaganie API. W praktyce zostawiasz tylko te pola, których faktycznie chcesz użyć (zwykle: page, per_page; ewentualnie jeden operator na pole).\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy widzisz pole data z listą obiektów? Czy potrafisz wskazać id i title pierwszego datasetu? Zapisz sobie jedno id — przyda się za chwilę.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "2.4 Dokumentacja interaktywna (Swagger)\nZanim napiszesz pierwsze zapytanie, warto wiedzieć gdzie szukać informacji o endpointach, parametrach i formatach odpowiedzi.\nAPI dane.gov.pl ma dokumentację Swagger pod adresem:\n\nhttps://api.dane.gov.pl/doc\n\nSwagger UI to interaktywna strona, na której możesz:\n\nprzeglądać listę endpointów (pogrupowanych tematycznie),\nsprawdzić jakie parametry przyjmuje dany endpoint,\nwypróbować zapytanie bezpośrednio w przeglądarce (przycisk Try it out → Execute).\n\n\n2.4.1 Czytanie Swaggera\nOtwórz w przeglądarce https://api.dane.gov.pl/doc i wykonaj po kolei:\n\nZnajdź sekcję dotyczącą Datasets.\nRozwiń endpoint GET /1.4/datasets.\nPrzejrzyj listę parametrów. Zwróć uwagę na:\n\npage — numer strony,\nper_page — liczba wyników na stronę,\nq — fraza wyszukiwania,\nsort — kryterium sortowania.\n\nKliknij Try it out.\nUstaw per_page na 2, wyczyść pozostałe pola, jeśli Swagger coś w nich dopisał automatycznie (zobacz uwagę poniżej).\nKliknij Execute.\nW sekcji Response body zobaczysz odpowiedź JSON. Zwróć uwagę na strukturę data → [{ id, type, attributes }].\nW sekcji Curl Swagger pokaże polecenie curl:\n\njeśli jest bardzo długie (z parametrami typu id[gt], id[lt], title[...], description[...] itd.), potraktuj je jako „szablon” i usuń z URL-a wszystkie te automatycznie dodane filtry, zostawiając tylko to, co ustawiłeś ręcznie (np. page i per_page).\n\n\n\n\n\n\n\n\nWarningUwaga dotycząca Swaggera\n\n\n\nSwagger często wypełnia „pusty formularz” przykładowymi wartościami we wszystkich polach naraz (zwłaszcza tam, gdzie parametr jest obiektem filtrów typu term/terms/gt/lt/gte/lte/...). To jest artefakt UI, nie wymaganie API. W praktyce zostawiasz tylko te pola, których faktycznie chcesz użyć (zwykle: page, per_page; ewentualnie jeden operator na pole).\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy widzisz pole data z listą obiektów? Czy potrafisz wskazać id i title pierwszego datasetu? Zapisz sobie jedno id — przyda się za chwilę."
   },
   {
     "objectID": "laby/lab_1.html#przygotowanie",
     "href": "laby/lab_1.html#przygotowanie",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "3.1 Przygotowanie",
-    "text": "3.1 Przygotowanie\nSprawdź, czy masz curl (w terminalu / PowerShell):\ncurl --version\nUwaga (Windows): jeśli pracujesz w PowerShell, używaj curl.exe zamiast curl (które bywa aliasem do innego polecenia).",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "3.1 Przygotowanie\nSprawdź, czy masz curl (w terminalu / PowerShell):\ncurl --version\nUwaga (Windows): jeśli pracujesz w PowerShell, używaj curl.exe zamiast curl (które bywa aliasem do innego polecenia)."
   },
   {
     "objectID": "laby/lab_1.html#surowa-odpowiedź-http",
     "href": "laby/lab_1.html#surowa-odpowiedź-http",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "3.2 Surowa odpowiedź HTTP",
-    "text": "3.2 Surowa odpowiedź HTTP\nPobierz stronę i wyświetl nagłówki + ciało razem:\ncurl -i \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2\"\nNa ekranie zobaczysz coś w rodzaju:\nHTTP/2 200\ncontent-type: application/vnd.api+json\n...\n\n{\"data\":[{\"id\":\"...\", ...}], ...}\n\n\n\n\n\n\nNote\n\n\n\nWidzisz linię statusu (HTTP/2 200), nagłówki odpowiedzi (w tym content-type), pustą linię, a potem ciało odpowiedzi (JSON). To jest dokładnie struktura odpowiedzi HTTP z wykładu.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "3.2 Surowa odpowiedź HTTP\nPobierz stronę i wyświetl nagłówki + ciało razem:\ncurl -i \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2\"\nNa ekranie zobaczysz coś w rodzaju:\nHTTP/2 200\ncontent-type: application/vnd.api+json\n...\n\n{\"data\":[{\"id\":\"...\", ...}], ...}\n\n\n\n\n\n\nNote\n\n\n\nWidzisz linię statusu (HTTP/2 200), nagłówki odpowiedzi (w tym content-type), pustą linię, a potem ciało odpowiedzi (JSON). To jest dokładnie struktura odpowiedzi HTTP z wykładu."
   },
   {
     "objectID": "laby/lab_1.html#tryb-diagnostyczny",
     "href": "laby/lab_1.html#tryb-diagnostyczny",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "3.3 Tryb diagnostyczny",
-    "text": "3.3 Tryb diagnostyczny\nDodaj flagę -v (verbose), żeby zobaczyć też żądanie, które wysłał twój klient:\ncurl -v \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\"\nW trybie -v curl oznacza różne typy linii prefiksami:\n\nLinie zaczynające się od * to informacje diagnostyczne klienta (np. rozwiązywanie DNS, próba połączenia, TLS/HTTPS handshake, negocjacja HTTP/2, przekierowania, uwagi typu „Connection #0 left intact”).\nLinie zaczynające się od &gt; to żądanie wysyłane przez ciebie (linia GET ... oraz nagłówki żądania).\nLinie zaczynające się od &lt; to odpowiedź serwera (status i nagłówki odpowiedzi).\n\nUwaga: ciało odpowiedzi (np. JSON) zwykle pojawia się jako „zwykły” tekst bez prefiksów &gt;, &lt;, * — jest wypisywane na standardowe wyjście, podczas gdy log -v idzie na standardowy błąd. Dlatego w terminalu widzisz to wymieszane czasowo, ale logicznie to są dwa strumienie.\nZnajdź w części &gt; linię GET /1.4/datasets?... oraz nagłówek Host:. W części &lt; znajdź content-type: i kod statusu (np. 200).",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "3.3 Tryb diagnostyczny\nDodaj flagę -v (verbose), żeby zobaczyć też żądanie, które wysłał twój klient:\ncurl -v \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\"\nW trybie -v curl oznacza różne typy linii prefiksami:\n\nLinie zaczynające się od * to informacje diagnostyczne klienta (np. rozwiązywanie DNS, próba połączenia, TLS/HTTPS handshake, negocjacja HTTP/2, przekierowania, uwagi typu „Connection #0 left intact”).\nLinie zaczynające się od &gt; to żądanie wysyłane przez ciebie (linia GET ... oraz nagłówki żądania).\nLinie zaczynające się od &lt; to odpowiedź serwera (status i nagłówki odpowiedzi).\n\nUwaga: ciało odpowiedzi (np. JSON) zwykle pojawia się jako „zwykły” tekst bez prefiksów &gt;, &lt;, * — jest wypisywane na standardowe wyjście, podczas gdy log -v idzie na standardowy błąd. Dlatego w terminalu widzisz to wymieszane czasowo, ale logicznie to są dwa strumienie.\nZnajdź w części &gt; linię GET /1.4/datasets?... oraz nagłówek Host:. W części &lt; znajdź content-type: i kod statusu (np. 200)."
   },
   {
     "objectID": "laby/lab_1.html#sama-odpowiedź-ładnie-sformatowana",
     "href": "laby/lab_1.html#sama-odpowiedź-ładnie-sformatowana",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "3.4 Sama odpowiedź, ładnie sformatowana",
-    "text": "3.4 Sama odpowiedź, ładnie sformatowana\ncurl -s \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2\" | python3 -m json.tool | head -40\nPipe przez python3 -m json.tool formatuje JSON z wcięciami. Flaga -s wycisza pasek postępu.\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nPotrafisz wskazać w wyjściu curl -i kod statusu, Content-Type i początek ciała JSON?",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "3.4 Sama odpowiedź, ładnie sformatowana\ncurl -s \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2\" | python3 -m json.tool | head -40\nPipe przez python3 -m json.tool formatuje JSON z wcięciami. Flaga -s wycisza pasek postępu.\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nPotrafisz wskazać w wyjściu curl -i kod statusu, Content-Type i początek ciała JSON?"
   },
   {
     "objectID": "laby/lab_1.html#instalacja-jeśli-potrzeba",
     "href": "laby/lab_1.html#instalacja-jeśli-potrzeba",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "4.1 Instalacja (jeśli potrzeba)",
-    "text": "4.1 Instalacja (jeśli potrzeba)\nBiblioteka requests jest standardem do wysyłania zapytań HTTP w Pythonie, nie jest jednak częścią biblioteki standardowej, więc może wymagać instalacji:\npip install requests",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "4.1 Instalacja (jeśli potrzeba)\nBiblioteka requests jest standardem do wysyłania zapytań HTTP w Pythonie, nie jest jednak częścią biblioteki standardowej, więc może wymagać instalacji:\npip install requests"
   },
   {
     "objectID": "laby/lab_1.html#pierwsze-żądanie-get",
     "href": "laby/lab_1.html#pierwsze-żądanie-get",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "4.2 Pierwsze żądanie GET",
-    "text": "4.2 Pierwsze żądanie GET\nimport requests\n\nurl = \"https://example.com\"\nr = requests.get(url)\n\nprint(\"Status:\", r.status_code)\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\nprint(\"Treść (100 znaków):\", r.text[:100])\nObiekt r (obiekt klasy Response) zawiera całą odpowiedź HTTP:\n\nr.status_code — kod statusu (int, np. 200),\nr.headers — słownik nagłówków odpowiedzi,\nr.text — ciało jako tekst (str),\nr.content — ciało jako bajty (bytes),\nr.json() — ciało sparsowane z JSON do dict/list.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "4.2 Pierwsze żądanie GET\nimport requests\n\nurl = \"https://example.com\"\nr = requests.get(url)\n\nprint(\"Status:\", r.status_code)\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\nprint(\"Treść (100 znaków):\", r.text[:100])\nObiekt r (obiekt klasy Response) zawiera całą odpowiedź HTTP:\n\nr.status_code — kod statusu (int, np. 200),\nr.headers — słownik nagłówków odpowiedzi,\nr.text — ciało jako tekst (str),\nr.content — ciało jako bajty (bytes),\nr.json() — ciało sparsowane z JSON do dict/list."
   },
   {
     "objectID": "laby/lab_1.html#parametry-zapytania-query-string",
     "href": "laby/lab_1.html#parametry-zapytania-query-string",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "4.3 Parametry zapytania (query string)",
-    "text": "4.3 Parametry zapytania (query string)\nZamiast sklejać URL ręcznie, podaj parametry jako słownik:\nr = requests.get(\n    \"https://httpbin.org/get\",\n    params={\"q\": \"python\", \"page\": 1}\n)\nprint(\"Pełny URL:\", r.url)\n# → https://httpbin.org/get?q=python&page=1\nrequests sam zakoduje wartości i doda ?...&... do URL.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "4.3 Parametry zapytania (query string)\nZamiast sklejać URL ręcznie, podaj parametry jako słownik:\nr = requests.get(\n    \"https://httpbin.org/get\",\n    params={\"q\": \"python\", \"page\": 1}\n)\nprint(\"Pełny URL:\", r.url)\n# → https://httpbin.org/get?q=python&page=1\nrequests sam zakoduje wartości i doda ?...&... do URL."
   },
   {
     "objectID": "laby/lab_1.html#nagłówki-żądania",
     "href": "laby/lab_1.html#nagłówki-żądania",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "4.4 Nagłówki żądania",
-    "text": "4.4 Nagłówki żądania\nNagłówki podajesz przez parametr headers:\nr = requests.get(\n    \"https://httpbin.org/headers\",\n    headers={\"Accept\": \"application/json\", \"User-Agent\": \"MojSkrypt/1.0\"}\n)\nprint(r.json())",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "4.4 Nagłówki żądania\nNagłówki podajesz przez parametr headers:\nr = requests.get(\n    \"https://httpbin.org/headers\",\n    headers={\"Accept\": \"application/json\", \"User-Agent\": \"MojSkrypt/1.0\"}\n)\nprint(r.json())"
   },
   {
     "objectID": "laby/lab_1.html#odbieranie-json",
     "href": "laby/lab_1.html#odbieranie-json",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "4.5 Odbieranie JSON",
-    "text": "4.5 Odbieranie JSON\nr = requests.get(\"https://httpbin.org/json\")\n\nprint(\"Status:\", r.status_code)\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\n\ndata = r.json()           # parsuje JSON → dict\nprint(\"Typ:\", type(data))\nprint(\"Klucze:\", list(data.keys()))\n\n\n\n\n\n\nTipWażne\n\n\n\nr.json() rzuci wyjątek, jeśli ciało odpowiedzi nie jest poprawnym JSON-em (np. gdy serwer zwrócił HTML ze stroną błędu). Dlatego przed parsowaniem warto sprawdzić r.status_code lub użyć r.raise_for_status().",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "4.5 Odbieranie JSON\nr = requests.get(\"https://httpbin.org/json\")\n\nprint(\"Status:\", r.status_code)\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\n\ndata = r.json()           # parsuje JSON → dict\nprint(\"Typ:\", type(data))\nprint(\"Klucze:\", list(data.keys()))\n\n\n\n\n\n\nTipWażne\n\n\n\nr.json() rzuci wyjątek, jeśli ciało odpowiedzi nie jest poprawnym JSON-em (np. gdy serwer zwrócił HTML ze stroną błędu). Dlatego przed parsowaniem warto sprawdzić r.status_code lub użyć r.raise_for_status()."
   },
   {
     "objectID": "laby/lab_1.html#bezpieczny-wzorzec-sprawdzaj-przed-parsowaniem",
     "href": "laby/lab_1.html#bezpieczny-wzorzec-sprawdzaj-przed-parsowaniem",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "4.6 Bezpieczny wzorzec: sprawdzaj przed parsowaniem",
-    "text": "4.6 Bezpieczny wzorzec: sprawdzaj przed parsowaniem\nr = requests.get(\"https://httpbin.org/json\", timeout=10)\nr.raise_for_status()  # rzuci wyjątek przy 4xx / 5xx\ndata = r.json()\nMetoda raise_for_status() zamienia kody błędów na wyjątek Pythona — dzięki temu nie próbujesz parsować odpowiedzi z błędem.\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nWykonaj requests.get(\"https://httpbin.org/json\") i wypisz status_code, Content-Type z nagłówków, oraz klucze (keys) sparsowanego JSON-a. Czy wszystko się zgadza?",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "4.6 Bezpieczny wzorzec: sprawdzaj przed parsowaniem\nr = requests.get(\"https://httpbin.org/json\", timeout=10)\nr.raise_for_status()  # rzuci wyjątek przy 4xx / 5xx\ndata = r.json()\nMetoda raise_for_status() zamienia kody błędów na wyjątek Pythona — dzięki temu nie próbujesz parsować odpowiedzi z błędem.\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nWykonaj requests.get(\"https://httpbin.org/json\") i wypisz status_code, Content-Type z nagłówków, oraz klucze (keys) sparsowanego JSON-a. Czy wszystko się zgadza?"
   },
   {
     "objectID": "laby/lab_1.html#krok-1-lista-datasetów",
     "href": "laby/lab_1.html#krok-1-lista-datasetów",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "5.1 Krok 1: lista datasetów",
-    "text": "5.1 Krok 1: lista datasetów\nimport requests\n\nAPI = \"https://api.dane.gov.pl/1.4\"\n\nr = requests.get(\n    f\"{API}/datasets\",\n    params={\"page\": 1, \"per_page\": 5},\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\nr.raise_for_status()\n\ndata = r.json()\nprint(\"Klucze odpowiedzi:\", list(data.keys()))\nSpodziewane klucze: data, links, meta (ewentualnie included).",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "5.1 Krok 1: lista datasetów\nimport requests\n\nAPI = \"https://api.dane.gov.pl/1.4\"\n\nr = requests.get(\n    f\"{API}/datasets\",\n    params={\"page\": 1, \"per_page\": 5},\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\nr.raise_for_status()\n\ndata = r.json()\nprint(\"Klucze odpowiedzi:\", list(data.keys()))\nSpodziewane klucze: data, links, meta (ewentualnie included)."
   },
   {
     "objectID": "laby/lab_1.html#krok-2-eksploracja-struktury",
     "href": "laby/lab_1.html#krok-2-eksploracja-struktury",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "5.2 Krok 2: eksploracja struktury",
-    "text": "5.2 Krok 2: eksploracja struktury\n# Ile datasetów na tej stronie?\ndatasets = data[\"data\"]\nprint(\"Liczba datasetów:\", len(datasets))\n\n# Pierwszy dataset — co zawiera?\nfirst = datasets[0]\nprint(\"Klucze obiektu:\", list(first.keys()))\nprint(\"ID:\", first[\"id\"])\nprint(\"Typ:\", first[\"type\"])\nprint(\"Tytuł:\", first[\"attributes\"][\"title\"])",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "5.2 Krok 2: eksploracja struktury\n# Ile datasetów na tej stronie?\ndatasets = data[\"data\"]\nprint(\"Liczba datasetów:\", len(datasets))\n\n# Pierwszy dataset — co zawiera?\nfirst = datasets[0]\nprint(\"Klucze obiektu:\", list(first.keys()))\nprint(\"ID:\", first[\"id\"])\nprint(\"Typ:\", first[\"type\"])\nprint(\"Tytuł:\", first[\"attributes\"][\"title\"])"
   },
   {
     "objectID": "laby/lab_1.html#krok-3-przegląd-wszystkich-wyników",
     "href": "laby/lab_1.html#krok-3-przegląd-wszystkich-wyników",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "5.3 Krok 3: przegląd wszystkich wyników",
-    "text": "5.3 Krok 3: przegląd wszystkich wyników\nfor ds in datasets:\n    ds_id = ds[\"id\"]\n    title = ds[\"attributes\"][\"title\"]\n    print(f\"  [{ds_id}] {title}\")",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "5.3 Krok 3: przegląd wszystkich wyników\nfor ds in datasets:\n    ds_id = ds[\"id\"]\n    title = ds[\"attributes\"][\"title\"]\n    print(f\"  [{ds_id}] {title}\")"
   },
   {
     "objectID": "laby/lab_1.html#krok-4-linki-nawigacyjne-stronicowanie",
     "href": "laby/lab_1.html#krok-4-linki-nawigacyjne-stronicowanie",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "5.4 Krok 4: linki nawigacyjne (stronicowanie)",
-    "text": "5.4 Krok 4: linki nawigacyjne (stronicowanie)\nprint(\"Linki:\", data.get(\"links\", {}))\nprint(\"Meta:\", data.get(\"meta\", {}))\nW polu links powinien pojawić się klucz next z URL-em następnej strony. W polu meta — łączna liczba zbiorów (count).\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy widzisz listę 5 datasetów z ich id i tytułami? Czy w links jest adres next? Zapisz id jednego datasetu, który wydaje ci się ciekawy.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "5.4 Krok 4: linki nawigacyjne (stronicowanie)\nprint(\"Linki:\", data.get(\"links\", {}))\nprint(\"Meta:\", data.get(\"meta\", {}))\nW polu links powinien pojawić się klucz next z URL-em następnej strony. W polu meta — łączna liczba zbiorów (count).\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy widzisz listę 5 datasetów z ich id i tytułami? Czy w links jest adres next? Zapisz id jednego datasetu, który wydaje ci się ciekawy."
   },
   {
     "objectID": "laby/lab_1.html#krok-5-szczegóły-wybranego-datasetu",
     "href": "laby/lab_1.html#krok-5-szczegóły-wybranego-datasetu",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "5.5 Krok 5: szczegóły wybranego datasetu",
-    "text": "5.5 Krok 5: szczegóły wybranego datasetu\nPodstaw id z poprzedniego kroku:\nDATASET_ID = \"...\"   # ← wklej tu swoje id\n\nr = requests.get(\n    f\"{API}/datasets/{DATASET_ID}\",\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\nr.raise_for_status()\n\nds = r.json()[\"data\"]\nattrs = ds[\"attributes\"]\n\nprint(\"Tytuł:\", attrs[\"title\"])\nprint(\"Opis:\", attrs.get(\"notes\", \"(brak)\")[:200])\nprint(\"Kategoria:\", attrs.get(\"category\"))\nprint(\"Modyfikacja:\", attrs.get(\"modified\"))\nZwróć uwagę: dla kolekcji data jest listą, a dla pojedynczego elementu — słownikiem.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "5.5 Krok 5: szczegóły wybranego datasetu\nPodstaw id z poprzedniego kroku:\nDATASET_ID = \"...\"   # ← wklej tu swoje id\n\nr = requests.get(\n    f\"{API}/datasets/{DATASET_ID}\",\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\nr.raise_for_status()\n\nds = r.json()[\"data\"]\nattrs = ds[\"attributes\"]\n\nprint(\"Tytuł:\", attrs[\"title\"])\nprint(\"Opis:\", attrs.get(\"notes\", \"(brak)\")[:200])\nprint(\"Kategoria:\", attrs.get(\"category\"))\nprint(\"Modyfikacja:\", attrs.get(\"modified\"))\nZwróć uwagę: dla kolekcji data jest listą, a dla pojedynczego elementu — słownikiem."
   },
   {
     "objectID": "laby/lab_1.html#krok-6-zasoby-resources-datasetu",
     "href": "laby/lab_1.html#krok-6-zasoby-resources-datasetu",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "5.6 Krok 6: zasoby (resources) datasetu",
-    "text": "5.6 Krok 6: zasoby (resources) datasetu\nr = requests.get(\n    f\"{API}/datasets/{DATASET_ID}/resources\",\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\nr.raise_for_status()\n\nresources = r.json()[\"data\"]\nprint(f\"Liczba zasobów: {len(resources)}\\n\")\n\nfor res in resources:\n    res_attrs = res[\"attributes\"]\n    print(f\"  [{res['id']}] {res_attrs.get('title', '(bez tytułu)')}\")\n    print(f\"       format: {res_attrs.get('format', '?')}\")\n    print()\nJeśli lista zasobów jest pusta, wybierz inny dataset i powtórz od kroku 5.\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy widzisz listę zasobów z ich id, tytułami i formatami? Jeśli tak — udało ci się przejść pełny łańcuch: kolekcja → element → podzasoby. To jest główna umiejętność tego labu.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "5.6 Krok 6: zasoby (resources) datasetu\nr = requests.get(\n    f\"{API}/datasets/{DATASET_ID}/resources\",\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\nr.raise_for_status()\n\nresources = r.json()[\"data\"]\nprint(f\"Liczba zasobów: {len(resources)}\\n\")\n\nfor res in resources:\n    res_attrs = res[\"attributes\"]\n    print(f\"  [{res['id']}] {res_attrs.get('title', '(bez tytułu)')}\")\n    print(f\"       format: {res_attrs.get('format', '?')}\")\n    print()\nJeśli lista zasobów jest pusta, wybierz inny dataset i powtórz od kroku 5.\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy widzisz listę zasobów z ich id, tytułami i formatami? Jeśli tak — udało ci się przejść pełny łańcuch: kolekcja → element → podzasoby. To jest główna umiejętność tego labu."
   },
   {
     "objectID": "laby/lab_1.html#błąd-404-nieistniejący-zasób",
     "href": "laby/lab_1.html#błąd-404-nieistniejący-zasób",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "6.1 Błąd 404: nieistniejący zasób",
-    "text": "6.1 Błąd 404: nieistniejący zasób\nr = requests.get(\n    f\"{API}/datasets/999999999\",\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\n\nprint(\"Status:\", r.status_code)\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\nprint(\"Treść:\", r.text[:300])\nSerwer powinien zwrócić 404. Zwróć uwagę, że odpowiedź nadal ma ciało — serwer wysyła komunikat o błędzie (zwykle w JSON).",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "6.1 Błąd 404: nieistniejący zasób\nr = requests.get(\n    f\"{API}/datasets/999999999\",\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\n\nprint(\"Status:\", r.status_code)\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\nprint(\"Treść:\", r.text[:300])\nSerwer powinien zwrócić 404. Zwróć uwagę, że odpowiedź nadal ma ciało — serwer wysyła komunikat o błędzie (zwykle w JSON)."
   },
   {
     "objectID": "laby/lab_1.html#co-robi-raise_for_status-przy-404",
     "href": "laby/lab_1.html#co-robi-raise_for_status-przy-404",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "6.2 Co robi raise_for_status() przy 404?",
-    "text": "6.2 Co robi raise_for_status() przy 404?\ntry:\n    r.raise_for_status()\nexcept requests.exceptions.HTTPError as e:\n    print(\"Wyjątek:\", e)",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "6.2 Co robi raise_for_status() przy 404?\ntry:\n    r.raise_for_status()\nexcept requests.exceptions.HTTPError as e:\n    print(\"Wyjątek:\", e)"
   },
   {
     "objectID": "laby/lab_1.html#timeout",
     "href": "laby/lab_1.html#timeout",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "6.3 Timeout",
-    "text": "6.3 Timeout\ntry:\n    r = requests.get(f\"{API}/datasets\", params={\"page\": 1}, timeout=0.001)\nexcept requests.exceptions.Timeout:\n    print(\"Przekroczono limit czasu!\")\nexcept requests.exceptions.RequestException as e:\n    print(\"Inny błąd:\", e)\nUstawiamy absurdalnie krótki timeout (0.001 s), żeby wymusić błąd. W praktyce sensowna wartość to 5–30 sekund.\n\n\n\n\n\n\nTipWzorzec minimalny do zapamiętania\n\n\n\ntry:\n    r = requests.get(url, timeout=10)\n    r.raise_for_status()\n    data = r.json()\nexcept requests.exceptions.Timeout:\n    print(\"Timeout\")\nexcept requests.exceptions.HTTPError as e:\n    print(\"Błąd HTTP:\", e)\nexcept requests.exceptions.RequestException as e:\n    print(\"Błąd połączenia:\", e)\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy umiesz rozróżnić trzy sytuacje: odpowiedź 200 (sukces), odpowiedź 404 (błąd serwera w sensie „nie znaleziono”), wyjątek Timeout (brak odpowiedzi)? To jest kluczowe w automatyzacji.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "6.3 Timeout\ntry:\n    r = requests.get(f\"{API}/datasets\", params={\"page\": 1}, timeout=0.001)\nexcept requests.exceptions.Timeout:\n    print(\"Przekroczono limit czasu!\")\nexcept requests.exceptions.RequestException as e:\n    print(\"Inny błąd:\", e)\nUstawiamy absurdalnie krótki timeout (0.001 s), żeby wymusić błąd. W praktyce sensowna wartość to 5–30 sekund.\n\n\n\n\n\n\nTipWzorzec minimalny do zapamiętania\n\n\n\ntry:\n    r = requests.get(url, timeout=10)\n    r.raise_for_status()\n    data = r.json()\nexcept requests.exceptions.Timeout:\n    print(\"Timeout\")\nexcept requests.exceptions.HTTPError as e:\n    print(\"Błąd HTTP:\", e)\nexcept requests.exceptions.RequestException as e:\n    print(\"Błąd połączenia:\", e)\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy umiesz rozróżnić trzy sytuacje: odpowiedź 200 (sukces), odpowiedź 404 (błąd serwera w sensie „nie znaleziono”), wyjątek Timeout (brak odpowiedzi)? To jest kluczowe w automatyzacji."
   },
   {
     "objectID": "laby/lab_1.html#zadanie-a-wyszukiwanie-datasetów",
     "href": "laby/lab_1.html#zadanie-a-wyszukiwanie-datasetów",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "7.1 Zadanie A: wyszukiwanie datasetów",
-    "text": "7.1 Zadanie A: wyszukiwanie datasetów\nW dokumentacji Swagger (https://api.dane.gov.pl/doc) znajdź parametr, który pozwala wyszukiwać datasety po frazie (słowie kluczowym).\n\nWykonaj wyszukiwanie po wybranym słowie (np. \"transport\", \"szkoły\", \"powietrze\").\nWypisz id i title wyników.\nWybierz jeden dataset z wyników i pobierz jego szczegóły (/datasets/{id}).\nPobierz listę zasobów tego datasetu (/datasets/{id}/resources).\nWypisz tytuły i formaty zasobów.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "7.1 Zadanie A: wyszukiwanie datasetów\nW dokumentacji Swagger (https://api.dane.gov.pl/doc) znajdź parametr, który pozwala wyszukiwać datasety po frazie (słowie kluczowym).\n\nWykonaj wyszukiwanie po wybranym słowie (np. \"transport\", \"szkoły\", \"powietrze\").\nWypisz id i title wyników.\nWybierz jeden dataset z wyników i pobierz jego szczegóły (/datasets/{id}).\nPobierz listę zasobów tego datasetu (/datasets/{id}/resources).\nWypisz tytuły i formaty zasobów."
   },
   {
     "objectID": "laby/lab_1.html#zadanie-b-porównanie-dwóch-stron-wyników",
     "href": "laby/lab_1.html#zadanie-b-porównanie-dwóch-stron-wyników",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "7.2 Zadanie B: porównanie dwóch stron wyników",
-    "text": "7.2 Zadanie B: porównanie dwóch stron wyników\n\nPobierz stronę 1 i stronę 2 listy datasetów (np. per_page=5).\nWypisz id datasetów z obu stron.\nSprawdź (programowo lub ręcznie), że zbiory id się nie pokrywają.\nWypisz adres next z linków pierwszej strony i porównaj go z URL-em, który sam skonstruowałeś dla strony 2.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "7.2 Zadanie B: porównanie dwóch stron wyników\n\nPobierz stronę 1 i stronę 2 listy datasetów (np. per_page=5).\nWypisz id datasetów z obu stron.\nSprawdź (programowo lub ręcznie), że zbiory id się nie pokrywają.\nWypisz adres next z linków pierwszej strony i porównaj go z URL-em, który sam skonstruowałeś dla strony 2."
   },
   {
     "objectID": "laby/lab_1.html#zadanie-c-dodatkowe-metadane-zasobów-w-csv",
     "href": "laby/lab_1.html#zadanie-c-dodatkowe-metadane-zasobów-w-csv",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "7.3 Zadanie C (dodatkowe): metadane zasobów w CSV",
-    "text": "7.3 Zadanie C (dodatkowe): metadane zasobów w CSV\nAPI dane.gov.pl pozwala pobrać metadane zasobów danego datasetu jako CSV:\nGET /1.4/datasets/{id}/resources/metadata.csv?lang=en\n\nPobierz ten plik za pomocą requests (uwaga: to nie jest JSON, tylko CSV — użyj r.text zamiast r.json()).\nZapisz odpowiedź do pliku .csv.\nWczytaj plik do pandas.DataFrame i wypisz nazwy kolumn.\nZnajdź kolumnę Download URL — zawiera adresy do pobrania realnych plików danych.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
+    "text": "7.3 Zadanie C (dodatkowe): metadane zasobów w CSV\nAPI dane.gov.pl pozwala pobrać metadane zasobów danego datasetu jako CSV:\nGET /1.4/datasets/{id}/resources/metadata.csv?lang=en\n\nPobierz ten plik za pomocą requests (uwaga: to nie jest JSON, tylko CSV — użyj r.text zamiast r.json()).\nZapisz odpowiedź do pliku .csv.\nWczytaj plik do pandas.DataFrame i wypisz nazwy kolumn.\nZnajdź kolumnę Download URL — zawiera adresy do pobrania realnych plików danych."
   },
   {
     "objectID": "wyklady/wyklad_1.html",
