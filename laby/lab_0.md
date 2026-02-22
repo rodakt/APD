@@ -1,5 +1,5 @@
 ---
-title: "Lab 0: Python — podstawy"
+title: "Lab 0: Python — odświeżenie podstaw"
 subtitle: "Automatyczne pozyskiwanie danych — ćwiczenia"
 author: "Tomasz Rodak"
 ---
@@ -23,8 +23,8 @@ Narzędzia: Python 3, Thonny.
 
 ## Thonny
 
-Na dzisiejszych zajęciach korzystamy z **Thonny** — lekkiego edytora Pythona z wbudowanym interpreterem, oknem zmiennych i debuggerem. Thonny nie podpowiada kodu automatycznie, co jest zaletą na etapie powtórki — zmusza do samodzielnego pisania.
-
+Na dzisiejszych zajęciach korzystamy z **Thonny** — lekkiego edytora Pythona z wbudowanym interpreterem, oknem zmiennych i debuggerem.
+,
 Otwórz Thonny. Upewnij się, że w prawym dolnym rogu widoczna jest wersja Pythona **3.10** lub nowsza. Jeśli nie — zgłoś.
 
 W Thonnym będziemy pracować w dwóch trybach:
