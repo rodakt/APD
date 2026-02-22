@@ -4,7 +4,7 @@ title: "Automatyczne pozyskiwanie danych"
 
 ## Opis przedmiotu
 
-Kurs uczy automatycznego pozyskiwania danych z sieci. Zaczynamy od protokołu HTTP i pracy z API, przechodzimy przez parsowanie HTML i crawling, kończymy na asynchronicznym pobieraniu danych, Scrapy i Selenium.
+Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z sieci. Zaczynamy od protokołu HTTP i pracy z API, przechodzimy przez parsowanie HTML i crawling, kończymy na asynchronicznym pobieraniu danych, Scrapy i Selenium.
 
 ## Wykłady
 

@@ -21,7 +21,7 @@ website:
       - section: "Laboratoria"
         contents:
           - laby/lab_0.md
-          - laby/lab_1.md
+          # - laby/lab_1.md
 
 format:
   html:
