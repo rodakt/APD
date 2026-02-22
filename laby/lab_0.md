@@ -44,8 +44,9 @@ print("Wszystko działa!")
 
 Zapisz plik jako `lab0_test.py` i uruchom (F5).
 
-::: checkpoint
-**Checkpoint:** Czy widzisz w Shellu wersję Pythona i komunikat „Wszystko działa!"? Jeśli nie — zgłoś, zanim przejdziesz dalej.
+::: {.callout-note}
+## Checkpoint
+Czy widzisz w Shellu wersję Pythona i komunikat „Wszystko działa!"? Jeśli nie — zgłoś, zanim przejdziesz dalej.
 :::
 
 ## Instalacja pakietu
@@ -63,8 +64,9 @@ print("requests", requests.__version__)
 
 Jeśli widzisz wersję (np. `2.31.0`) — gotowe. Jeśli `ModuleNotFoundError` — wróć do Manage packages.
 
-::: key-concept
-**Instalacja pakietów — powtarzalna czynność.** Thonny ma menedżer pakietów (Manage packages), który pod spodem używa `pip`. W terminalu odpowiednikiem jest polecenie `pip install requests`. Komputery w pracowni mogą resetować zainstalowane pakiety między sesjami — dlatego na początku każdego labu trzeba sprawdzić, czy potrzebne biblioteki są dostępne, i w razie potrzeby zainstalować je ponownie.
+::: {.callout-tip}
+## Instalacja pakietów w pracowni
+Thonny ma menedżer pakietów (Manage packages), który pod spodem używa `pip`. W terminalu odpowiednikiem jest polecenie `pip install requests`. Komputery w pracowni mogą resetować zainstalowane pakiety między sesjami — dlatego na początku każdego labu trzeba sprawdzić, czy potrzebne biblioteki są dostępne, i w razie potrzeby zainstalować je ponownie.
 :::
 
 ---
@@ -120,8 +122,9 @@ print(dataset["attributes"]["category"])
 
 Czytaj od lewej do prawej: `dataset["attributes"]` zwraca wewnętrzny słownik, a `["title"]` wyciąga z niego wartość.
 
-::: checkpoint
-**Checkpoint:** Wypisz datę modyfikacji (`modified`) ze słownika `dataset`. Czy potrzebujesz jednego czy dwóch poziomów indeksowania?
+::: {.callout-note}
+## Checkpoint
+Wypisz datę modyfikacji (`modified`) ze słownika `dataset`. Czy potrzebujesz jednego czy dwóch poziomów indeksowania?
 :::
 
 ## Bezpieczny dostęp: `.get()`
@@ -226,8 +229,9 @@ Spodziewany wynik:
   [303] Lista szkół podstawowych (Education), zasoby: ?
 ```
 
-::: checkpoint
-**Checkpoint:** Czy Twój kod wypisuje trzy linie z danymi i nie rzuca `KeyError` na trzecim elemencie? Jeśli tak — potrafisz nawigować po zagnieżdżonych słownikach i listach.
+::: {.callout-note}
+## Checkpoint
+Czy Twój kod wypisuje trzy linie z danymi i nie rzuca `KeyError` na trzecim elemencie? Jeśli tak — poprawnie nawigujesz po zagnieżdżonych słownikach i listach.
 :::
 
 ---
@@ -303,8 +307,9 @@ print(titles)
 # → ['Dane meteorologiczne', 'Budżety gmin', 'Lista szkół podstawowych']
 ```
 
-::: key-concept
-**Dlaczego warto zamykać kod w funkcjach?** Bo eliminujesz powtórzenia. Wzorzec jest prosty: weź powtarzający się blok → zamknij w `def` → parametryzuj to, co się zmienia.
+::: {.callout-tip}
+## Dlaczego warto zamykać kod w funkcjach?
+Bo eliminujesz powtórzenia. Wzorzec jest prosty: weź powtarzający się blok → zamknij w `def` → parametryzuj to, co się zmienia.
 :::
 
 ---
@@ -365,8 +370,9 @@ while page_num < len(pages):
 print(f"\nWszystkie nazwiska: {all_names}")
 ```
 
-::: key-concept
-**`extend` vs `append`.** `extend` dodaje *elementy* listy do listy (spłaszcza jeden poziom). `append` dodaje *całą listę* jako jeden element. Porównaj:
+::: {.callout-tip}
+## `extend` vs `append`
+`extend` dodaje *elementy* listy do listy (spłaszcza jeden poziom). `append` dodaje *całą listę* jako jeden element. Porównaj:
 
 ```python
 a = [1, 2]
@@ -385,8 +391,9 @@ Zmodyfikuj powyższy kod tak, żeby pobieranie zatrzymało się po zebraniu **co
 
 Wskazówka: `extend` dodaje całą stronę naraz, więc łączna liczba może przekroczyć limit — to normalne. Ważne, żeby pętla nie przechodziła do kolejnych stron.
 
-::: checkpoint
-**Checkpoint:** Czy Twój kod zatrzymuje się po stronie 2 (zebrano 6 nazwisk — przekroczono limit 4) i nie przetwarza strony 3? Strona 3 zawiera dane, więc to limit — a nie pusta strona — powoduje zatrzymanie.
+::: {.callout-note}
+## Checkpoint
+Czy Twój kod zatrzymuje się po stronie 2 (zebrano 6 nazwisk — przekroczono limit 4) i nie przetwarza strony 3? Strona 3 zawiera dane, więc to limit — a nie pusta strona — powoduje zatrzymanie.
 :::
 
 ---
@@ -456,14 +463,14 @@ def safe_divide(a, b):
 # safe_divide(10, 0)  # wypisze komunikat I rzuci ZeroDivisionError
 ```
 
-::: key-concept
-**Wzorzec minimalny — zapamiętaj go, bo będzie wszędzie:**
+::: {.callout-tip}
+## Wzorzec minimalny — zapamiętaj go, bo będzie wszędzie
 
 ```python
 try:
     # operacja, która może się nie udać
     result = risky_operation()
-except SpecificError as e:
+except <SomeSpecificError> as e:
     print(f"Błąd: {e}")
 except Exception as e:
     print(f"Nieoczekiwany błąd: {e}")
@@ -486,8 +493,9 @@ result = parse_ids(["1", "abc", "3", "", "5"])
 print(result)  # [1, 3, 5]
 ```
 
-::: checkpoint
-**Checkpoint:** Czy Twoja funkcja radzi sobie z pustymi stringami i tekstem, zwracając tylko poprawne liczby? Jeśli tak — umiesz obsługiwać błędy w pętli, co jest kluczowe przy automatycznym przetwarzaniu danych.
+::: {.callout-note}
+## Checkpoint
+Czy Twoja funkcja radzi sobie z pustymi stringami i tekstem, zwracając tylko poprawne liczby? 
 :::
 
 ---
@@ -565,8 +573,9 @@ print(loaded[0]["title"])  # Jakość powietrza
 `json.dumps()` zamienia obiekt Pythona → tekst JSON.
 `json.loads()` zamienia tekst JSON → obiekt Pythona.
 
-::: checkpoint
-**Checkpoint:** Sprawdź, czy plik się zapisał. Wczytaj go z powrotem do Pythona i wypisz zawartość:
+::: {.callout-note}
+## Checkpoint
+Sprawdź, czy plik się zapisał. Wczytaj go z powrotem do Pythona i wypisz zawartość:
 
 ```python
 check = json.loads(json_path.read_text(encoding="utf-8"))
@@ -677,15 +686,16 @@ Zapisano 3 elementów (z limitem)
 
 Sprawdź plik `lab0_output/summary.json` — powinien zawierać listę słowników z polami `id`, `title`, `format`.
 
-::: checkpoint
-**Checkpoint:** Czy Twoja funkcja poprawnie obsługuje brak klucza `format` (→ `"unknown"`), limit `max_items` i zapis do JSON? Jeśli tak — masz solidne podstawy Pythona do dalszej pracy w kursie.
+::: {.callout-note}
+## Checkpoint
+Czy Twoja funkcja poprawnie obsługuje brak klucza `format` (→ `"unknown"`), limit `max_items` i zapis do JSON?
 :::
 
 ---
 
 # Zadania dodatkowe
 
-Poniższe zadania są **opcjonalne** — dla osób, które skończyły wcześniej. Poruszają tematy, które przydadzą się w dalszej części kursu.
+Poniższe zadania poruszają tematy, które przydadzą się w dalszej części kursu.
 
 ## Zadanie A: list comprehension
 
