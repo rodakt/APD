@@ -24,8 +24,8 @@ Narzędzia: Python 3, Thonny.
 ## Thonny
 
 Na dzisiejszych zajęciach korzystamy z **Thonny** — lekkiego edytora Pythona z wbudowanym interpreterem, oknem zmiennych i debuggerem.
-,
-Otwórz Thonny. Upewnij się, że w prawym dolnym rogu widoczna jest wersja Pythona **3.10** lub nowsza. Jeśli nie — zgłoś.
+
+Otwórz Thonny. Upewnij się, że w prawym dolnym rogu widoczna jest wersja Pythona **3.10** lub nowsza.
 
 W Thonnym będziemy pracować w dwóch trybach:
 
@@ -46,7 +46,7 @@ Zapisz plik jako `lab0_test.py` i uruchom (F5).
 
 ::: {.callout-note}
 ## Checkpoint
-Czy widzisz w Shellu wersję Pythona i komunikat „Wszystko działa!"? Jeśli nie — zgłoś, zanim przejdziesz dalej.
+Czy widzisz w Shellu wersję Pythona i komunikat „Wszystko działa!"?
 :::
 
 ## Instalacja pakietu
@@ -231,14 +231,14 @@ Spodziewany wynik:
 
 ::: {.callout-note}
 ## Checkpoint
-Czy Twój kod wypisuje trzy linie z danymi i nie rzuca `KeyError` na trzecim elemencie? Jeśli tak — poprawnie nawigujesz po zagnieżdżonych słownikach i listach.
+Czy Twój kod wypisuje trzy linie z danymi i nie rzuca `KeyError` na trzecim elemencie?
 :::
 
 ---
 
 # Funkcje
 
-W dalszej części kursu będziemy zamykać powtarzalne operacje w funkcjach. Przygotujmy się do tego.
+Powtarzalne operacje należy zamykać w funkcjach.
 
 ## Podstawowa funkcja
 
@@ -389,7 +389,7 @@ Przy zbieraniu wyników ze stron prawie zawsze chcesz `extend`.
 
 Zmodyfikuj powyższy kod tak, żeby pobieranie zatrzymało się po zebraniu **co najmniej 4 nazwisk** (nawet jeśli są jeszcze kolejne strony). Wypisz zebrane nazwiska i numer ostatniej pobranej strony.
 
-Wskazówka: `extend` dodaje całą stronę naraz, więc łączna liczba może przekroczyć limit — to normalne. Ważne, żeby pętla nie przechodziła do kolejnych stron.
+Wskazówka: `extend` dodaje całą stronę naraz, więc łączna liczba może przekroczyć limit.
 
 ::: {.callout-note}
 ## Checkpoint
@@ -699,35 +699,58 @@ Poniższe zadania poruszają tematy, które przydadzą się w dalszej części k
 
 ## Zadanie A: list comprehension
 
-Przepisz funkcję `extract_titles` z sekcji „Funkcje" tak, żeby używała list comprehension zamiast pętli:
+Dany jest słownik:
 
 ```python
-def extract_titles(response_data):
-    return [...]  # jedna linia
+items = [
+    {"id": "1", "name": "Alfa", "score": 80},
+    {"id": "2", "name": "Beta", "score": 45},
+    {"id": "3", "name": "Gamma", "score": 92},
+    {"id": "4", "name": "Delta", "score": 61},
+]
 ```
 
-Rozszerzenie: napisz wersję, która zwraca tylko tytuły datasetów z kategorii `"Environment"`.
+1. Wyciągnij listę wszystkich nazw (`name`) za pomocą list comprehension — w jednej linii.
+2. Wyciągnij listę nazw tylko tych elementów, które mają `score` > 70.
 
-## Zadanie B: słownik z listy
+## Zadanie B: dict comprehension
 
-Mając listę `records["data"]`, utwórz słownik mapujący `id → title`:
+Mając tę samą listę `items` co w Zadaniu A, utwórz słownik mapujący `id → name`:
 
 ```python
 # Spodziewany wynik:
-# {"10": "Pomiary hałasu", "20": "Emisje CO2", ...}
+# {"1": "Alfa", "2": "Beta", "3": "Gamma", "4": "Delta"}
 ```
 
 Użyj dict comprehension.
 
-## Zadanie C: obsługa wielu plików
+## Zadanie C: grupowanie danych
 
-Napisz funkcję `save_per_format(response, output_dir)`, która:
+Napisz funkcję `group_by_key(items, key)`, która:
 
-1. Grupuje datasety według formatu (`CSV`, `JSON`, `XML`, `unknown`).
-2. Dla każdego formatu zapisuje osobny plik, np. `CSV.json`, `JSON.json`, `unknown.json`.
-3. Zwraca słownik `{format: count}`.
+1. Przyjmuje listę słowników i nazwę klucza.
+2. Zwraca słownik, w którym kluczami są unikalne wartości tego pola, a wartościami — listy elementów z tą wartością.
 
-Wskazówka: użyj `dict` z listami jako wartościami albo `collections.defaultdict(list)`.
+Przykład:
+
+```python
+products = [
+    {"name": "Mleko", "category": "Nabiał"},
+    {"name": "Ser", "category": "Nabiał"},
+    {"name": "Chleb", "category": "Pieczywo"},
+    {"name": "Bułka", "category": "Pieczywo"},
+    {"name": "Jogurt", "category": "Nabiał"},
+]
+
+grouped = group_by_key(products, "category")
+print(grouped)
+# {
+#   "Nabiał": [{"name": "Mleko", ...}, {"name": "Ser", ...}, {"name": "Jogurt", ...}],
+#   "Pieczywo": [{"name": "Chleb", ...}, {"name": "Bułka", ...}]
+# }
+```
+
+Wskazówka: zacznij od pustego słownika. Dla każdego elementu sprawdź, czy klucz już istnieje — jeśli nie, utwórz pustą listę. Alternatywnie: `collections.defaultdict(list)`.
 
 ---
 
@@ -739,7 +762,7 @@ W tym labie:
 * przećwiczyłeś nawigację po zagnieżdżonych słownikach i listach — klucz do pracy z danymi w formacie JSON,
 * napisałeś funkcje z parametrami domyślnymi i docstringami,
 * opanowałeś pętle `for` i `while` z `break` i `extend`,
-* obsłużyłeś wyjątki (`try` / `except`) — bez tego żaden skrypt automatyzujący nie przetrwa kontaktu z rzeczywistością,
+* obsłużyłeś wyjątki (`try` / `except`)
 * zapisałeś dane do pliku JSON z użyciem `pathlib`.
 
 Na następnych zajęciach wykorzystamy te umiejętności w praktyce — zaczniemy pobierać dane z sieci.
