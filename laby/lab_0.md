@@ -630,9 +630,7 @@ print(f"Postęp: {ratio:.1%}")          # 85.7%
 
 ---
 
-# Ćwiczenie podsumowujące
-
-To ćwiczenie łączy wszystkie elementy z tego labu.
+# Zadania podsumowujące
 
 ## Zadanie
 
@@ -765,4 +763,4 @@ W tym labie:
 * obsłużyłeś wyjątki (`try` / `except`)
 * zapisałeś dane do pliku JSON z użyciem `pathlib`.
 
-Na następnych zajęciach wykorzystamy te umiejętności w praktyce — zaczniemy pobierać dane z sieci.
+Na następnych zajęciach zaczniemy pobierać dane z sieci.
