@@ -9,12 +9,14 @@ author: "Tomasz Rodak"
 
 Zakres materiału:
 
-* Wysyłanie żądań HTTP do publicznego API i odbieranie odpowiedzi w Pythonie,
+* Wysyłanie żądań HTTP do publicznego API i odbieranie odpowiedzi,
 * Rozpoznawanie w odpowiedzi kodu statusu, nagłówków i ciała (JSON),
+* Diagnostyka HTTP z poziomu wiersza poleceń (`curl`),
 * Korzystanie z interaktywnej dokumentacji API (Swagger),
-* Poruszanie się po strukturze JSON:API: listy, obiekty, pola `data`, `attributes`, `links`.
+* Poruszanie się po strukturze JSON:API: listy, obiekty, pola `data`, `attributes`, `links`,
+* Pobranie realnego pliku danych z API i zapis wyników do JSON.
 
-Narzędzia: Python (`requests`), `curl` (krótko, jako narzędzie diagnostyczne), przeglądarka.
+Narzędzia: Python (`requests`), `curl`, przeglądarka.
 
 ---
 
@@ -40,8 +42,6 @@ API dane.gov.pl organizuje dane w hierarchię, którą najłatwiej zrozumieć ja
 /datasets/{id}/resources         ← kolekcja zagnieżdżona: zasoby (pliki) w zbiorze
 /datasets/{id}/resources/{rid}   ← element: metadane jednego zasobu
 ```
-
-To jest dokładnie wzorzec **kolekcja / element / podzasób**, który poznałeś na wykładzie.
 
 Przykładowo:
 
@@ -95,8 +95,6 @@ Nagłówek `Accept: application/vnd.api+json` informuje serwer, że klient oczek
 
 ## Dokumentacja interaktywna (Swagger)
 
-Zanim napiszesz pierwsze zapytanie, warto wiedzieć **gdzie szukać informacji** o endpointach, parametrach i formatach odpowiedzi.
-
 API dane.gov.pl ma dokumentację Swagger pod adresem:
 
 > **<https://api.dane.gov.pl/doc>**
@@ -139,35 +137,38 @@ Czy widzisz pole `data` z listą obiektów? Czy potrafisz wskazać `id` i `title
 
 # Szczegóły HTTP (curl)
 
-Zanim przejdziemy do Pythona, użyjemy `curl` do zobaczenia „surowego" HTTP — tego, co zwykle jest ukryte za bibliotekami.
+`curl` umożliwia zobaczenie dokładnie tego, co jest wysyłane i odbierane na poziomie protokołu HTTP — nagłówków, statusu, ciała odpowiedzi. 
 
 ## Przygotowanie
 
 Sprawdź, czy masz `curl` (w terminalu / PowerShell):
 
-```bash
+~~~bash
 curl --version
-```
+~~~
 
-Uwaga (Windows): jeśli pracujesz w PowerShell, używaj `curl.exe` zamiast `curl` (które bywa aliasem do innego polecenia).
+::: {.callout-warning}
+## Uwaga dotycząca Windows
+Jeśli pracujesz w PowerShell, wpisz `curl.exe` zamiast `curl`. Samo `curl` w PowerShell bywa aliasem do `Invoke-WebRequest` — zupełnie innego programu. Jeśli widzisz błąd wspominający o `Invoke-WebRequest`, to właśnie ten przypadek.
+:::
 
-## Surowa odpowiedź HTTP
+## Nagłówki + ciało odpowiedzi
 
-Pobierz stronę i wyświetl **nagłówki + ciało** razem:
+Flaga `-i` wyświetla **nagłówki odpowiedzi** razem z ciałem:
 
-```bash
+~~~bash
 curl -i "https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2"
-```
+~~~
 
 Na ekranie zobaczysz coś w rodzaju:
 
-```
+~~~
 HTTP/2 200
 content-type: application/vnd.api+json
 ...
 
 {"data":[{"id":"...", ...}], ...}
-```
+~~~
 
 ::: {.callout-note}
 Widzisz linię statusu (`HTTP/2 200`), nagłówki odpowiedzi (w tym `content-type`), pustą linię, a potem ciało odpowiedzi (JSON). To jest dokładnie struktura odpowiedzi HTTP z wykładu.
@@ -175,35 +176,88 @@ Widzisz linię statusu (`HTTP/2 200`), nagłówki odpowiedzi (w tym `content-typ
 
 ## Tryb diagnostyczny
 
-Dodaj flagę `-v` (verbose), żeby zobaczyć **też żądanie**, które wysłał twój klient:
+Flaga `-v` (verbose) pokazuje **też żądanie**, które wysłał twój klient:
 
-```bash
+~~~bash
 curl -v "https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1"
-```
+~~~
 
 W trybie `-v` `curl` oznacza różne typy linii prefiksami:
 
-- Linie zaczynające się od `*` to **informacje diagnostyczne klienta** (np. rozwiązywanie DNS, próba połączenia, TLS/HTTPS handshake, negocjacja HTTP/2, przekierowania, uwagi typu „Connection #0 left intact”).
+- Linie zaczynające się od `*` to **informacje diagnostyczne klienta** (np. rozwiązywanie DNS, TLS handshake).
 - Linie zaczynające się od `>` to **żądanie** wysyłane przez ciebie (linia `GET ...` oraz nagłówki żądania).
 - Linie zaczynające się od `<` to **odpowiedź serwera** (status i nagłówki odpowiedzi).
 
-Uwaga: **ciało odpowiedzi** (np. JSON) zwykle pojawia się jako „zwykły” tekst **bez** prefiksów `>`, `<`, `*` — jest wypisywane na standardowe wyjście, podczas gdy log `-v` idzie na standardowy błąd. Dlatego w terminalu widzisz to wymieszane czasowo, ale logicznie to są dwa strumienie.
+Uwaga: **ciało odpowiedzi** (np. JSON) pojawia się jako zwykły tekst bez prefiksów — jest wypisywane na standardowe wyjście, podczas gdy log `-v` idzie na standardowy błąd.
 
-Znajdź w części `>` linię `GET /1.4/datasets?...` oraz nagłówek `Host:`. W części `<` znajdź `content-type:` i kod statusu (np. `200`).
+## Ćwiczenie 1: odczytywanie surowego HTTP
+
+Wykonaj polecenie:
+
+~~~bash
+curl -v "https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1" 2>&1 | head -30
+~~~
+
+(`2>&1` łączy oba strumienie, żeby `head` mógł ograniczyć wyjście.)
+
+Odpowiedz na pytania:
+
+1. Jaka **metoda HTTP** została użyta? (szukaj w liniach `>`)
+2. Jaki nagłówek **`Host`** wysłał twój klient?
+3. Jaki **kod statusu** zwrócił serwer? (szukaj w liniach `<`)
+4. Jaki **`content-type`** ma odpowiedź?
 
 
-## Sama odpowiedź, ładnie sformatowana
+## HEAD — same nagłówki, bez ciała
 
-```bash
+Flaga `-I` wysyła żądanie `HEAD` — serwer zwraca **tylko nagłówki**, bez ciała odpowiedzi. Przydatne, gdy chcesz sprawdzić typ lub rozmiar zasobu przed jego pobraniem.
+
+~~~bash
+curl -I "https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1"
+~~~
+
+Sprawdź to żądanie. Czy wszystko jest OK? 
+
+## Ćwiczenie 2: HEAD vs GET
+
+Wykonaj dwa polecenia i porównaj wyniki:
+
+~~~bash
+curl -I "https://httpbin.org/json"
+curl -i "https://httpbin.org/json"
+~~~
+
+Odpowiedz:
+
+1. Czy **kod statusu** jest taki sam w obu przypadkach?
+2. Czy **`content-type`** jest taki sam?
+3. Które polecenie **nie** zwróciło ciała odpowiedzi?
+4. W jakiej sytuacji HEAD byłby przydatny?
+
+## Formatowanie odpowiedzi JSON
+
+`curl` wypisuje JSON w jednej linii — nieczytelnie. Pipe przez `python3 -m json.tool` formatuje z wcięciami:
+
+~~~bash
 curl -s "https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2" | python3 -m json.tool | head -40
-```
+~~~
 
-Pipe przez `python3 -m json.tool` formatuje JSON z wcięciami. Flaga `-s` wycisza pasek postępu.
+Flaga `-s` wycisza pasek postępu.
 
-::: {.callout-note}
-## Checkpoint
-Potrafisz wskazać w wyjściu `curl -i` kod statusu, `Content-Type` i początek ciała JSON?
-:::
+## Ćwiczenie 3: parametry zapytania i nagłówki
+
+Wykonaj żądanie z parametrem wyszukiwania i nagłówkiem `Accept`:
+
+~~~bash
+curl -s -H "Accept: application/vnd.api+json" \
+  "https://api.dane.gov.pl/1.4/datasets?q=transport&per_page=3" \
+  | python3 -m json.tool | head -30
+~~~
+
+1. Ile datasetów zwrócił serwer? (policz obiekty w `data`)
+2. Zmień frazę `transport` na inną (np. `szkoły`, `powietrze`). Czy wyniki się zmieniły?
+3. Usuń flagę `-s` i wykonaj ponownie. Co się zmieniło w wyjściu?
+
 
 ---
 
@@ -219,66 +273,60 @@ Biblioteka `requests` jest standardem do wysyłania zapytań HTTP w Pythonie, ni
 pip install requests
 ```
 
-## Pierwsze żądanie GET
+## Obiekt Response — przypomnienie
 
-```python
+Na wykładzie poznałeś bibliotekę `requests`. Wykonajmy jedno żądanie, żeby przypomnieć kluczowe atrybuty obiektu `Response`:
+
+~~~python
 import requests
 
-url = "https://example.com"
-r = requests.get(url)
+r = requests.get("https://example.com", timeout=10)
 
-print("Status:", r.status_code)
+print("Status:", r.status_code)        # int, np. 200
 print("Content-Type:", r.headers.get("Content-Type"))
 print("Treść (100 znaków):", r.text[:100])
-```
+~~~
 
-Obiekt `r` (obiekt klasy `Response`) zawiera całą odpowiedź HTTP:
+Pełny zestaw atrybutów, z których będziemy korzystać:
 
-* `r.status_code` — kod statusu (int, np. `200`),
+* `r.status_code` — kod statusu (int),
 * `r.headers` — słownik nagłówków odpowiedzi,
 * `r.text` — ciało jako tekst (str),
 * `r.content` — ciało jako bajty (bytes),
-* `r.json()` — ciało sparsowane z JSON do dict/list.
+* `r.json()` — ciało sparsowane z JSON do dict/list,
+* `r.url` — pełny URL po dołączeniu parametrów.
 
-## Parametry zapytania (query string)
+## httpbin.org — echo i symulacja błędów
 
-Zamiast sklejać URL ręcznie, podaj parametry jako słownik:
+[httpbin.org](https://httpbin.org/) to serwis testowy, który „odbija" twoje żądanie — pokazuje, co serwer otrzymał. Przydatny do nauki i debugowania.
 
-```python
+**Echo żądania z parametrami i nagłówkami:**
+
+~~~python
 r = requests.get(
     "https://httpbin.org/get",
-    params={"q": "python", "page": 1}
+    params={"q": "python", "page": 1},
+    headers={"Accept": "application/json", "User-Agent": "MojSkrypt/1.0"},
+    timeout=10,
 )
+
 print("Pełny URL:", r.url)
-# → https://httpbin.org/get?q=python&page=1
-```
+echo = r.json()
+print("Serwer widzi nagłówki:", echo["headers"])
+print("Serwer widzi parametry:", echo["args"])
+~~~
 
-`requests` sam zakoduje wartości i doda `?...&...` do URL.
+Zwróć uwagę: `requests` sam zakoduje parametry i doda `?...&...` do URL.
 
-## Nagłówki żądania
+**Symulacja kodów błędów:**
 
-Nagłówki podajesz przez parametr `headers`:
+httpbin potrafi zwrócić dowolny kod statusu — przydatne, żeby przetestować obsługę błędów bez czekania na „prawdziwy" błąd:
 
-```python
-r = requests.get(
-    "https://httpbin.org/headers",
-    headers={"Accept": "application/json", "User-Agent": "MojSkrypt/1.0"}
-)
-print(r.json())
-```
-
-## Odbieranie JSON
-
-```python
-r = requests.get("https://httpbin.org/json")
-
-print("Status:", r.status_code)
-print("Content-Type:", r.headers.get("Content-Type"))
-
-data = r.json()           # parsuje JSON → dict
-print("Typ:", type(data))
-print("Klucze:", list(data.keys()))
-```
+~~~python
+for code in [200, 301, 404, 500]:
+    r = requests.get(f"https://httpbin.org/status/{code}", allow_redirects=False, timeout=10)
+    print(f"  Żądany kod: {code}, otrzymany: {r.status_code}")
+~~~
 
 ::: {.callout-tip}
 ## Ważne
@@ -287,32 +335,56 @@ print("Klucze:", list(data.keys()))
 
 ## Bezpieczny wzorzec: sprawdzaj przed parsowaniem
 
-```python
+~~~python
 r = requests.get("https://httpbin.org/json", timeout=10)
 r.raise_for_status()  # rzuci wyjątek przy 4xx / 5xx
 data = r.json()
-```
+~~~
 
 Metoda `raise_for_status()` zamienia kody błędów na wyjątek Pythona — dzięki temu nie próbujesz parsować odpowiedzi z błędem.
 
 ::: {.callout-note}
 ## Checkpoint
-Wykonaj `requests.get("https://httpbin.org/json")` i wypisz `status_code`, `Content-Type` z nagłówków, oraz klucze (keys) sparsowanego JSON-a. Czy wszystko się zgadza?
+Wykonaj `requests.get("https://httpbin.org/status/418")`. Jaki kod statusu zwrócił serwer? Co się stanie, gdy na tym obiekcie wywołasz `raise_for_status()`?
 :::
 
 ---
 
 # Zapytanie do API dane.gov.pl
 
-Teraz łączymy to, co wiemy o `requests`, ze strukturą API, którą poznaliśmy w Części 1.
+Teraz łączymy to, co wiemy o `requests`, ze strukturą API dane.gov.pl. Strategia: każdą odpowiedź zapisujemy do pliku JSON i otwieramy w edytorze lub przeglądarce. Dzięki temu widzisz pełną strukturę danych — zagnieżdżenia, klucze, typy — zamiast zgadywać z `print(data.keys())`.
 
-## Krok 1: lista datasetów
+## Przygotowanie: katalog i funkcja zapisu
+
+Utwórz nowy skrypt (np. `lab1_api.py`). Na początku przygotuj katalog na odpowiedzi i pomocniczą funkcję:
 
 ```python
+import json
 import requests
+from pathlib import Path
 
 API = "https://api.dane.gov.pl/1.4"
+OUT = Path("lab1_output")
+OUT.mkdir(exist_ok=True)
 
+
+def save_response(data, filename):
+    """Zapisuje odpowiedź JSON do pliku i wypisuje ścieżkę."""
+    path = OUT / filename
+    path.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(f"Zapisano: {path}")
+```
+
+To jest wzorzec z Lab 0 (`json.dumps` + `pathlib`) — teraz używamy go na żywych danych.
+
+## Demonstracja: lista datasetów
+
+Pobierz pierwszą stronę kolekcji i zapisz do pliku:
+
+```python
 r = requests.get(
     f"{API}/datasets",
     params={"page": 1, "per_page": 5},
@@ -321,101 +393,64 @@ r = requests.get(
 )
 r.raise_for_status()
 
-data = r.json()
-print("Klucze odpowiedzi:", list(data.keys()))
+save_response(r.json(), "datasets_page1.json")
 ```
 
-Spodziewane klucze: `data`, `links`, `meta` (ewentualnie `included`).
+Uruchom skrypt, a następnie **otwórz plik `lab1_output/datasets_page1.json`** w przeglądarce (Firefox i Chrome automatycznie formatują JSON).
 
-## Krok 2: eksploracja struktury
+## Co zobaczyć w pliku
 
-```python
-# Ile datasetów na tej stronie?
-datasets = data["data"]
-print("Liczba datasetów:", len(datasets))
+Plik ma kilkaset linii. Nie czytaj go całego — szukaj struktury:
 
-# Pierwszy dataset — co zawiera?
-first = datasets[0]
-print("Klucze obiektu:", list(first.keys()))
-print("ID:", first["id"])
-print("Typ:", first["type"])
-print("Tytuł:", first["attributes"]["title"])
-```
+**Poziom główny** — trzy klucze:
 
-## Krok 3: przegląd wszystkich wyników
+* `"data"` — **lista** obiektów (datasetów). To główna zawartość odpowiedzi.
+* `"links"` — adresy do nawigacji. Klucz `"next"` zawiera URL następnej strony wyników. To jest mechanizm **stronicowania**, którego użyjemy na Lab 2.
+* `"meta"` — metadane. Klucz `"count"` mówi, ile jest datasetów łącznie (nie na tej stronie, lecz w całym API).
 
-```python
-for ds in datasets:
-    ds_id = ds["id"]
-    title = ds["attributes"]["title"]
-    print(f"  [{ds_id}] {title}")
-```
+**Pojedynczy dataset** (element listy `"data"`) — zwróć uwagę na:
 
-## Krok 4: linki nawigacyjne (stronicowanie)
+* `"id"` — identyfikator, którego użyjesz w kolejnym zapytaniu,
+* `"type"` — zawsze `"dataset"`,
+* `"attributes"` — słownik z właściwymi danymi: `"title"`, `"notes"`, `"category"`, `"modified"` itd.,
+* `"links"` → `"self"` — URL tego konkretnego datasetu.
 
-```python
-print("Linki:", data.get("links", {}))
-print("Meta:", data.get("meta", {}))
-```
+Zapisz sobie `id` jednego datasetu, który wydaje ci się ciekawy.
 
-W polu `links` powinien pojawić się klucz `next` z URL-em następnej strony. W polu `meta` — łączna liczba zbiorów (`count`).
 
-::: {.callout-note}
-## Checkpoint
-Czy widzisz listę 5 datasetów z ich `id` i tytułami? Czy w `links` jest adres `next`? Zapisz `id` jednego datasetu, który wydaje ci się ciekawy.
+## Samodzielna eksploracja: element i podzasoby
+
+Masz `id` wybranego datasetu. Teraz przejdź dwa kolejne poziomy hierarchii API — dokładnie te, które widziałeś w sekcji „Mapa zasobów API":
+
+**1. Szczegóły datasetu** — endpoint `/datasets/{id}`
+
+Pobierz szczegóły i zapisz do pliku (np. `dataset_{id}.json`). Otwórz plik i zwróć uwagę na kluczową różnicę: **`"data"` jest teraz słownikiem, nie listą**. Dla kolekcji API zwraca listę, dla pojedynczego elementu — obiekt.
+
+**2. Zasoby datasetu** — endpoint `/datasets/{id}/resources`
+
+Pobierz listę zasobów (plików) i zapisz do osobnego pliku. W każdym zasobie znajdź w `"attributes"` pola: `"title"`, `"format"`, `"download_url"`. Jeśli lista zasobów jest pusta — wybierz inny dataset i powtórz.
+
+::: {.callout-tip}
+## Wskazówka
+Wzorzec kodu jest identyczny jak w demonstracji powyżej — zmienia się tylko URL i nazwa pliku wyjściowego. Użyj `save_response()`.
 :::
 
-## Krok 5: szczegóły wybranego datasetu
+**3. Podsumowanie na konsoli**
 
-Podstaw `id` z poprzedniego kroku:
-
-```python
-DATASET_ID = "..."   # ← wklej tu swoje id
-
-r = requests.get(
-    f"{API}/datasets/{DATASET_ID}",
-    headers={"Accept": "application/vnd.api+json"},
-    timeout=10,
-)
-r.raise_for_status()
-
-ds = r.json()["data"]
-attrs = ds["attributes"]
-
-print("Tytuł:", attrs["title"])
-print("Opis:", attrs.get("notes", "(brak)")[:200])
-print("Kategoria:", attrs.get("category"))
-print("Modyfikacja:", attrs.get("modified"))
-```
-
-Zwróć uwagę: dla kolekcji `data` jest **listą**, a dla pojedynczego elementu — **słownikiem**.
-
-## Krok 6: zasoby (resources) datasetu
+Gdy masz już zapisane pliki, wczytaj plik z zasobami i wypisz podsumowanie:
 
 ```python
-r = requests.get(
-    f"{API}/datasets/{DATASET_ID}/resources",
-    headers={"Accept": "application/vnd.api+json"},
-    timeout=10,
+resources = json.loads(
+    (OUT / "resources_TWOJE_ID.json").read_text(encoding="utf-8")
 )
-r.raise_for_status()
 
-resources = r.json()["data"]
-print(f"Liczba zasobów: {len(resources)}\n")
-
-for res in resources:
-    res_attrs = res["attributes"]
-    print(f"  [{res['id']}] {res_attrs.get('title', '(bez tytułu)')}")
-    print(f"       format: {res_attrs.get('format', '?')}")
-    print()
+for res in resources["data"]:
+    attrs = res["attributes"]
+    print(f"  [{res['id']}] {attrs.get('title', '(bez tytułu)')}")
+    print(f"       format: {attrs.get('format', '?')}")
 ```
 
-Jeśli lista zasobów jest pusta, wybierz inny dataset i powtórz od kroku 5.
-
-::: {.callout-note}
-## Checkpoint
-Czy widzisz listę zasobów z ich `id`, tytułami i formatami? Jeśli tak — udało ci się przejść pełny łańcuch: kolekcja → element → podzasoby. To jest główna umiejętność tego labu.
-:::
+Ten fragment pokazuje ważny wzorzec: dane zapisane na dysk można wczytać i przetwarzać **bez ponownego odpytywania API**. To jest kluczowa umiejętność: **API → plik → analiza**. Dzięki temu nie obciążasz serwera wielokrotnymi zapytaniami, a jednocześnie masz 
 
 ---
 
@@ -522,9 +557,10 @@ GET /1.4/datasets/{id}/resources/metadata.csv?lang=en
 W tym labie:
 
 * poznałeś API dane.gov.pl i jego hierarchię zasobów,
-* zobaczyłeś surowe HTTP w `curl` (nagłówki, kody statusu),
+* użyłeś `curl` do diagnostyki HTTP: nagłówki, kody statusu, HEAD vs GET,
 * nauczyłeś się wysyłać zapytania GET w `requests` i parsować odpowiedzi JSON:API,
-* przeszedłeś pełny łańcuch: kolekcja → element → podzasoby,
+* przeszedłeś pełny łańcuch: kolekcja → element → podzasoby → pobranie pliku,
+* zapisałeś wyniki do pliku JSON (pipeline: API → Python → plik),
 * obsłużyłeś błędy HTTP (404, timeout).
 
-W następnym labie: nawigacja po wielu stronach wyników (pętla po API), pobieranie realnych plików danych i budowanie pierwszego pipeline'u automatycznego pozyskiwania danych.
+W następnym labie: nawigacja po wielu stronach wyników (pętla po API), automatyczne pobieranie wielu plików i budowanie pipeline'u z obsługą retry.
