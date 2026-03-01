@@ -13,7 +13,7 @@ Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z si
 ## Laboratoria
 
 - [Laboratorium 0: Python — odświeżenie podstaw](laby/lab_0.md)
-<!-- - [Laboratorium 1: HTTP i klienci HTTP](laby/lab_1.md) -->
+- [Laboratorium 1: HTTP i klienci HTTP](laby/lab_1.md)
 
 ## Zaliczenie
 
