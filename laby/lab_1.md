@@ -190,7 +190,7 @@ W trybie `-v` `curl` oznacza różne typy linii prefiksami:
 
 Uwaga: **ciało odpowiedzi** (np. JSON) pojawia się jako zwykły tekst bez prefiksów — jest wypisywane na standardowe wyjście, podczas gdy log `-v` idzie na standardowy błąd.
 
-## Ćwiczenie 1: odczytywanie surowego HTTP
+## Ćwiczenie: odczytywanie surowego HTTP
 
 Wykonaj polecenie:
 
@@ -212,13 +212,16 @@ Odpowiedz na pytania:
 
 Flaga `-I` wysyła żądanie `HEAD` — serwer zwraca **tylko nagłówki**, bez ciała odpowiedzi. Przydatne, gdy chcesz sprawdzić typ lub rozmiar zasobu przed jego pobraniem.
 
+## Ćwiczenie: żądanie HEAD
+
+Sprawdź to żądanie. Czy wszystko jest OK? 
+
 ~~~bash
 curl -I "https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1"
 ~~~
 
-Sprawdź to żądanie. Czy wszystko jest OK? 
 
-## Ćwiczenie 2: HEAD vs GET
+## Ćwiczenie: HEAD vs GET
 
 Wykonaj dwa polecenia i porównaj wyniki:
 
@@ -244,7 +247,7 @@ curl -s "https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2" | python3 -m js
 
 Flaga `-s` wycisza pasek postępu.
 
-## Ćwiczenie 3: parametry zapytania i nagłówki
+## Ćwiczenie: parametry zapytania i nagłówki
 
 Wykonaj żądanie z parametrem wyszukiwania i nagłówkiem `Accept`:
 
@@ -275,7 +278,7 @@ pip install requests
 
 ## Obiekt Response — przypomnienie
 
-Na wykładzie poznałeś bibliotekę `requests`. Wykonajmy jedno żądanie, żeby przypomnieć kluczowe atrybuty obiektu `Response`:
+Na wykładzie poznaliśmy bibliotekę `requests`. Wykonajmy jedno żądanie, żeby przypomnieć kluczowe atrybuty obiektu `Response`:
 
 ~~~python
 import requests
