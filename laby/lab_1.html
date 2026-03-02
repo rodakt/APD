@@ -214,11 +214,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#przygotowanie" id="toc-przygotowanie" class="nav-link" data-scroll-target="#przygotowanie"><span class="header-section-number">3.1</span> Przygotowanie</a></li>
   <li><a href="#nagłówki-ciało-odpowiedzi" id="toc-nagłówki-ciało-odpowiedzi" class="nav-link" data-scroll-target="#nagłówki-ciało-odpowiedzi"><span class="header-section-number">3.2</span> Nagłówki + ciało odpowiedzi</a></li>
   <li><a href="#tryb-diagnostyczny" id="toc-tryb-diagnostyczny" class="nav-link" data-scroll-target="#tryb-diagnostyczny"><span class="header-section-number">3.3</span> Tryb diagnostyczny</a></li>
-  <li><a href="#ćwiczenie-1-odczytywanie-surowego-http" id="toc-ćwiczenie-1-odczytywanie-surowego-http" class="nav-link" data-scroll-target="#ćwiczenie-1-odczytywanie-surowego-http"><span class="header-section-number">3.4</span> Ćwiczenie 1: odczytywanie surowego HTTP</a></li>
+  <li><a href="#ćwiczenie-odczytywanie-surowego-http" id="toc-ćwiczenie-odczytywanie-surowego-http" class="nav-link" data-scroll-target="#ćwiczenie-odczytywanie-surowego-http"><span class="header-section-number">3.4</span> Ćwiczenie: odczytywanie surowego HTTP</a></li>
   <li><a href="#head-same-nagłówki-bez-ciała" id="toc-head-same-nagłówki-bez-ciała" class="nav-link" data-scroll-target="#head-same-nagłówki-bez-ciała"><span class="header-section-number">3.5</span> HEAD — same nagłówki, bez ciała</a></li>
-  <li><a href="#ćwiczenie-2-head-vs-get" id="toc-ćwiczenie-2-head-vs-get" class="nav-link" data-scroll-target="#ćwiczenie-2-head-vs-get"><span class="header-section-number">3.6</span> Ćwiczenie 2: HEAD vs GET</a></li>
-  <li><a href="#formatowanie-odpowiedzi-json" id="toc-formatowanie-odpowiedzi-json" class="nav-link" data-scroll-target="#formatowanie-odpowiedzi-json"><span class="header-section-number">3.7</span> Formatowanie odpowiedzi JSON</a></li>
-  <li><a href="#ćwiczenie-3-parametry-zapytania-i-nagłówki" id="toc-ćwiczenie-3-parametry-zapytania-i-nagłówki" class="nav-link" data-scroll-target="#ćwiczenie-3-parametry-zapytania-i-nagłówki"><span class="header-section-number">3.8</span> Ćwiczenie 3: parametry zapytania i nagłówki</a></li>
+  <li><a href="#ćwiczenie-żądanie-head" id="toc-ćwiczenie-żądanie-head" class="nav-link" data-scroll-target="#ćwiczenie-żądanie-head"><span class="header-section-number">3.6</span> Ćwiczenie: żądanie HEAD</a></li>
+  <li><a href="#ćwiczenie-head-vs-get" id="toc-ćwiczenie-head-vs-get" class="nav-link" data-scroll-target="#ćwiczenie-head-vs-get"><span class="header-section-number">3.7</span> Ćwiczenie: HEAD vs GET</a></li>
+  <li><a href="#formatowanie-odpowiedzi-json" id="toc-formatowanie-odpowiedzi-json" class="nav-link" data-scroll-target="#formatowanie-odpowiedzi-json"><span class="header-section-number">3.8</span> Formatowanie odpowiedzi JSON</a></li>
+  <li><a href="#ćwiczenie-parametry-zapytania-i-nagłówki" id="toc-ćwiczenie-parametry-zapytania-i-nagłówki" class="nav-link" data-scroll-target="#ćwiczenie-parametry-zapytania-i-nagłówki"><span class="header-section-number">3.9</span> Ćwiczenie: parametry zapytania i nagłówki</a></li>
   </ul></li>
   <li><a href="#zapytania-http-w-pythonie-requests" id="toc-zapytania-http-w-pythonie-requests" class="nav-link" data-scroll-target="#zapytania-http-w-pythonie-requests"><span class="header-section-number">4</span> Zapytania HTTP w Pythonie (requests)</a>
   <ul class="collapse">
@@ -477,8 +478,8 @@ Note
 </ul>
 <p>Uwaga: <strong>ciało odpowiedzi</strong> (np. JSON) pojawia się jako zwykły tekst bez prefiksów — jest wypisywane na standardowe wyjście, podczas gdy log <code>-v</code> idzie na standardowy błąd.</p>
 </section>
-<section id="ćwiczenie-1-odczytywanie-surowego-http" class="level2" data-number="3.4">
-<h2 data-number="3.4" class="anchored" data-anchor-id="ćwiczenie-1-odczytywanie-surowego-http"><span class="header-section-number">3.4</span> Ćwiczenie 1: odczytywanie surowego HTTP</h2>
+<section id="ćwiczenie-odczytywanie-surowego-http" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="ćwiczenie-odczytywanie-surowego-http"><span class="header-section-number">3.4</span> Ćwiczenie: odczytywanie surowego HTTP</h2>
 <p>Wykonaj polecenie:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-v</span> <span class="st">"https://api.dane.gov.pl/1.4/datasets?page=1&amp;per_page=1"</span> <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">head</span> <span class="at">-30</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>(<code>2&gt;&amp;1</code> łączy oba strumienie, żeby <code>head</code> mógł ograniczyć wyjście.)</p>
@@ -493,11 +494,14 @@ Note
 <section id="head-same-nagłówki-bez-ciała" class="level2" data-number="3.5">
 <h2 data-number="3.5" class="anchored" data-anchor-id="head-same-nagłówki-bez-ciała"><span class="header-section-number">3.5</span> HEAD — same nagłówki, bez ciała</h2>
 <p>Flaga <code>-I</code> wysyła żądanie <code>HEAD</code> — serwer zwraca <strong>tylko nagłówki</strong>, bez ciała odpowiedzi. Przydatne, gdy chcesz sprawdzić typ lub rozmiar zasobu przed jego pobraniem.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-I</span> <span class="st">"https://api.dane.gov.pl/1.4/datasets?page=1&amp;per_page=1"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Sprawdź to żądanie. Czy wszystko jest OK?</p>
 </section>
-<section id="ćwiczenie-2-head-vs-get" class="level2" data-number="3.6">
-<h2 data-number="3.6" class="anchored" data-anchor-id="ćwiczenie-2-head-vs-get"><span class="header-section-number">3.6</span> Ćwiczenie 2: HEAD vs GET</h2>
+<section id="ćwiczenie-żądanie-head" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="ćwiczenie-żądanie-head"><span class="header-section-number">3.6</span> Ćwiczenie: żądanie HEAD</h2>
+<p>Sprawdź to żądanie. Czy wszystko jest OK?</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-I</span> <span class="st">"https://api.dane.gov.pl/1.4/datasets?page=1&amp;per_page=1"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="ćwiczenie-head-vs-get" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="ćwiczenie-head-vs-get"><span class="header-section-number">3.7</span> Ćwiczenie: HEAD vs GET</h2>
 <p>Wykonaj dwa polecenia i porównaj wyniki:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-I</span> <span class="st">"https://httpbin.org/json"</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> <span class="st">"https://httpbin.org/json"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -509,14 +513,14 @@ Note
 <li>W jakiej sytuacji HEAD byłby przydatny?</li>
 </ol>
 </section>
-<section id="formatowanie-odpowiedzi-json" class="level2" data-number="3.7">
-<h2 data-number="3.7" class="anchored" data-anchor-id="formatowanie-odpowiedzi-json"><span class="header-section-number">3.7</span> Formatowanie odpowiedzi JSON</h2>
+<section id="formatowanie-odpowiedzi-json" class="level2" data-number="3.8">
+<h2 data-number="3.8" class="anchored" data-anchor-id="formatowanie-odpowiedzi-json"><span class="header-section-number">3.8</span> Formatowanie odpowiedzi JSON</h2>
 <p><code>curl</code> wypisuje JSON w jednej linii — nieczytelnie. Pipe przez <code>python3 -m json.tool</code> formatuje z wcięciami:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="st">"https://api.dane.gov.pl/1.4/datasets?page=1&amp;per_page=2"</span> <span class="kw">|</span> <span class="ex">python3</span> <span class="at">-m</span> json.tool <span class="kw">|</span> <span class="fu">head</span> <span class="at">-40</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Flaga <code>-s</code> wycisza pasek postępu.</p>
 </section>
-<section id="ćwiczenie-3-parametry-zapytania-i-nagłówki" class="level2" data-number="3.8">
-<h2 data-number="3.8" class="anchored" data-anchor-id="ćwiczenie-3-parametry-zapytania-i-nagłówki"><span class="header-section-number">3.8</span> Ćwiczenie 3: parametry zapytania i nagłówki</h2>
+<section id="ćwiczenie-parametry-zapytania-i-nagłówki" class="level2" data-number="3.9">
+<h2 data-number="3.9" class="anchored" data-anchor-id="ćwiczenie-parametry-zapytania-i-nagłówki"><span class="header-section-number">3.9</span> Ćwiczenie: parametry zapytania i nagłówki</h2>
 <p>Wykonaj żądanie z parametrem wyszukiwania i nagłówkiem <code>Accept</code>:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> <span class="at">-H</span> <span class="st">"Accept: application/vnd.api+json"</span> <span class="dt">\</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"https://api.dane.gov.pl/1.4/datasets?q=transport&amp;per_page=3"</span> <span class="dt">\</span></span>
@@ -539,7 +543,7 @@ Note
 </section>
 <section id="obiekt-response-przypomnienie" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="obiekt-response-przypomnienie"><span class="header-section-number">4.2</span> Obiekt Response — przypomnienie</h2>
-<p>Na wykładzie poznałeś bibliotekę <code>requests</code>. Wykonajmy jedno żądanie, żeby przypomnieć kluczowe atrybuty obiektu <code>Response</code>:</p>
+<p>Na wykładzie poznaliśmy bibliotekę <code>requests</code>. Wykonajmy jedno żądanie, żeby przypomnieć kluczowe atrybuty obiektu <code>Response</code>:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="st">"https://example.com"</span>, timeout<span class="op">=</span><span class="dv">10</span>)</span>

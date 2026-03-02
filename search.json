@@ -668,11 +668,11 @@
     ]
   },
   {
-    "objectID": "laby/lab_1.html#ćwiczenie-1-odczytywanie-surowego-http",
-    "href": "laby/lab_1.html#ćwiczenie-1-odczytywanie-surowego-http",
+    "objectID": "laby/lab_1.html#ćwiczenie-odczytywanie-surowego-http",
+    "href": "laby/lab_1.html#ćwiczenie-odczytywanie-surowego-http",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.4 Ćwiczenie 1: odczytywanie surowego HTTP",
-    "text": "3.4 Ćwiczenie 1: odczytywanie surowego HTTP\nWykonaj polecenie:\ncurl -v \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\" 2&gt;&1 | head -30\n(2&gt;&1 łączy oba strumienie, żeby head mógł ograniczyć wyjście.)\nOdpowiedz na pytania:\n\nJaka metoda HTTP została użyta? (szukaj w liniach &gt;)\nJaki nagłówek Host wysłał twój klient?\nJaki kod statusu zwrócił serwer? (szukaj w liniach &lt;)\nJaki content-type ma odpowiedź?",
+    "section": "3.4 Ćwiczenie: odczytywanie surowego HTTP",
+    "text": "3.4 Ćwiczenie: odczytywanie surowego HTTP\nWykonaj polecenie:\ncurl -v \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\" 2&gt;&1 | head -30\n(2&gt;&1 łączy oba strumienie, żeby head mógł ograniczyć wyjście.)\nOdpowiedz na pytania:\n\nJaka metoda HTTP została użyta? (szukaj w liniach &gt;)\nJaki nagłówek Host wysłał twój klient?\nJaki kod statusu zwrócił serwer? (szukaj w liniach &lt;)\nJaki content-type ma odpowiedź?",
     "crumbs": [
       "Laboratoria",
       "Lab 1: Klienci HTTP (curl, requests)"
@@ -683,18 +683,29 @@
     "href": "laby/lab_1.html#head-same-nagłówki-bez-ciała",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "3.5 HEAD — same nagłówki, bez ciała",
-    "text": "3.5 HEAD — same nagłówki, bez ciała\nFlaga -I wysyła żądanie HEAD — serwer zwraca tylko nagłówki, bez ciała odpowiedzi. Przydatne, gdy chcesz sprawdzić typ lub rozmiar zasobu przed jego pobraniem.\ncurl -I \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\"\nSprawdź to żądanie. Czy wszystko jest OK?",
+    "text": "3.5 HEAD — same nagłówki, bez ciała\nFlaga -I wysyła żądanie HEAD — serwer zwraca tylko nagłówki, bez ciała odpowiedzi. Przydatne, gdy chcesz sprawdzić typ lub rozmiar zasobu przed jego pobraniem.",
     "crumbs": [
       "Laboratoria",
       "Lab 1: Klienci HTTP (curl, requests)"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#ćwiczenie-2-head-vs-get",
-    "href": "laby/lab_1.html#ćwiczenie-2-head-vs-get",
+    "objectID": "laby/lab_1.html#ćwiczenie-żądanie-head",
+    "href": "laby/lab_1.html#ćwiczenie-żądanie-head",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.6 Ćwiczenie 2: HEAD vs GET",
-    "text": "3.6 Ćwiczenie 2: HEAD vs GET\nWykonaj dwa polecenia i porównaj wyniki:\ncurl -I \"https://httpbin.org/json\"\ncurl -i \"https://httpbin.org/json\"\nOdpowiedz:\n\nCzy kod statusu jest taki sam w obu przypadkach?\nCzy content-type jest taki sam?\nKtóre polecenie nie zwróciło ciała odpowiedzi?\nW jakiej sytuacji HEAD byłby przydatny?",
+    "section": "3.6 Ćwiczenie: żądanie HEAD",
+    "text": "3.6 Ćwiczenie: żądanie HEAD\nSprawdź to żądanie. Czy wszystko jest OK?\ncurl -I \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\"",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#ćwiczenie-head-vs-get",
+    "href": "laby/lab_1.html#ćwiczenie-head-vs-get",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.7 Ćwiczenie: HEAD vs GET",
+    "text": "3.7 Ćwiczenie: HEAD vs GET\nWykonaj dwa polecenia i porównaj wyniki:\ncurl -I \"https://httpbin.org/json\"\ncurl -i \"https://httpbin.org/json\"\nOdpowiedz:\n\nCzy kod statusu jest taki sam w obu przypadkach?\nCzy content-type jest taki sam?\nKtóre polecenie nie zwróciło ciała odpowiedzi?\nW jakiej sytuacji HEAD byłby przydatny?",
     "crumbs": [
       "Laboratoria",
       "Lab 1: Klienci HTTP (curl, requests)"
@@ -704,19 +715,19 @@
     "objectID": "laby/lab_1.html#formatowanie-odpowiedzi-json",
     "href": "laby/lab_1.html#formatowanie-odpowiedzi-json",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.7 Formatowanie odpowiedzi JSON",
-    "text": "3.7 Formatowanie odpowiedzi JSON\ncurl wypisuje JSON w jednej linii — nieczytelnie. Pipe przez python3 -m json.tool formatuje z wcięciami:\ncurl -s \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2\" | python3 -m json.tool | head -40\nFlaga -s wycisza pasek postępu.",
+    "section": "3.8 Formatowanie odpowiedzi JSON",
+    "text": "3.8 Formatowanie odpowiedzi JSON\ncurl wypisuje JSON w jednej linii — nieczytelnie. Pipe przez python3 -m json.tool formatuje z wcięciami:\ncurl -s \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2\" | python3 -m json.tool | head -40\nFlaga -s wycisza pasek postępu.",
     "crumbs": [
       "Laboratoria",
       "Lab 1: Klienci HTTP (curl, requests)"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#ćwiczenie-3-parametry-zapytania-i-nagłówki",
-    "href": "laby/lab_1.html#ćwiczenie-3-parametry-zapytania-i-nagłówki",
+    "objectID": "laby/lab_1.html#ćwiczenie-parametry-zapytania-i-nagłówki",
+    "href": "laby/lab_1.html#ćwiczenie-parametry-zapytania-i-nagłówki",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.8 Ćwiczenie 3: parametry zapytania i nagłówki",
-    "text": "3.8 Ćwiczenie 3: parametry zapytania i nagłówki\nWykonaj żądanie z parametrem wyszukiwania i nagłówkiem Accept:\ncurl -s -H \"Accept: application/vnd.api+json\" \\\n  \"https://api.dane.gov.pl/1.4/datasets?q=transport&per_page=3\" \\\n  | python3 -m json.tool | head -30\n\nIle datasetów zwrócił serwer? (policz obiekty w data)\nZmień frazę transport na inną (np. szkoły, powietrze). Czy wyniki się zmieniły?\nUsuń flagę -s i wykonaj ponownie. Co się zmieniło w wyjściu?",
+    "section": "3.9 Ćwiczenie: parametry zapytania i nagłówki",
+    "text": "3.9 Ćwiczenie: parametry zapytania i nagłówki\nWykonaj żądanie z parametrem wyszukiwania i nagłówkiem Accept:\ncurl -s -H \"Accept: application/vnd.api+json\" \\\n  \"https://api.dane.gov.pl/1.4/datasets?q=transport&per_page=3\" \\\n  | python3 -m json.tool | head -30\n\nIle datasetów zwrócił serwer? (policz obiekty w data)\nZmień frazę transport na inną (np. szkoły, powietrze). Czy wyniki się zmieniły?\nUsuń flagę -s i wykonaj ponownie. Co się zmieniło w wyjściu?",
     "crumbs": [
       "Laboratoria",
       "Lab 1: Klienci HTTP (curl, requests)"
@@ -738,7 +749,7 @@
     "href": "laby/lab_1.html#obiekt-response-przypomnienie",
     "title": "Lab 1: Klienci HTTP (curl, requests)",
     "section": "4.2 Obiekt Response — przypomnienie",
-    "text": "4.2 Obiekt Response — przypomnienie\nNa wykładzie poznałeś bibliotekę requests. Wykonajmy jedno żądanie, żeby przypomnieć kluczowe atrybuty obiektu Response:\nimport requests\n\nr = requests.get(\"https://example.com\", timeout=10)\n\nprint(\"Status:\", r.status_code)        # int, np. 200\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\nprint(\"Treść (100 znaków):\", r.text[:100])\nPełny zestaw atrybutów, z których będziemy korzystać:\n\nr.status_code — kod statusu (int),\nr.headers — słownik nagłówków odpowiedzi,\nr.text — ciało jako tekst (str),\nr.content — ciało jako bajty (bytes),\nr.json() — ciało sparsowane z JSON do dict/list,\nr.url — pełny URL po dołączeniu parametrów.",
+    "text": "4.2 Obiekt Response — przypomnienie\nNa wykładzie poznaliśmy bibliotekę requests. Wykonajmy jedno żądanie, żeby przypomnieć kluczowe atrybuty obiektu Response:\nimport requests\n\nr = requests.get(\"https://example.com\", timeout=10)\n\nprint(\"Status:\", r.status_code)        # int, np. 200\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\nprint(\"Treść (100 znaków):\", r.text[:100])\nPełny zestaw atrybutów, z których będziemy korzystać:\n\nr.status_code — kod statusu (int),\nr.headers — słownik nagłówków odpowiedzi,\nr.text — ciało jako tekst (str),\nr.content — ciało jako bajty (bytes),\nr.json() — ciało sparsowane z JSON do dict/list,\nr.url — pełny URL po dołączeniu parametrów.",
     "crumbs": [
       "Laboratoria",
       "Lab 1: Klienci HTTP (curl, requests)"
