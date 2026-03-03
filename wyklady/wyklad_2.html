@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Wykład 2: Serwer HTTP - framework Flask – Automatyczne pozyskiwanie danych</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-b2594a383c4077ccf38c5dc50f43008b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_2.html">Wykład 2: Serwer HTTP - framework Flask</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Automatyczne pozyskiwanie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automatyczne pozyskiwanie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: HTTP i klienci HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Wykład 2: Serwer HTTP - framework Flask</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Python — odświeżenie podstaw</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Klienci HTTP (curl, requests)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#cele-i-zakres" id="toc-cele-i-zakres" class="nav-link active" data-scroll-target="#cele-i-zakres"><span class="header-section-number">1</span> Cele i zakres</a></li>
+  <li><a href="#serwer-jako-program" id="toc-serwer-jako-program" class="nav-link" data-scroll-target="#serwer-jako-program"><span class="header-section-number">2</span> Serwer jako program</a>
+  <ul class="collapse">
+  <li><a href="#co-robi-serwer-pod-maską" id="toc-co-robi-serwer-pod-maską" class="nav-link" data-scroll-target="#co-robi-serwer-pod-maską"><span class="header-section-number">2.1</span> Co robi serwer „pod maską”</a></li>
+  </ul></li>
+  <li><a href="#flask-serwer-http-jako-model-pojęć-http" id="toc-flask-serwer-http-jako-model-pojęć-http" class="nav-link" data-scroll-target="#flask-serwer-http-jako-model-pojęć-http"><span class="header-section-number">3</span> Flask — serwer HTTP jako model pojęć HTTP</a>
+  <ul class="collapse">
+  <li><a href="#instalacja" id="toc-instalacja" class="nav-link" data-scroll-target="#instalacja"><span class="header-section-number">3.1</span> Instalacja</a></li>
+  <li><a href="#minimalny-serwer-flask" id="toc-minimalny-serwer-flask" class="nav-link" data-scroll-target="#minimalny-serwer-flask"><span class="header-section-number">3.2</span> Minimalny serwer Flask</a></li>
+  </ul></li>
+  <li><a href="#routing-dopasowanie-żądania-do-funkcji" id="toc-routing-dopasowanie-żądania-do-funkcji" class="nav-link" data-scroll-target="#routing-dopasowanie-żądania-do-funkcji"><span class="header-section-number">4</span> Routing — dopasowanie żądania do funkcji</a>
+  <ul class="collapse">
+  <li><a href="#parametry-w-ścieżce-zmienne-trasowe" id="toc-parametry-w-ścieżce-zmienne-trasowe" class="nav-link" data-scroll-target="#parametry-w-ścieżce-zmienne-trasowe"><span class="header-section-number">4.1</span> Parametry w ścieżce (zmienne trasowe)</a></li>
+  <li><a href="#query-string-request.args" id="toc-query-string-request.args" class="nav-link" data-scroll-target="#query-string-request.args"><span class="header-section-number">4.2</span> Query string — <code>request.args</code></a></li>
+  </ul></li>
+  <li><a href="#metody-http" id="toc-metody-http" class="nav-link" data-scroll-target="#metody-http"><span class="header-section-number">5</span> Metody HTTP</a></li>
+  <li><a href="#kody-statusu" id="toc-kody-statusu" class="nav-link" data-scroll-target="#kody-statusu"><span class="header-section-number">6</span> Kody statusu</a></li>
+  <li><a href="#zwracanie-json-jsonify" id="toc-zwracanie-json-jsonify" class="nav-link" data-scroll-target="#zwracanie-json-jsonify"><span class="header-section-number">7</span> Zwracanie JSON — <code>jsonify()</code></a>
+  <ul class="collapse">
+  <li><a href="#kolekcja-z-danymi-w-słowniku" id="toc-kolekcja-z-danymi-w-słowniku" class="nav-link" data-scroll-target="#kolekcja-z-danymi-w-słowniku"><span class="header-section-number">7.1</span> Kolekcja z danymi w słowniku</a></li>
+  </ul></li>
+  <li><a href="#zwracanie-html" id="toc-zwracanie-html" class="nav-link" data-scroll-target="#zwracanie-html"><span class="header-section-number">8</span> Zwracanie HTML</a></li>
+  <li><a href="#generowanie-html-dynamicznie" id="toc-generowanie-html-dynamicznie" class="nav-link" data-scroll-target="#generowanie-html-dynamicznie"><span class="header-section-number">9</span> Generowanie HTML dynamicznie</a>
+  <ul class="collapse">
+  <li><a href="#lista-z-linkami" id="toc-lista-z-linkami" class="nav-link" data-scroll-target="#lista-z-linkami"><span class="header-section-number">9.1</span> Lista z linkami</a></li>
+  <li><a href="#tabela-z-danymi" id="toc-tabela-z-danymi" class="nav-link" data-scroll-target="#tabela-z-danymi"><span class="header-section-number">9.2</span> Tabela z danymi</a></li>
+  <li><a href="#dane-z-logiki-ciąg-collatza" id="toc-dane-z-logiki-ciąg-collatza" class="nav-link" data-scroll-target="#dane-z-logiki-ciąg-collatza"><span class="header-section-number">9.3</span> Dane z logiki — ciąg Collatza</a></li>
+  </ul></li>
+  <li><a href="#serwer-jako-kontrolowane-środowisko" id="toc-serwer-jako-kontrolowane-środowisko" class="nav-link" data-scroll-target="#serwer-jako-kontrolowane-środowisko"><span class="header-section-number">10</span> Serwer jako kontrolowane środowisko</a>
+  <ul class="collapse">
+  <li><a href="#przykład-serwer-z-paginacją" id="toc-przykład-serwer-z-paginacją" class="nav-link" data-scroll-target="#przykład-serwer-z-paginacją"><span class="header-section-number">10.1</span> Przykład: serwer z paginacją</a></li>
+  <li><a href="#przykład-serwer-symulujący-błędy" id="toc-przykład-serwer-symulujący-błędy" class="nav-link" data-scroll-target="#przykład-serwer-symulujący-błędy"><span class="header-section-number">10.2</span> Przykład: serwer symulujący błędy</a></li>
+  </ul></li>
+  <li><a href="#serwer-i-klient-dwie-strony-dialogu" id="toc-serwer-i-klient-dwie-strony-dialogu" class="nav-link" data-scroll-target="#serwer-i-klient-dwie-strony-dialogu"><span class="header-section-number">11</span> Serwer i klient — dwie strony dialogu</a></li>
+  <li><a href="#narzędzia-na-przyszłość" id="toc-narzędzia-na-przyszłość" class="nav-link" data-scroll-target="#narzędzia-na-przyszłość"><span class="header-section-number">12</span> Narzędzia na przyszłość</a>
+  <ul class="collapse">
+  <li><a href="#make_response-pełna-kontrola-nad-odpowiedzią" id="toc-make_response-pełna-kontrola-nad-odpowiedzią" class="nav-link" data-scroll-target="#make_response-pełna-kontrola-nad-odpowiedzią"><span class="header-section-number">12.1</span> <code>make_response</code> — pełna kontrola nad odpowiedzią</a></li>
+  <li><a href="#przekierowania" id="toc-przekierowania" class="nav-link" data-scroll-target="#przekierowania"><span class="header-section-number">12.2</span> Przekierowania</a></li>
+  <li><a href="#abort-przerwanie-z-kodem-błędu" id="toc-abort-przerwanie-z-kodem-błędu" class="nav-link" data-scroll-target="#abort-przerwanie-z-kodem-błędu"><span class="header-section-number">12.3</span> <code>abort</code> — przerwanie z kodem błędu</a></li>
+  </ul></li>
+  <li><a href="#uruchamianie-serwera-jak-to-działa-w-praktyce" id="toc-uruchamianie-serwera-jak-to-działa-w-praktyce" class="nav-link" data-scroll-target="#uruchamianie-serwera-jak-to-działa-w-praktyce"><span class="header-section-number">13</span> Uruchamianie serwera — jak to działa w praktyce</a>
+  <ul class="collapse">
+  <li><a href="#przejście-na-vscode" id="toc-przejście-na-vscode" class="nav-link" data-scroll-target="#przejście-na-vscode"><span class="header-section-number">13.1</span> Przejście na VSCode</a></li>
+  <li><a href="#jak-uruchomić-serwer-flask" id="toc-jak-uruchomić-serwer-flask" class="nav-link" data-scroll-target="#jak-uruchomić-serwer-flask"><span class="header-section-number">13.2</span> Jak uruchomić serwer Flask</a></li>
+  <li><a href="#kompletny-przykład-krok-po-kroku" id="toc-kompletny-przykład-krok-po-kroku" class="nav-link" data-scroll-target="#kompletny-przykład-krok-po-kroku"><span class="header-section-number">13.3</span> Kompletny przykład krok po kroku</a></li>
+  <li><a href="#flagi-polecenia-flask-run" id="toc-flagi-polecenia-flask-run" class="nav-link" data-scroll-target="#flagi-polecenia-flask-run"><span class="header-section-number">13.4</span> Flagi polecenia <code>flask run</code></a></li>
+  <li><a href="#workflow-w-labie" id="toc-workflow-w-labie" class="nav-link" data-scroll-target="#workflow-w-labie"><span class="header-section-number">13.5</span> Workflow w labie</a></li>
+  <li><a href="#zatrzymywanie-serwera" id="toc-zatrzymywanie-serwera" class="nav-link" data-scroll-target="#zatrzymywanie-serwera"><span class="header-section-number">13.6</span> Zatrzymywanie serwera</a></li>
+  <li><a href="#plik-o-innej-nazwie-niż-app.py" id="toc-plik-o-innej-nazwie-niż-app.py" class="nav-link" data-scroll-target="#plik-o-innej-nazwie-niż-app.py"><span class="header-section-number">13.7</span> Plik o innej nazwie niż <code>app.py</code></a></li>
+  <li><a href="#najczęstsze-problemy" id="toc-najczęstsze-problemy" class="nav-link" data-scroll-target="#najczęstsze-problemy"><span class="header-section-number">13.8</span> Najczęstsze problemy</a></li>
+  </ul></li>
+  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">14</span> Podsumowanie</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_2.html">Wykład 2: Serwer HTTP - framework Flask</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Wykład 2: Serwer HTTP - framework Flask</h1>
+<p class="subtitle lead">Automatyczne pozyskiwanie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="cele-i-zakres" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="cele-i-zakres"><span class="header-section-number">1</span> Cele i zakres</h2>
+<p>Na Wykładzie 1 patrzyliśmy na HTTP wyłącznie od strony klienta: wysyłaliśmy żądania (<code>curl</code>, <code>requests</code>) i analizowaliśmy odpowiedzi. Teraz przechodzimy na <strong>drugą stronę</strong> — budujemy serwer, który te odpowiedzi generuje.</p>
+<p>Celem nie jest nauka web-developmentu, lecz:</p>
+<ul>
+<li><strong>zrozumienie serwera HTTP</strong> — co robi program, który odpowiada na żądania,</li>
+<li><strong>opanowanie Flaska</strong> jako narzędzia do budowania kontrolowanych środowisk.</li>
+</ul>
+<p>Zakres obejmuje:</p>
+<ul>
+<li>serwer HTTP jako program w Pythonie,</li>
+<li>Flask: routing, parametry, metody HTTP, kody statusu, generowanie HTML i JSON,</li>
+<li>dynamiczne generowanie stron — serwer jako „model świata”,</li>
+<li>serwer jako kontrolowane środowisko do nauki crawlingu.</li>
+</ul>
+<hr>
+</section>
+<section id="serwer-jako-program" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="serwer-jako-program"><span class="header-section-number">2</span> Serwer jako program</h2>
+<p>Na Wykładzie 1 serwer opisaliśmy jako „czarną skrzynkę”, która odbiera żądanie i zwraca odpowiedź. Teraz otworzymy tę skrzynkę i zobaczymy, że <strong>serwer HTTP to zwykły program</strong> — w naszym przypadku skrypt w Pythonie — który:</p>
+<ol type="1">
+<li>nasłuchuje na porcie (np. <code>5000</code>),</li>
+<li>odbiera żądanie HTTP (metoda, ścieżka, nagłówki, body),</li>
+<li>wykonuje logikę (routing, przetwarzanie danych),</li>
+<li>odsyła odpowiedź HTTP (status, nagłówki, body).</li>
+</ol>
+<p>To jest dokładnie to, co widzieliśmy w <code>curl -v</code> — tyle że teraz <strong>piszemy kod po stronie <code>&lt;</code></strong> (odpowiedzi), a nie <code>&gt;</code> (żądania).</p>
+<section id="co-robi-serwer-pod-maską" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="co-robi-serwer-pod-maską"><span class="header-section-number">2.1</span> Co robi serwer „pod maską”</h3>
+<p>Gdy piszemy we Flasku <code>return "Witaj!", 200</code> — framework wykonuje za nas operacje, które na poziomie protokołu wyglądają tak:</p>
+<pre><code>1. Przyjmij połączenie TCP na porcie 5000
+2. Odczytaj żądanie:   GET / HTTP/1.1\r\nHost: localhost:5000\r\n...
+3. Dopasuj ścieżkę "/" do funkcji obsługującej (routing)
+4. Wywołaj funkcję → zwróć tekst "Witaj!" i kod 200
+5. Zbuduj odpowiedź:   HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\nWitaj!
+6. Wyślij odpowiedź do klienta
+7. Zamknij połączenie (lub utrzymaj, jeśli keep-alive)</code></pre>
+<p>Kroki 1–2 i 5–7 to niskopoziomowa obsługa protokołu — Flask robi je automatycznie. My piszemy <strong>tylko krok 3–4</strong>: trasę i logikę.</p>
+<p>Python ma wbudowany moduł <code>http.server</code>, który pozwala napisać serwer bez żadnych zależności zewnętrznych. Wymaga on ręcznego wykonywania każdego z tych kroków — ustawiania kodu statusu, nagłówków, kodowania body do bajtów. Jest cenny poznawczo (widać każdy bajt), ale produkuje dużo powtarzalnego kodu. Dlatego od razu korzystamy z Flaska.</p>
+<hr>
+</section>
+</section>
+<section id="flask-serwer-http-jako-model-pojęć-http" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="flask-serwer-http-jako-model-pojęć-http"><span class="header-section-number">3</span> Flask — serwer HTTP jako model pojęć HTTP</h2>
+<p>Flask to mikroframework webowy dla Pythona. W tym kursie używamy go <strong>nie</strong> do budowania aplikacji webowych, lecz jako <strong>wygodnego modelu serwera HTTP</strong>, który mapuje się niemal 1:1 na pojęcia z Wykładu 1.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Pojęcie HTTP (Wykład 1)</th>
+<th>Odpowiednik w Flask</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Routing (metoda + ścieżka → handler)</td>
+<td><code>@app.route("/path", methods=["GET"])</code></td>
+</tr>
+<tr class="even">
+<td>Query string (<code>?key=value</code>)</td>
+<td><code>request.args["key"]</code></td>
+</tr>
+<tr class="odd">
+<td>Body żądania (formularz)</td>
+<td><code>request.form["field"]</code></td>
+</tr>
+<tr class="even">
+<td>Body żądania (JSON)</td>
+<td><code>request.get_json()</code></td>
+</tr>
+<tr class="odd">
+<td>Kod statusu</td>
+<td><code>return ..., 200</code> albo <code>return ..., 404</code></td>
+</tr>
+<tr class="even">
+<td>Nagłówek <code>Content-Type: text/html</code></td>
+<td><code>return "&lt;html&gt;..."</code> (domyślnie)</td>
+</tr>
+<tr class="odd">
+<td>Nagłówek <code>Content-Type: application/json</code></td>
+<td><code>return jsonify({...})</code></td>
+</tr>
+<tr class="even">
+<td>Nagłówki niestandardowe</td>
+<td><code>make_response()</code> + <code>response.headers[...] = ...</code></td>
+</tr>
+</tbody>
+</table>
+<section id="instalacja" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="instalacja"><span class="header-section-number">3.1</span> Instalacja</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install flask</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Flask jest frameworkiem open-source (licencja BSD).</p>
+</section>
+<section id="minimalny-serwer-flask" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="minimalny-serwer-flask"><span class="header-section-number">3.2</span> Minimalny serwer Flask</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> index():</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"Witaj! To jest odpowiedź serwera."</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Zapisz ten kod jako <code>app.py</code> i uruchom w terminalu poleceniem <code>flask run --debug -p 5000</code> (szczegóły — w sekcji „Uruchamianie serwera” na końcu wykładu). Po uruchomieniu otwórz w przeglądarce <code>http://localhost:5000/</code>.</p>
+<p>Test klientem:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> http://localhost:5000/</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre><code>HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 38
+...
+
+Witaj! To jest odpowiedź serwera.</code></pre>
+<hr>
+</section>
+</section>
+<section id="routing-dopasowanie-żądania-do-funkcji" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="routing-dopasowanie-żądania-do-funkcji"><span class="header-section-number">4</span> Routing — dopasowanie żądania do funkcji</h2>
+<p>Serwer musi umieć rozróżnić, czego dotyczy żądanie. Przeglądarka wysyła <code>GET /about</code> — serwer musi wiedzieć, jaką funkcję wywołać. W Flask robi to <strong>dekorator <code>@app.route</code></strong>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> index():</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"Strona główna"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/about"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> about():</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"O nas"</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/contact"</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> contact():</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"Kontakt: email@example.com"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Każda funkcja obsługuje <strong>jedną trasę</strong> (ścieżkę). Gdy klient wysyła <code>GET /about</code>, Flask wywołuje <code>about()</code>. Gdy ścieżka nie pasuje do żadnej trasy — Flask zwraca <code>404</code>.</p>
+<section id="parametry-w-ścieżce-zmienne-trasowe" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="parametry-w-ścieżce-zmienne-trasowe"><span class="header-section-number">4.1</span> Parametry w ścieżce (zmienne trasowe)</h3>
+<p>Na Wykładzie 1 widzieliśmy wzorzec kolekcja / element w URL-ach API: <code>/datasets</code> (lista) vs <code>/datasets/830</code> (konkretny zbiór). Serwer musi umieć wyciągnąć <code>830</code> ze ścieżki i przekazać do logiki. Flask robi to tak:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/items/&lt;int:item_id&gt;"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> item_detail(item_id):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Szczegóły przedmiotu nr </span><span class="sc">{</span>item_id<span class="sc">}</span><span class="ss">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li><code>&lt;int:item_id&gt;</code> — Flask wyciąga fragment ścieżki, konwertuje na <code>int</code> i przekazuje jako argument funkcji.</li>
+<li><code>GET /items/42</code> → <code>item_detail(42)</code> → <code>"Szczegóły przedmiotu nr 42"</code>.</li>
+<li><code>GET /items/abc</code> → Flask zwraca <code>404</code> (bo <code>abc</code> nie jest <code>int</code>).</li>
+</ul>
+<p>Dostępne konwertery: <code>int</code>, <code>float</code>, <code>string</code> (domyślny — dowolny tekst bez <code>/</code>), <code>path</code> (tekst z <code>/</code>).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/users/&lt;username&gt;"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> user_profile(username):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Profil użytkownika: </span><span class="sc">{</span>username<span class="sc">}</span><span class="ss">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>GET /users/anna</code> → <code>user_profile("anna")</code>.</p>
+</section>
+<section id="query-string-request.args" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="query-string-request.args"><span class="header-section-number">4.2</span> Query string — <code>request.args</code></h3>
+<p>Na Wykładzie 1 po stronie klienta pisaliśmy <code>params={"q": "python", "page": 2}</code> w <code>requests.get()</code>. Po stronie serwera te parametry trafiają do <code>request.args</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, request</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/search"</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> search():</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    q <span class="op">=</span> request.args.get(<span class="st">"q"</span>, <span class="st">""</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    page <span class="op">=</span> request.args.get(<span class="st">"page"</span>, <span class="dv">1</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Szukam: '</span><span class="sc">{</span>q<span class="sc">}</span><span class="ss">', strona: </span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li><code>request.args</code> to słownik-podobny obiekt z parametrami query string.</li>
+<li><code>GET /search?q=python&amp;page=2</code> → <code>"Szukam: 'python', strona: 2"</code>.</li>
+<li><code>request.args.get("page", 1, type=int)</code> — jeśli brak parametru, zwraca <code>1</code>; jeśli jest, konwertuje na <code>int</code>.</li>
+</ul>
+<p>Uwaga: <code>request</code> w Flasku to <strong>obiekt globalny</strong> (a dokładniej: kontekstowy), dostępny wewnątrz funkcji obsługującej żądanie. Nie jest to parametr funkcji — Flask zarządza nim automatycznie.</p>
+<hr>
+</section>
+</section>
+<section id="metody-http" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="metody-http"><span class="header-section-number">5</span> Metody HTTP</h2>
+<p>Domyślnie <code>@app.route</code> obsługuje tylko <code>GET</code>. Żeby obsłużyć inne metody, podajemy je jawnie:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/items"</span>, methods<span class="op">=</span>[<span class="st">"GET"</span>, <span class="st">"POST"</span>])</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> items():</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> request.method <span class="op">==</span> <span class="st">"GET"</span>:</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"Lista przedmiotów"</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> request.method <span class="op">==</span> <span class="st">"POST"</span>:</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        data <span class="op">=</span> request.get_json()</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Tworzę: </span><span class="sc">{</span>data<span class="sc">}</span><span class="ss">"</span>, <span class="dv">201</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li><code>request.method</code> — string z nazwą metody (<code>"GET"</code>, <code>"POST"</code>, …).</li>
+<li><code>request.get_json()</code> — parsuje body żądania z JSON do dict/list.</li>
+</ul>
+<p>Test POST-em:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST http://localhost:5000/items <span class="dt">\</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">"Content-Type: application/json"</span> <span class="dt">\</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">'{"name": "Jabłko"}'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Na razie <code>POST</code> pokazujemy jako mechanizm — pełne zastosowanie (formularze, logowanie) pojawi się na Wykładzie 4.</p>
+<hr>
+</section>
+<section id="kody-statusu" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="kody-statusu"><span class="header-section-number">6</span> Kody statusu</h2>
+<p>Domyślnie Flask zwraca <code>200 OK</code>. Inny kod podajemy jako drugi element krotki w <code>return</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/items/&lt;int:item_id&gt;"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> item_detail(item_id):</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> item_id <span class="op">&gt;</span> <span class="dv">100</span>:</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"Nie znaleziono"</span>, <span class="dv">404</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Przedmiot </span><span class="sc">{</span>item_id<span class="sc">}</span><span class="ss">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Test:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> http://localhost:5000/items/42</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># HTTP/1.1 200 OK</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Przedmiot 42</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> http://localhost:5000/items/999</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># HTTP/1.1 404 NOT FOUND</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Nie znaleziono</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+<section id="zwracanie-json-jsonify" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="zwracanie-json-jsonify"><span class="header-section-number">7</span> Zwracanie JSON — <code>jsonify()</code></h2>
+<p>Serwer, który generuje JSON:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, jsonify</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>ITEMS <span class="op">=</span> [</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"id"</span>: <span class="dv">1</span>, <span class="st">"name"</span>: <span class="st">"Jabłko"</span>, <span class="st">"category"</span>: <span class="st">"Owoce"</span>},</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"id"</span>: <span class="dv">2</span>, <span class="st">"name"</span>: <span class="st">"Marchewka"</span>, <span class="st">"category"</span>: <span class="st">"Warzywa"</span>},</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"id"</span>: <span class="dv">3</span>, <span class="st">"name"</span>: <span class="st">"Chleb"</span>, <span class="st">"category"</span>: <span class="st">"Pieczywo"</span>},</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/api/items"</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> api_items():</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jsonify(ITEMS)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>jsonify()</code> robi dwie rzeczy:</p>
+<ol type="1">
+<li>serializuje dane do JSON (<code>json.dumps</code> pod spodem),</li>
+<li>ustawia <code>Content-Type: application/json</code>.</li>
+</ol>
+<p>Test:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-s</span> http://localhost:5000/api/items <span class="kw">|</span> <span class="ex">python3</span> <span class="at">-m</span> json.tool</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Albo w Pythonie:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="st">"http://localhost:5000/api/items"</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>r.raise_for_status()</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>items <span class="op">=</span> r.json()</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> item <span class="kw">in</span> items:</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  [</span><span class="sc">{</span>item[<span class="st">'id'</span>]<span class="sc">}</span><span class="ss">] </span><span class="sc">{</span>item[<span class="st">'name'</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Klient nie odróżnia „lokalnego Flaska” od „API dane.gov.pl” — to ten sam protokół, ten sam format, ten sam kod klienta.</p>
+<section id="kolekcja-z-danymi-w-słowniku" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="kolekcja-z-danymi-w-słowniku"><span class="header-section-number">7.1</span> Kolekcja z danymi w słowniku</h3>
+<p>API często opakowuje listę wyników w słownik z metadanymi — jak <code>dane.gov.pl</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/api/items"</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> api_items():</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jsonify({</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"data"</span>: ITEMS,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"meta"</span>: {<span class="st">"count"</span>: <span class="bu">len</span>(ITEMS)},</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="zwracanie-html" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="zwracanie-html"><span class="header-section-number">8</span> Zwracanie HTML</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/page"</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> page():</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"""</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;html&gt;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;body&gt;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;h1&gt;Tytuł strony&lt;/h1&gt;</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;p&gt;To jest akapit.&lt;/p&gt;</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;a href="/other"&gt;Link do innej strony&lt;/a&gt;</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;/body&gt;</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;/html&gt;</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Flask domyślnie ustawia <code>Content-Type: text/html</code>. Przeglądarka renderuje HTML; <code>curl</code> i <code>requests</code> widzą surowy tekst.</p>
+<p>Różnica między HTML a JSON z perspektywy serwera sprowadza się do jednego: <strong>co zwracasz i jaki <code>Content-Type</code> ustawiasz</strong>. Flask wybiera domyślnie <code>text/html</code>; <code>jsonify()</code> przełącza na <code>application/json</code>.</p>
+<hr>
+</section>
+<section id="generowanie-html-dynamicznie" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="generowanie-html-dynamicznie"><span class="header-section-number">9</span> Generowanie HTML dynamicznie</h2>
+<p>Serwer nie musi zwracać stałego tekstu — może <strong>generować HTML</strong> na podstawie danych i logiki. To jest kluczowa umiejętność: serwery lokalne, które będziemy budować w kursie, będą generować strony z tabelami, listami i linkami — jako materiał do parsowania i scrapingu.</p>
+<section id="lista-z-linkami" class="level3" data-number="9.1">
+<h3 data-number="9.1" class="anchored" data-anchor-id="lista-z-linkami"><span class="header-section-number">9.1</span> Lista z linkami</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/numbers"</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> numbers():</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    html <span class="op">=</span> <span class="st">"&lt;html&gt;&lt;body&gt;&lt;h1&gt;Liczby&lt;/h1&gt;&lt;ul&gt;"</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">11</span>):</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>        html <span class="op">+=</span> <span class="ss">f'&lt;li&gt;&lt;a href="/numbers/</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"&gt;Liczba </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">&lt;/a&gt;&lt;/li&gt;'</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    html <span class="op">+=</span> <span class="st">"&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;"</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> html</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/numbers/&lt;int:n&gt;"</span>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> number_detail(n):</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"""</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="ss">    &lt;html&gt;&lt;body&gt;</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;h1&gt;Liczba </span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">&lt;/h1&gt;</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;p&gt;Kwadrat: </span><span class="sc">{</span>n<span class="op">**</span><span class="dv">2</span><span class="sc">}</span><span class="ss">&lt;/p&gt;</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;p&gt;Sześcian: </span><span class="sc">{</span>n<span class="op">**</span><span class="dv">3</span><span class="sc">}</span><span class="ss">&lt;/p&gt;</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;a href="/numbers"&gt;Powrót do listy&lt;/a&gt;</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="ss">    &lt;/body&gt;&lt;/html&gt;</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="ss">    """</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Ten serwer tworzy <strong>sieć stron połączonych linkami</strong>: strona <code>/numbers</code> linkuje do <code>/numbers/1</code>, <code>/numbers/2</code>, …, a każda z nich linkuje z powrotem do listy.</p>
+</section>
+<section id="tabela-z-danymi" class="level3" data-number="9.2">
+<h3 data-number="9.2" class="anchored" data-anchor-id="tabela-z-danymi"><span class="header-section-number">9.2</span> Tabela z danymi</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/products"</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> products():</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    items <span class="op">=</span> [</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"name"</span>: <span class="st">"Jabłko"</span>, <span class="st">"price"</span>: <span class="fl">3.50</span>, <span class="st">"unit"</span>: <span class="st">"kg"</span>},</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"name"</span>: <span class="st">"Chleb"</span>, <span class="st">"price"</span>: <span class="fl">5.00</span>, <span class="st">"unit"</span>: <span class="st">"szt"</span>},</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>        {<span class="st">"name"</span>: <span class="st">"Mleko"</span>, <span class="st">"price"</span>: <span class="fl">4.20</span>, <span class="st">"unit"</span>: <span class="st">"l"</span>},</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    rows <span class="op">=</span> <span class="st">""</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> item <span class="kw">in</span> items:</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>        rows <span class="op">+=</span> <span class="ss">f"""</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;tr&gt;</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="ss">            &lt;td&gt;</span><span class="sc">{</span>item[<span class="st">'name'</span>]<span class="sc">}</span><span class="ss">&lt;/td&gt;</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="ss">            &lt;td&gt;</span><span class="sc">{</span>item[<span class="st">'price'</span>]<span class="sc">:.2f}</span><span class="ss"> zł&lt;/td&gt;</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="ss">            &lt;td&gt;</span><span class="sc">{</span>item[<span class="st">'unit'</span>]<span class="sc">}</span><span class="ss">&lt;/td&gt;</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;/tr&gt;"""</span></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"""</span></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="ss">    &lt;html&gt;&lt;body&gt;</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;h1&gt;Produkty&lt;/h1&gt;</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;table border="1"&gt;</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="ss">            &lt;tr&gt;&lt;th&gt;Nazwa&lt;/th&gt;&lt;th&gt;Cena&lt;/th&gt;&lt;th&gt;Jednostka&lt;/th&gt;&lt;/tr&gt;</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="ss">            </span><span class="sc">{</span>rows<span class="sc">}</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;/table&gt;</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="ss">    &lt;/body&gt;&lt;/html&gt;</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a><span class="ss">    """</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="dane-z-logiki-ciąg-collatza" class="level3" data-number="9.3">
+<h3 data-number="9.3" class="anchored" data-anchor-id="dane-z-logiki-ciąg-collatza"><span class="header-section-number">9.3</span> Dane z logiki — ciąg Collatza</h3>
+<p>Serwer może generować strony na podstawie obliczeń. Ciąg Collatza (problem 3n+1) generuje dla danej liczby naturalnej sekwencję: jeśli n jest parzyste → n/2, jeśli nieparzyste → 3n+1, aż do 1. Każdą liczbę prezentujemy jako stronę HTML, a przejście do następnej — jako link:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/collatz/&lt;int:n&gt;"</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> collatz(n):</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">&lt;</span> <span class="dv">1</span>:</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"Liczba musi być dodatnia"</span>, <span class="dv">400</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"""</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;html&gt;&lt;body&gt;</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="st">            &lt;h1&gt;Collatz: 1&lt;/h1&gt;</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="st">            &lt;p&gt;Koniec ciągu!&lt;/p&gt;</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="st">            &lt;a href="/collatz/7"&gt;Rozpocznij od 7&lt;/a&gt;</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;/body&gt;&lt;/html&gt;</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="st">        """</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    next_n <span class="op">=</span> n <span class="op">//</span> <span class="dv">2</span> <span class="cf">if</span> n <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span> <span class="cf">else</span> <span class="dv">3</span> <span class="op">*</span> n <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"""</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="ss">    &lt;html&gt;&lt;body&gt;</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;h1&gt;Collatz: </span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">&lt;/h1&gt;</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;p&gt;Następna liczba: </span><span class="sc">{</span>next_n<span class="sc">}</span><span class="ss">&lt;/p&gt;</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;a href="/collatz/</span><span class="sc">{</span>next_n<span class="sc">}</span><span class="ss">"&gt;Przejdź do </span><span class="sc">{</span>next_n<span class="sc">}</span><span class="ss">&lt;/a&gt;</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a><span class="ss">    &lt;/body&gt;&lt;/html&gt;</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a><span class="ss">    """</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Z perspektywy klienta: <code>GET /collatz/6</code> zwraca HTML z linkiem do <code>/collatz/3</code>, ten do <code>/collatz/10</code>, itd. To jest sieć stron, po której można nawigować ręcznie (w przeglądarce) lub automatycznie (programem). Serwery o takiej strukturze — strony powiązane linkami — będą bazą do nauki crawlingu i scrapingu w dalszej części kursu.</p>
+<hr>
+</section>
+</section>
+<section id="serwer-jako-kontrolowane-środowisko" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="serwer-jako-kontrolowane-środowisko"><span class="header-section-number">10</span> Serwer jako kontrolowane środowisko</h2>
+<p>Wcześniej korzystaliśmy z publicznego API (dane.gov.pl). Było to dobre do nauki klientów HTTP, ale miało ograniczenia:</p>
+<ul>
+<li>brak kontroli nad strukturą danych,</li>
+<li>brak kontroli nad kodami błędów i opóźnieniami,</li>
+<li>ryzyko obciążenia cudzego serwera,</li>
+<li>zależność od dostępności zewnętrznej usługi.</li>
+</ul>
+<p>Teraz możemy tworzyć <strong>własne serwery lokalne</strong> — programy Flask, które:</p>
+<ul>
+<li>serwują strony HTML z kontrolowaną strukturą (tabele, listy, linki),</li>
+<li>zwracają JSON z przewidywalnymi danymi,</li>
+<li>mogą symulować błędy (<code>404</code>, <code>500</code>), opóźnienia (<code>time.sleep</code>), paginację,</li>
+<li>działają offline.</li>
+</ul>
+<section id="przykład-serwer-z-paginacją" class="level3" data-number="10.1">
+<h3 data-number="10.1" class="anchored" data-anchor-id="przykład-serwer-z-paginacją"><span class="header-section-number">10.1</span> Przykład: serwer z paginacją</h3>
+<p>Na Labie 2 pisaliśmy klienta, który pobierał kolejne strony wyników z API dane.gov.pl. Teraz zobaczymy, jak taka paginacja wygląda <strong>po stronie serwera</strong>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, jsonify, request</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>ALL_ITEMS <span class="op">=</span> [{<span class="st">"id"</span>: i, <span class="st">"name"</span>: <span class="ss">f"Element </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>} <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">51</span>)]</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/api/items"</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> items():</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    page <span class="op">=</span> request.args.get(<span class="st">"page"</span>, <span class="dv">1</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    per_page <span class="op">=</span> request.args.get(<span class="st">"per_page"</span>, <span class="dv">10</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> (page <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> per_page</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    end <span class="op">=</span> start <span class="op">+</span> per_page</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    page_items <span class="op">=</span> ALL_ITEMS[start:end]</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    response <span class="op">=</span> {</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>        <span class="st">"data"</span>: page_items,</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"meta"</span>: {<span class="st">"total"</span>: <span class="bu">len</span>(ALL_ITEMS), <span class="st">"page"</span>: page, <span class="st">"per_page"</span>: per_page},</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> end <span class="op">&lt;</span> <span class="bu">len</span>(ALL_ITEMS):</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>        response[<span class="st">"links"</span>] <span class="op">=</span> {</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>            <span class="st">"next"</span>: <span class="ss">f"/api/items?page=</span><span class="sc">{</span>page <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">&amp;per_page=</span><span class="sc">{</span>per_page<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jsonify(response)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Ten serwer zachowuje się <strong>dokładnie jak API dane.gov.pl</strong> — ma paginację, <code>meta</code>, <code>links.next</code> — ale działa lokalnie i ma 50 elementów zamiast tysięcy.</p>
+</section>
+<section id="przykład-serwer-symulujący-błędy" class="level3" data-number="10.2">
+<h3 data-number="10.2" class="anchored" data-anchor-id="przykład-serwer-symulujący-błędy"><span class="header-section-number">10.2</span> Przykład: serwer symulujący błędy</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/api/flaky"</span>)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> flaky():</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> random.random() <span class="op">&lt;</span> <span class="fl">0.3</span>:</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> jsonify({<span class="st">"error"</span>: <span class="st">"Server overloaded"</span>}), <span class="dv">503</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jsonify({<span class="st">"status"</span>: <span class="st">"ok"</span>})</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/api/slow"</span>)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> slow():</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">3</span>)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jsonify({<span class="st">"status"</span>: <span class="st">"done"</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Przydatne do testowania logiki retry i timeoutów — bez czekania, aż prawdziwy serwer się „zepsuje”.</p>
+<hr>
+</section>
+</section>
+<section id="serwer-i-klient-dwie-strony-dialogu" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="serwer-i-klient-dwie-strony-dialogu"><span class="header-section-number">11</span> Serwer i klient — dwie strony dialogu</h2>
+<p>Po tym wykładzie widzimy <strong>pełny obraz</strong> komunikacji HTTP:</p>
+<pre><code>     KLIENT                                SERWER
+     ──────                                ──────
+     requests.get(                         @app.route("/api/items",
+       "/api/items",                          methods=["GET"])
+       params={"page": 2}                  def items():
+     )                                        page = request.args.get("page")
+                          ─── GET /api/items?page=2 ───►
+                          ◄── 200 OK, JSON ────────────
+     
+     r.status_code  ←  200                 return jsonify(data), 200
+     r.json()       ←  {"data": [...]}     jsonify(data)
+     r.headers      ←  Content-Type: ...   (automatycznie)</code></pre>
+<p>To jest ta sama wymiana komunikatów, którą widzieliśmy w <code>curl -v</code> na Wykładzie 1 — tyle że teraz rozumiemy <strong>obie strony</strong>.</p>
+<hr>
+</section>
+<section id="narzędzia-na-przyszłość" class="level2" data-number="12">
+<h2 data-number="12" class="anchored" data-anchor-id="narzędzia-na-przyszłość"><span class="header-section-number">12</span> Narzędzia na przyszłość</h2>
+<p>Poniżej trzy mechanizmy Flaska, które <strong>na tym wykładzie tylko sygnalizujemy</strong>. Użyjemy ich w pełni na Wykładzie 4 (cookies, sesje, formularze) — tutaj wystarczy wiedzieć, że istnieją.</p>
+<section id="make_response-pełna-kontrola-nad-odpowiedzią" class="level3" data-number="12.1">
+<h3 data-number="12.1" class="anchored" data-anchor-id="make_response-pełna-kontrola-nad-odpowiedzią"><span class="header-section-number">12.1</span> <code>make_response</code> — pełna kontrola nad odpowiedzią</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> make_response</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/custom"</span>)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> custom():</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=</span> make_response(<span class="st">"Treść odpowiedzi"</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    resp.headers[<span class="st">"X-Custom-Header"</span>] <span class="op">=</span> <span class="st">"wartość"</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    resp.headers[<span class="st">"Content-Type"</span>] <span class="op">=</span> <span class="st">"text/plain; charset=utf-8"</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> resp</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Przydatne, gdy standardowy <code>return</code> nie wystarcza — np. gdy chcesz ustawić cookies, nagłówki cache’owania lub niestandardowy <code>Content-Type</code>.</p>
+</section>
+<section id="przekierowania" class="level3" data-number="12.2">
+<h3 data-number="12.2" class="anchored" data-anchor-id="przekierowania"><span class="header-section-number">12.2</span> Przekierowania</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> redirect</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/old-page"</span>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> old_page():</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> redirect(<span class="st">"/new-page"</span>, code<span class="op">=</span><span class="dv">301</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/new-page"</span>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> new_page():</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"To jest nowa strona."</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>redirect()</code> zwraca odpowiedź z kodem <code>3xx</code> i nagłówkiem <code>Location:</code> — dokładnie to, co omawialiśmy na Wykładzie 1. Przekierowania pojawią się przy obsłudze logowania (Wykład 4).</p>
+</section>
+<section id="abort-przerwanie-z-kodem-błędu" class="level3" data-number="12.3">
+<h3 data-number="12.3" class="anchored" data-anchor-id="abort-przerwanie-z-kodem-błędu"><span class="header-section-number">12.3</span> <code>abort</code> — przerwanie z kodem błędu</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> abort</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/items/&lt;int:item_id&gt;"</span>)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> item(item_id):</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> item_id <span class="kw">not</span> <span class="kw">in</span> ITEMS_DB:</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>        abort(<span class="dv">404</span>)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jsonify(ITEMS_DB[item_id])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>abort(404)</code> natychmiast przerywa obsługę żądania i zwraca odpowiedź z kodem 404. Można też zdefiniować własne strony błędów:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.errorhandler</span>(<span class="dv">404</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> not_found(error):</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jsonify({<span class="st">"error"</span>: <span class="st">"Nie znaleziono"</span>}), <span class="dv">404</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<hr>
+</section>
+</section>
+<section id="uruchamianie-serwera-jak-to-działa-w-praktyce" class="level2" data-number="13">
+<h2 data-number="13" class="anchored" data-anchor-id="uruchamianie-serwera-jak-to-działa-w-praktyce"><span class="header-section-number">13</span> Uruchamianie serwera — jak to działa w praktyce</h2>
+<section id="przejście-na-vscode" class="level3" data-number="13.1">
+<h3 data-number="13.1" class="anchored" data-anchor-id="przejście-na-vscode"><span class="header-section-number">13.1</span> Przejście na VSCode</h3>
+<p>Na Labach 0–2 pracowaliśmy w Thonnym — wystarczał do pisania prostych skryptów i uruchamiania ich klawiszem F5. Od tego momentu potrzebujemy czegoś więcej: <strong>edytora kodu</strong> i <strong>terminala</strong> działających jednocześnie. Serwer Flask działa w nieskończoność (nasłuchuje na porcie i czeka na żądania), a my musimy równolegle pisać i uruchamiać klienta, który do tego serwera wysyła żądania.</p>
+<p><strong>Visual Studio Code (VSCode)</strong> daje nam to naturalnie: edytor na górze, terminal (lub kilka terminali) na dole. Wszystko w jednym oknie.</p>
+</section>
+<section id="jak-uruchomić-serwer-flask" class="level3" data-number="13.2">
+<h3 data-number="13.2" class="anchored" data-anchor-id="jak-uruchomić-serwer-flask"><span class="header-section-number">13.2</span> Jak uruchomić serwer Flask</h3>
+<p>Flask udostępnia polecenie <code>flask run</code>, które uruchamia serwer. Żeby zadziałało, potrzebujemy dwóch rzeczy:</p>
+<ol type="1">
+<li><strong>Plik <code>app.py</code></strong> — Flask domyślnie szuka pliku o tej nazwie w bieżącym katalogu. To jest konwencja: jeśli nazwiesz plik <code>app.py</code>, nie musisz niczego konfigurować.</li>
+<li><strong>Obiekt <code>app</code></strong> wewnątrz tego pliku — Flask szuka zmiennej <code>app</code> będącej instancją <code>Flask(...)</code>. To jest kolejna konwencja.</li>
+</ol>
+<p>Żadnego specjalnego bloku uruchamiającego nie potrzeba. Plik <code>app.py</code> zawiera <strong>definicję</strong> serwera (trasy, logikę), a polecenie <code>flask run</code> zajmuje się jego <strong>uruchomieniem</strong>.</p>
+</section>
+<section id="kompletny-przykład-krok-po-kroku" class="level3" data-number="13.3">
+<h3 data-number="13.3" class="anchored" data-anchor-id="kompletny-przykład-krok-po-kroku"><span class="header-section-number">13.3</span> Kompletny przykład krok po kroku</h3>
+<p><strong>Krok 1.</strong> Utwórz katalog na projekt (np. <code>lab3</code>) i otwórz go w VSCode (<code>File → Open Folder...</code>).</p>
+<p><strong>Krok 2.</strong> Utwórz plik <code>app.py</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/"</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> index():</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"Serwer działa!"</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/hello/&lt;name&gt;"</span>)</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hello(name):</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Cześć, </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">!"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Zwróć uwagę: plik nie ma żadnego <code>app.run(...)</code> ani bloku <code>if __name__</code>. Definicja serwera to trasy i funkcje — nic więcej.</p>
+<p><strong>Krok 3.</strong> Otwórz terminal w VSCode (<code>Ctrl+``</code> lub <code>View → Terminal</code>). Upewnij się, że jesteś w katalogu z plikiem <code>app.py</code>. Uruchom serwer:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">flask</span> run <span class="at">--debug</span> <span class="at">-p</span> 5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>W terminalu zobaczysz:</p>
+<pre><code> * Serving Flask app 'app'
+ * Debug mode: on
+ * Running on http://127.0.0.1:5000
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!</code></pre>
+<p>Serwer działa i nasłuchuje. Terminal jest zajęty — to normalne.</p>
+<p><strong>Krok 4.</strong> Otwórz przeglądarkę i wpisz <code>http://localhost:5000/</code>. Powinieneś zobaczyć „Serwer działa!“. Wpisz <code>http://localhost:5000/hello/Anna</code> — zobaczysz „Cześć, Anna!”.</p>
+<p>W terminalu VSCode zobaczysz logi — Flask wypisuje każde żądanie:</p>
+<pre><code>127.0.0.1 - - [15/Mar/2025 10:30:00] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [15/Mar/2025 10:30:05] "GET /hello/Anna HTTP/1.1" 200 -</code></pre>
+<p>To jest <strong>perspektywa serwera</strong> na komunikację HTTP — widzi adres klienta, metodę, ścieżkę i kod statusu, który sam zwrócił.</p>
+<p><strong>Krok 5.</strong> Żeby przetestować serwer <code>requests</code>-em lub <code>curl</code>-em, otwórz <strong>drugi terminal</strong> w VSCode (ikona <code>+</code> obok karty terminala, lub <code>Ctrl+Shift+``</code>). Teraz masz dwa terminale: w jednym działa serwer, w drugim możesz uruchamiać komendy.</p>
+<p>W drugim terminalu:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-i</span> http://localhost:5000/hello/Anna</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Albo utwórz plik <code>client.py</code> i uruchom go z drugiego terminala:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="st">"http://localhost:5000/hello/Anna"</span>)</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Status:"</span>, r.status_code)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Treść:"</span>, r.text)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> client.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="flagi-polecenia-flask-run" class="level3" data-number="13.4">
+<h3 data-number="13.4" class="anchored" data-anchor-id="flagi-polecenia-flask-run"><span class="header-section-number">13.4</span> Flagi polecenia <code>flask run</code></h3>
+<ul>
+<li><code>--debug</code> — włącza tryb debugowania: <strong>auto-reload</strong> (po zapisaniu zmian w <code>app.py</code> serwer automatycznie się restartuje) i <strong>debugger</strong> (przy błędzie w kodzie serwera przeglądarka pokazuje traceback zamiast ogólnego „Internal Server Error”).</li>
+<li><code>-p 5000</code> (lub <code>--port 5000</code>) — port, na którym serwer nasłuchuje. Domyślnie <code>5000</code>. Jeśli jest zajęty, użyj innego (np. <code>-p 5001</code>).</li>
+<li><code>-h 0.0.0.0</code> (lub <code>--host 0.0.0.0</code>) — serwer dostępny z innych komputerów w sieci. Domyślnie (<code>127.0.0.1</code>) serwer nasłuchuje tylko na localhost. Na labach używamy domyślnego ustawienia.</li>
+</ul>
+<p>W labach zawsze uruchamiamy z <code>--debug</code>. Polecenie, które będziemy wpisywać na początku każdego labu:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="ex">flask</span> run <span class="at">--debug</span> <span class="at">-p</span> 5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="workflow-w-labie" class="level3" data-number="13.5">
+<h3 data-number="13.5" class="anchored" data-anchor-id="workflow-w-labie"><span class="header-section-number">13.5</span> Workflow w labie</h3>
+<pre><code>┌──────────────────────────────────────────────────────┐
+│  VSCode                                              │
+│  ┌────────────────────────────────────────────────┐  │
+│  │  app.py (edytor)                               │  │
+│  │                                                 │  │
+│  │  from flask import Flask                        │  │
+│  │  app = Flask(__name__)                          │  │
+│  │  ...                                            │  │
+│  └────────────────────────────────────────────────┘  │
+│  ┌──────────────────────┐┌─────────────────────────┐ │
+│  │ Terminal 1: serwer   ││ Terminal 2: klient      │ │
+│  │                      ││                          │ │
+│  │ $ flask run --debug  ││ $ curl localhost:5000/   │ │
+│  │ * Running on ...     ││ Serwer działa!           │ │
+│  │ "GET / HTTP/1.1" 200 ││                          │ │
+│  └──────────────────────┘└─────────────────────────┘ │
+└──────────────────────────────────────────────────────┘</code></pre>
+<ul>
+<li><strong>Edytor</strong>: plik <code>app.py</code> (i inne pliki projektu). Tu piszesz kod serwera.</li>
+<li><strong>Terminal 1 (serwer)</strong>: <code>flask run --debug -p 5000</code>. Działa cały czas. Tu widzisz logi żądań.</li>
+<li><strong>Terminal 2 (klient)</strong>: <code>curl</code>, <code>python client.py</code>, lub przeglądarka. Tu testujesz serwer.</li>
+</ul>
+</section>
+<section id="zatrzymywanie-serwera" class="level3" data-number="13.6">
+<h3 data-number="13.6" class="anchored" data-anchor-id="zatrzymywanie-serwera"><span class="header-section-number">13.6</span> Zatrzymywanie serwera</h3>
+<p><code>Ctrl+C</code> w terminalu, w którym działa serwer. Jeśli port pozostaje „zajęty” po zamknięciu (błąd „Address already in use”), poczekaj kilka sekund lub zmień port.</p>
+</section>
+<section id="plik-o-innej-nazwie-niż-app.py" class="level3" data-number="13.7">
+<h3 data-number="13.7" class="anchored" data-anchor-id="plik-o-innej-nazwie-niż-app.py"><span class="header-section-number">13.7</span> Plik o innej nazwie niż <code>app.py</code></h3>
+<p>Jeśli nazwiesz plik inaczej (np. <code>server.py</code>), musisz powiedzieć Flaskowi, gdzie szukać aplikacji:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="ex">flask</span> <span class="at">--app</span> server run <span class="at">--debug</span> <span class="at">-p</span> 5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Opcja <code>--app server</code> wskazuje moduł <code>server.py</code>. Na labach trzymamy się konwencji <code>app.py</code>, żeby unikać tej dodatkowej konfiguracji.</p>
+</section>
+<section id="najczęstsze-problemy" class="level3" data-number="13.8">
+<h3 data-number="13.8" class="anchored" data-anchor-id="najczęstsze-problemy"><span class="header-section-number">13.8</span> Najczęstsze problemy</h3>
+<p><strong>„Address already in use”</strong> — port jest zajęty. Zatrzymaj poprzednią instancję serwera (może działa w innym terminalu?) lub zmień port (<code>-p 5001</code>).</p>
+<p><strong>„Could not import ‘app’“</strong> — Flask nie znalazł pliku <code>app.py</code> w bieżącym katalogu. Sprawdź, czy terminal jest otwarty w katalogu z plikiem (<code>ls</code> / <code>dir</code> powinno pokazać <code>app.py</code>).</p>
+<p><strong>Przeglądarka pokazuje „Nie można połączyć”</strong> — sprawdź, czy serwer jest uruchomiony (logi w terminalu) i czy adres jest poprawny (<code>http://localhost:5000/</code>, nie <code>https://</code>).</p>
+<hr>
+</section>
+</section>
+<section id="podsumowanie" class="level2" data-number="14">
+<h2 data-number="14" class="anchored" data-anchor-id="podsumowanie"><span class="header-section-number">14</span> Podsumowanie</h2>
+<p>Na tym wykładzie:</p>
+<ul>
+<li>zobaczyliśmy, że serwer HTTP to program, który nasłuchuje na porcie i odpowiada na żądania,</li>
+<li>poznaliśmy Flask jako model serwera HTTP: routing, parametry ścieżki, query string, kody statusu, <code>jsonify()</code>, generowanie HTML,</li>
+<li>nauczyliśmy się dynamicznie generować strony HTML z danymi, linkami i tabelami,</li>
+<li>zrozumieliśmy, dlaczego tworzymy własne serwery lokalne — jako kontrolowane środowisko do nauki.</li>
+</ul>
+<p><strong>Co dalej:</strong></p>
+<ul>
+<li><strong>Lab 3</strong>: budujemy serwer Flask od zera — routing, generowanie HTML z linkami, endpointy JSON. Testujemy go <code>curl</code>-em, <code>requests</code>-em i przeglądarką.</li>
+<li><strong>Lab 4</strong>: budujemy bardziej złożone serwery — paginacja (jak dane.gov.pl), katalog danych z tabelami (materiał do przyszłego parsowania), symulacja błędów. Testujemy kodem klienta z Labów 1–2.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/APD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
