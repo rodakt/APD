@@ -9,6 +9,7 @@ Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z si
 ## Wykłady
 
 - [Wykład 1: HTTP i klienci HTTP](wyklady/wyklad_1.md)
+- [Wykład 2: Wykład 2: Serwer HTTP - framework Flask](wyklady/wyklad_2.md)
 
 ## Laboratoria
 
