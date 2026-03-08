@@ -167,107 +167,200 @@
   {
     "objectID": "laby/lab_2.html",
     "href": "laby/lab_2.html",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
+    "title": "1 Cel",
     "section": "",
-    "text": "Zakres materiału:\n\nprzechodzenie pełnego pipeline’u: wyszukanie datasetu → pobranie metadanych → pobranie realnego pliku danych,\niteracja po stronach wyników API (stronicowanie w pętli),\nzapisywanie pobranych danych do plików (JSON, CSV, binarne),\nbudowanie funkcji opakowujących zapytania HTTP z obsługą błędów.\n\nWymagania wstępne: ukończony Lab 1 (umiesz wysłać GET przez requests, znasz strukturę JSON:API, korzystałeś ze Swaggera)."
+    "text": "v— title: “Lab 2: Nawigacja po API — stronicowanie, pipeline, retry” subtitle: “Automatyczne pozyskiwanie danych — ćwiczenia” author: “Tomasz Rodak” —",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#przygotowanie",
-    "href": "laby/lab_2.html#przygotowanie",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "2.1 Przygotowanie",
-    "text": "2.1 Przygotowanie\nUtwórz folder roboczy i otwórz notatnik Jupyter lub skrypt .py.\nimport requests\nfrom pathlib import Path\n\nAPI = \"https://api.dane.gov.pl/1.4\"\nHEADERS = {\"Accept\": \"application/vnd.api+json\"}\nTIMEOUT = 15\n\n# folder na pobrane pliki\nOUT = Path(\"lab_2_output\")\nOUT.mkdir(exist_ok=True)\nStałe API, HEADERS, TIMEOUT definiujemy raz — dzięki temu nie powtarzamy ich w każdym zapytaniu."
+    "objectID": "laby/lab_2.html#instalacja-jeśli-potrzeba",
+    "href": "laby/lab_2.html#instalacja-jeśli-potrzeba",
+    "title": "1 Cel",
+    "section": "2.1 Instalacja (jeśli potrzeba)",
+    "text": "2.1 Instalacja (jeśli potrzeba)\npip install requests",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#szybki-test-połączenia",
-    "href": "laby/lab_2.html#szybki-test-połączenia",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "2.2 Szybki test połączenia",
-    "text": "2.2 Szybki test połączenia\nr = requests.get(f\"{API}/datasets\", params={\"page\": 1, \"per_page\": 1},\n                 headers=HEADERS, timeout=TIMEOUT)\nr.raise_for_status()\nprint(\"OK, status:\", r.status_code)\n\nCheckpoint: Jeśli widzisz OK, status: 200 — środowisko działa. Jeśli nie — sprawdź połączenie z internetem i poprawność URL-a."
+    "objectID": "laby/lab_2.html#szkielet-skryptu",
+    "href": "laby/lab_2.html#szkielet-skryptu",
+    "title": "1 Cel",
+    "section": "2.2 Szkielet skryptu",
+    "text": "2.2 Szkielet skryptu\nUtwórz nowy skrypt lab2_pipeline.py. Zacznij od importów i konfiguracji — to jest rozszerzenie wzorca z Lab 1:\nimport json\nimport time\nimport requests\nfrom pathlib import Path\n\nAPI = \"https://api.dane.gov.pl/1.4\"\nHEADERS = {\"Accept\": \"application/vnd.api+json\"}\nOUT = Path(\"lab2_output\")\nOUT.mkdir(exist_ok=True)\n\n\ndef save_json(data, filename):\n    \"\"\"Zapisuje dane do pliku JSON.\"\"\"\n    path = OUT / filename\n    path.write_text(\n        json.dumps(data, ensure_ascii=False, indent=2),\n        encoding=\"utf-8\",\n    )\n    print(f\"Zapisano: {path}\")\n    return path\nNowość względem Lab 1: stała HEADERS — wydzielamy powtarzające się nagłówki. Funkcja save_json zwraca ścieżkę — przyda się w pipeline.",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#krok-1-wyszukiwanie",
-    "href": "laby/lab_2.html#krok-1-wyszukiwanie",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "4.1 Krok 1: wyszukiwanie",
-    "text": "4.1 Krok 1: wyszukiwanie\nSzukamy datasetów związanych z wybranym tematem. Parametr wyszukiwania to q (możesz to sprawdzić w Swaggerze).\nquery = \"jakość powietrza\"\n\ndata = api_get(\"/datasets\", {\"q\": query, \"per_page\": 5})\nresults = data[\"data\"]\n\nprint(f\"Znaleziono {data['meta']['count']} wyników, wyświetlam {len(results)}:\\n\")\nfor ds in results:\n    a = ds[\"attributes\"]\n    print(f\"  [{ds['id']}] {a['title']}\")\n    print(f\"       kategoria: {a.get('category', '?')}, \"\n          f\"zasoby: {a.get('resources_count', '?')}\")\n    print()\nWybierz dataset, który ma przynajmniej kilka zasobów (resources_count &gt; 0)."
+    "objectID": "laby/lab_2.html#przypomnienie-mechanizm-stronicowania",
+    "href": "laby/lab_2.html#przypomnienie-mechanizm-stronicowania",
+    "title": "1 Cel",
+    "section": "3.1 Przypomnienie: mechanizm stronicowania",
+    "text": "3.1 Przypomnienie: mechanizm stronicowania\nW Lab 1 zobaczyliśmy, że odpowiedź API dane.gov.pl zawiera klucz \"links\" z adresem następnej strony:\n{\n  \"data\": [...],\n  \"links\": {\n    \"self\": \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=5\",\n    \"next\": \"https://api.dane.gov.pl/1.4/datasets?page=2&per_page=5\"\n  },\n  \"meta\": {\"count\": 12345}\n}\nGdy \"next\" jest obecny — jest kolejna strona. Gdy go brak (None lub brak klucza) — to ostatnia strona.",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#krok-2-szczegóły-datasetu",
-    "href": "laby/lab_2.html#krok-2-szczegóły-datasetu",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "4.2 Krok 2: szczegóły datasetu",
-    "text": "4.2 Krok 2: szczegóły datasetu\nDATASET_ID = \"...\"  # ← wklej id z kroku 1\n\nds_data = api_get(f\"/datasets/{DATASET_ID}\")\nds = ds_data[\"data\"]\nattrs = ds[\"attributes\"]\n\nprint(\"Tytuł:\", attrs[\"title\"])\nprint(\"Opis:\", attrs.get(\"notes\", \"(brak)\")[:300])\nprint(\"Licencja:\", attrs.get(\"license_condition_db_or_copyrighted\"))"
+    "objectID": "laby/lab_2.html#demonstracja-ręczne-przejście-dwóch-stron",
+    "href": "laby/lab_2.html#demonstracja-ręczne-przejście-dwóch-stron",
+    "title": "1 Cel",
+    "section": "3.2 Demonstracja: ręczne przejście dwóch stron",
+    "text": "3.2 Demonstracja: ręczne przejście dwóch stron\nZanim napiszemy pętlę, zobaczmy mechanizm krok po kroku:\n# Strona 1\nr = requests.get(\n    f\"{API}/datasets\",\n    params={\"page\": 1, \"per_page\": 3},\n    headers=HEADERS,\n    timeout=10,\n)\nr.raise_for_status()\npage1 = r.json()\n\nprint(\"Strona 1 — liczba wyników:\", len(page1[\"data\"]))\nprint(\"Następna strona:\", page1[\"links\"].get(\"next\"))\n\n# Strona 2 — używamy URL z links.next\nnext_url = page1[\"links\"][\"next\"]\nr2 = requests.get(next_url, headers=HEADERS, timeout=10)\nr2.raise_for_status()\npage2 = r2.json()\n\nprint(\"Strona 2 — liczba wyników:\", len(page2[\"data\"]))\nKluczowa obserwacja: nie konstruujemy URL-a strony 2 ręcznie. Używamy tego, co serwer podał w links.next. To jest wzorzec nawigacji po API — serwer mówi, dokąd iść dalej.\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy URL z links.next strony 1 zgadza się z tym, co sam byś skonstruował (?page=2&per_page=3)? Porównaj oba.",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#krok-3-lista-zasobów",
-    "href": "laby/lab_2.html#krok-3-lista-zasobów",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "4.3 Krok 3: lista zasobów",
-    "text": "4.3 Krok 3: lista zasobów\nres_data = api_get(f\"/datasets/{DATASET_ID}/resources\")\nresources = res_data[\"data\"]\n\nprint(f\"Zasoby ({len(resources)}):\\n\")\nfor res in resources:\n    ra = res[\"attributes\"]\n    print(f\"  [{res['id']}] {ra.get('title', '(bez tytułu)')}\")\n    print(f\"       format: {ra.get('format', '?')}, \"\n          f\"rozmiar: {ra.get('file_size', '?')}\")\n    print()"
+    "objectID": "laby/lab_2.html#ćwiczenie-pętla-stronicowania",
+    "href": "laby/lab_2.html#ćwiczenie-pętla-stronicowania",
+    "title": "1 Cel",
+    "section": "3.3 Ćwiczenie: pętla stronicowania",
+    "text": "3.3 Ćwiczenie: pętla stronicowania\nDemonstracja powyżej pokazała mechanizm: pobierz stronę → weź links.next → pobierz następną → … → links.next jest None → koniec.\nTeraz zamknij ten mechanizm w funkcji. Poniżej jest szkielet — uzupełnij miejsca oznaczone komentarzami:\ndef fetch_all_datasets(query, per_page=5, max_pages=None):\n    \"\"\"Pobiera datasety ze wszystkich stron wyników wyszukiwania.\n    \n    Parameters\n    ----------\n    query : str\n        Fraza wyszukiwania.\n    per_page : int\n        Liczba wyników na stronę.\n    max_pages : int or None\n        Limit stron (None = bez limitu).\n    \n    Returns\n    -------\n    list\n        Lista wszystkich datasetów (słowników z data).\n    \"\"\"\n    url = f\"{API}/datasets\"\n    params = {\"q\": query, \"per_page\": per_page, \"page\": 1}\n    \n    all_datasets = []\n    page_num = 0\n    \n    while url is not None:\n        page_num += 1\n        \n        # 1. Sprawdź, czy nie przekroczono limitu stron (max_pages).\n        #    Jeśli tak — przerwij pętlę.\n        # --- Twój kod ---\n        \n        # 2. Wyślij żądanie GET na url z params i HEADERS.\n        #    Użyj raise_for_status().\n        # --- Twój kod ---\n        \n        # 3. Sparsuj odpowiedź JSON.\n        #    Wyciągnij listę datasetów (klucz \"data\") i dodaj do all_datasets.\n        #    Wypisz postęp: numer strony, ile pobrano, ile łącznie.\n        # --- Twój kod ---\n        \n        # 4. Ustal URL następnej strony: links.next (lub None, jeśli brak).\n        #    WAŻNE: przy kolejnych stronach ustaw params = None,\n        #    bo links.next to pełny URL z parametrami — nie chcesz ich podwajać.\n        # --- Twój kod ---\n        \n        # 5. Pauza między żądaniami — nie obciążaj cudzego serwera.\n        time.sleep(0.5)\n    \n    return all_datasets\n\n\n\n\n\n\nTipDlaczego params = None po pierwszej stronie?\n\n\n\nPrzy pierwszym żądaniu konstruujemy URL z parametrami (q, per_page, page). Ale links.next to pełny URL z parametrami już wbudowanymi. Gdybyśmy dalej przekazywali params, requests dodałby je ponownie — podwojone parametry.\n\n\n\n\n\n\n\n\nTipDlaczego time.sleep?\n\n\n\nTo nie jest wymóg techniczny — to etykieta. API dane.gov.pl jest serwisem publicznym. Wysyłanie wielu żądań bez przerwy może obciążyć serwer i pogorszyć usługę dla innych. Pół sekundy między stronami to rozsądne minimum.\n\n\nPrzetestuj:\ndatasets = fetch_all_datasets(\"transport\", per_page=5, max_pages=3)\n\nfor ds in datasets:\n    print(f\"  [{ds['id']}] {ds['attributes']['title']}\")\n\nsave_json(datasets, \"datasets_transport.json\")\n\nCzy pętla zatrzymuje się po 3 stronach (limit), nawet jeśli jest ich więcej?\nIle datasetów zebrałeś? Ile jest łącznie datasetów pasujących do frazy? (Sprawdź meta.count w dowolnej odpowiedzi API.)",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#krok-4-metadane-zasobów-jako-csv",
-    "href": "laby/lab_2.html#krok-4-metadane-zasobów-jako-csv",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "4.4 Krok 4: metadane zasobów jako CSV",
-    "text": "4.4 Krok 4: metadane zasobów jako CSV\nAPI dane.gov.pl umożliwia pobranie metadanych zasobów jako plik CSV. To nie jest odpowiedź JSON:API — to zwykły plik CSV.\ncsv_url = f\"{API}/datasets/{DATASET_ID}/resources/metadata.csv\"\n\nr = requests.get(csv_url, params={\"lang\": \"en\"}, timeout=TIMEOUT)\nr.raise_for_status()\n\ncsv_path = OUT / f\"resources_{DATASET_ID}_metadata.csv\"\ncsv_path.write_text(r.text, encoding=\"utf-8\")\nprint(f\"Zapisano: {csv_path} ({len(r.text)} znaków)\")\nPodgląd:\nimport pandas as pd\n\ndf = pd.read_csv(csv_path, sep=\";\")\nprint(\"Kolumny:\", list(df.columns))\nprint(f\"Wiersze: {len(df)}\\n\")\ndf[[\"Resource title\", \"File format\", \"File size\", \"Download URL\"]].head()\n\nCheckpoint: Czy widzisz kolumnę Download URL z adresami do pobrania plików? Jeśli kolumna jest pusta albo nie istnieje — wybierz inny dataset z kroku 1 i powtórz od kroku 2."
+    "objectID": "laby/lab_2.html#problem",
+    "href": "laby/lab_2.html#problem",
+    "title": "1 Cel",
+    "section": "4.1 Problem",
+    "text": "4.1 Problem\nSerwer nie zawsze odpowiada poprawnie. Mogą wystąpić:\n\nTimeout — serwer nie zdążył odpowiedzieć,\n503 Service Unavailable — serwer chwilowo przeciążony,\n429 Too Many Requests — przekroczono limit zapytań,\nBłąd połączenia — chwilowy problem sieciowy.\n\nJednokrotna porażka nie oznacza, że dane są niedostępne — często wystarczy poczekać i spróbować ponownie.",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#krok-5-pobranie-realnego-pliku-danych",
-    "href": "laby/lab_2.html#krok-5-pobranie-realnego-pliku-danych",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "4.5 Krok 5: pobranie realnego pliku danych",
-    "text": "4.5 Krok 5: pobranie realnego pliku danych\nWybierz jeden adres z kolumny Download URL:\ndownload_url = df[\"Download URL\"].dropna().iloc[0]\nprint(\"Pobieram:\", download_url)\nPobieranie pliku binarnego (z obsługą przekierowań — requests robi to domyślnie):\nr = requests.get(download_url, timeout=30)\nr.raise_for_status()\n\n# nazwa pliku z nagłówka lub z URL-a\nfilename = download_url.split(\"/\")[-1] or \"downloaded_file\"\nfile_path = OUT / filename\n\nfile_path.write_bytes(r.content)\nprint(f\"Zapisano: {file_path} ({len(r.content)} bajtów)\")\n\nUwaga o dużych plikach. Powyższy kod wczytuje cały plik do pamięci (r.content). Dla plików większych niż ~100 MB lepiej pobierać strumieniowo:\nwith requests.get(download_url, stream=True, timeout=30) as r:\n    r.raise_for_status()\n    with open(file_path, \"wb\") as f:\n        for chunk in r.iter_content(chunk_size=8192):\n            f.write(chunk)\nNa potrzeby tego labu zwykłe pobranie wystarczy.\n\n\nCheckpoint: Przeszedłeś pełny pipeline: wyszukiwanie → dataset → zasoby → metadane CSV → pobranie pliku. To jest rdzeń automatycznego pozyskiwania danych z API."
+    "objectID": "laby/lab_2.html#wzorzec-retry-z-backoffem",
+    "href": "laby/lab_2.html#wzorzec-retry-z-backoffem",
+    "title": "1 Cel",
+    "section": "4.2 Wzorzec retry z backoffem",
+    "text": "4.2 Wzorzec retry z backoffem\nBackoff oznacza zwiększanie czasu oczekiwania między kolejnymi próbami. Dzięki temu nie zalewamy serwera żądaniami, gdy ma problemy:\ndef fetch_with_retry(url, params=None, max_retries=3, backoff=1.0, timeout=10):\n    \"\"\"Pobiera URL z automatycznym ponawianiem przy błędach przejściowych.\n    \n    Parameters\n    ----------\n    url : str\n        Adres do pobrania.\n    params : dict or None\n        Parametry query string.\n    max_retries : int\n        Maksymalna liczba prób.\n    backoff : float\n        Początkowy czas oczekiwania (sekundy). Podwaja się z każdą próbą.\n    timeout : float\n        Timeout pojedynczego żądania.\n    \n    Returns\n    -------\n    requests.Response\n        Obiekt odpowiedzi (jeśli sukces).\n    \n    Raises\n    ------\n    requests.exceptions.RequestException\n        Jeśli wszystkie próby się nie powiodą.\n    \"\"\"\n    for attempt in range(1, max_retries + 1):\n        try:\n            r = requests.get(\n                url, params=params, headers=HEADERS, timeout=timeout\n            )\n            \n            if r.status_code in (429, 503):\n                wait = backoff * (2 ** (attempt - 1))\n                print(f\"  [{r.status_code}] Próba {attempt}/{max_retries}, \"\n                      f\"czekam {wait:.1f}s...\")\n                time.sleep(wait)\n                continue\n            \n            r.raise_for_status()\n            return r\n            \n        except requests.exceptions.Timeout:\n            wait = backoff * (2 ** (attempt - 1))\n            print(f\"  [Timeout] Próba {attempt}/{max_retries}, \"\n                  f\"czekam {wait:.1f}s...\")\n            time.sleep(wait)\n        \n        except requests.exceptions.ConnectionError:\n            wait = backoff * (2 ** (attempt - 1))\n            print(f\"  [ConnectionError] Próba {attempt}/{max_retries}, \"\n                  f\"czekam {wait:.1f}s...\")\n            time.sleep(wait)\n    \n    raise requests.exceptions.RequestException(\n        f\"Nie udało się pobrać {url} po {max_retries} próbach\"\n    )\nAnaliza wzorca:\n\nPętla for z ograniczoną liczbą prób — nigdy nie robimy nieskończonego retry.\nBackoff wykładniczy: 1s → 2s → 4s. Serwer dostaje czas na odzyskanie.\nKody 429/503: nie rzucamy wyjątku — czekamy i próbujemy ponownie.\nTimeout i ConnectionError: łapiemy i ponawiamy.\nInne błędy (np. 404): raise_for_status() rzuca wyjątek natychmiast — bo 404 się nie „naprawi” po chwili.\n\n\n\n\n\n\n\nTipRetry-After\n\n\n\nNiektóre serwery zwracają nagłówek Retry-After z kodem 429 lub 503 — mówi on, ile sekund czekać. Nasz kod tego nie wykorzystuje, ale w produkcyjnym kodzie warto to sprawdzić: r.headers.get(\"Retry-After\") i użyć tej wartości zamiast stałego backoffu.",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#podejście-1-pętla-po-numerach-stron",
-    "href": "laby/lab_2.html#podejście-1-pętla-po-numerach-stron",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "5.1 Podejście 1: pętla po numerach stron",
-    "text": "5.1 Podejście 1: pętla po numerach stron\npage = 1\nper_page = 5\nall_datasets = []\n\nwhile True:\n    data = api_get(\"/datasets\", {\"page\": page, \"per_page\": per_page})\n    items = data[\"data\"]\n    \n    if not items:\n        break\n    \n    all_datasets.extend(items)\n    print(f\"Strona {page}: pobrano {len(items)} datasetów \"\n          f\"(łącznie: {len(all_datasets)})\")\n    \n    # sprawdź, czy jest następna strona\n    next_link = data.get(\"links\", {}).get(\"next\")\n    if next_link is None:\n        break\n    \n    page += 1\n    \n    # bezpiecznik: nie pobieraj więcej niż 5 stron w tym ćwiczeniu\n    if page &gt; 5:\n        print(\"Przerwano po 5 stronach (bezpiecznik).\")\n        break\n\nprint(f\"\\nPobrano łącznie: {len(all_datasets)} datasetów\")"
+    "objectID": "laby/lab_2.html#ćwiczenie-test-retry",
+    "href": "laby/lab_2.html#ćwiczenie-test-retry",
+    "title": "1 Cel",
+    "section": "4.3 Ćwiczenie: test retry",
+    "text": "4.3 Ćwiczenie: test retry\nUżyj httpbin do symulacji błędów:\n# httpbin.org/status/503 zawsze zwraca 503\ntry:\n    r = fetch_with_retry(\n        \"https://httpbin.org/status/503\", max_retries=3, backoff=0.5\n    )\nexcept requests.exceptions.RequestException as e:\n    print(f\"Ostateczny błąd: {e}\")\n\nIle prób wykonał program? Ile łącznie czekał?\nZmień max_retries na 5. Jak zmieni się łączny czas oczekiwania?\nSprawdź, że fetch_with_retry(\"https://httpbin.org/json\") zwraca odpowiedź bez retry.\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy widzisz logi z każdej próby (numer, czas oczekiwania)? Czy program ostatecznie rzuca wyjątek po wyczerpaniu prób?",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#podejście-2-podążanie-za-linkiem-next",
-    "href": "laby/lab_2.html#podejście-2-podążanie-za-linkiem-next",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "5.2 Podejście 2: podążanie za linkiem next",
-    "text": "5.2 Podejście 2: podążanie za linkiem next\nZamiast ręcznie zwiększać page, można podążać za adresem next z odpowiedzi. To jest bardziej odporny wzorzec — nie zakłada, że numeracja stron zaczyna się od 1 ani że jest ciągła.\nurl = f\"{API}/datasets\"\nparams = {\"per_page\": 5}\nall_datasets = []\npage_count = 0\n\nwhile url is not None:\n    r = requests.get(url, params=params, headers=HEADERS, timeout=TIMEOUT)\n    r.raise_for_status()\n    data = r.json()\n    \n    all_datasets.extend(data[\"data\"])\n    page_count += 1\n    print(f\"Strona {page_count}: +{len(data['data'])} \"\n          f\"(łącznie: {len(all_datasets)})\")\n    \n    # następna strona — link jest pełnym URL-em\n    url = data.get(\"links\", {}).get(\"next\")\n    params = None  # parametry są już wbudowane w URL z linku next\n    \n    if page_count &gt;= 5:\n        print(\"Przerwano po 5 stronach (bezpiecznik).\")\n        break\n\nBezpiecznik (if page &gt;= N: break) jest ważny przy nauce i debugowaniu. API dane.gov.pl ma tysiące datasetów — bez limitu pętla potrwa bardzo długo i obciąży serwer. W kodzie produkcyjnym bezpiecznik zastąpisz właściwym warunkiem stopu (np. „pobierz wszystkie do 2024 roku”).\n\n\nCheckpoint: Czy obie metody dały te same id datasetów? Porównaj:\n# zakładając, że wyniki z podejścia 1 są w all_datasets_v1,\n# a z podejścia 2 w all_datasets_v2:\nids_v1 = [d[\"id\"] for d in all_datasets_v1]\nids_v2 = [d[\"id\"] for d in all_datasets_v2]\nprint(\"Identyczne:\", ids_v1 == ids_v2)"
+    "objectID": "laby/lab_2.html#czym-jest-pipeline",
+    "href": "laby/lab_2.html#czym-jest-pipeline",
+    "title": "1 Cel",
+    "section": "5.1 Czym jest pipeline",
+    "text": "5.1 Czym jest pipeline\nPipeline to łańcuch kroków, w którym wynik jednego kroku jest wejściem następnego:\nwyszukiwanie → lista datasetów → wybór jednego → lista zasobów → pobranie pliku\nW Lab 1 przeszliśmy te kroki ręcznie (kopiując id z jednego zapytania do następnego). Teraz automatyzujemy cały łańcuch.",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#prosta-funkcja-z-retry",
-    "href": "laby/lab_2.html#prosta-funkcja-z-retry",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "6.1 Prosta funkcja z retry",
-    "text": "6.1 Prosta funkcja z retry\nimport time\n\ndef api_get_retry(endpoint, params=None, max_retries=3, backoff=2.0):\n    \"\"\"GET z automatycznym ponawianiem przy błędach przejściowych.\"\"\"\n    url = f\"{API}{endpoint}\"\n    \n    for attempt in range(1, max_retries + 1):\n        try:\n            r = requests.get(url, params=params, headers=HEADERS, timeout=TIMEOUT)\n            \n            if r.status_code == 429:\n                wait = float(r.headers.get(\"Retry-After\", backoff * attempt))\n                print(f\"  429 Too Many Requests, czekam {wait}s...\")\n                time.sleep(wait)\n                continue\n            \n            r.raise_for_status()\n            return r.json()\n        \n        except requests.exceptions.Timeout:\n            print(f\"  Timeout (próba {attempt}/{max_retries})\")\n            if attempt &lt; max_retries:\n                time.sleep(backoff * attempt)\n        \n        except requests.exceptions.HTTPError as e:\n            if r.status_code &gt;= 500:\n                print(f\"  Błąd serwera {r.status_code} (próba {attempt}/{max_retries})\")\n                if attempt &lt; max_retries:\n                    time.sleep(backoff * attempt)\n            else:\n                raise  # 4xx (poza 429) — nie ponawiamy\n    \n    raise RuntimeError(f\"Nie udało się pobrać {url} po {max_retries} próbach\")\nKluczowe elementy:\n\n429 (Too Many Requests) — serwer mówi „za szybko”; czekamy tyle, ile każe nagłówek Retry-After (lub domyślnie),\n5xx (błąd serwera) — problem po stronie serwera, warto spróbować ponownie,\n4xx (poza 429) — błąd klienta (np. 404), ponawianie nie pomoże, od razu rzucamy wyjątek,\nbackoff — czas oczekiwania rośnie z każdą próbą (2s, 4s, 6s), żeby nie zalewać serwera.\n\nTest:\n# powinno działać normalnie\ndata = api_get_retry(\"/datasets\", {\"page\": 1, \"per_page\": 2})\nprint(\"OK:\", data[\"data\"][0][\"attributes\"][\"title\"])\n\n# powinno rzucić wyjątek (404, nie ponawiamy)\ntry:\n    api_get_retry(\"/datasets/999999999\")\nexcept requests.exceptions.HTTPError as e:\n    print(\"Błąd (zgodnie z oczekiwaniem):\", e)\n\nCheckpoint: Czy rozumiesz, dlaczego 404 nie jest ponawiane, a 503 tak? W automatyzacji to rozróżnienie decyduje o tym, czy skrypt „zawiesza się” na godzinę, czy szybko informuje o prawdziwym problemie."
+    "objectID": "laby/lab_2.html#schemat-zależności",
+    "href": "laby/lab_2.html#schemat-zależności",
+    "title": "1 Cel",
+    "section": "5.2 Schemat zależności",
+    "text": "5.2 Schemat zależności\nPoniższy schemat pokazuje, które funkcje wywołują które i co przepływa między nimi:\nfetch_all_datasets(\"transport\", ...)\n│\n▼\n[dataset_1, dataset_2, ...]\n│\n├── fetch_resources(dataset_1[\"id\"])\n│   ▼\n│   [resource_A, resource_B]\n│   ├── download_resource(resource_A) → plik.csv\n│   └── download_resource(resource_B) → plik.xlsx\n│\n├── fetch_resources(dataset_2[\"id\"])\n│   ▼\n│   [resource_C]\n│   └── download_resource(resource_C) → plik.json\n│\n▼\nsave_json(summary) → pipeline_summary.json\nKażdy poziom to osobna funkcja. Każda strzałka to jedno lub więcej żądań HTTP do API. Funkcja pipeline orkiestruje całość.",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#zadanie-a-zbierz-tytuły-z-n-stron",
-    "href": "laby/lab_2.html#zadanie-a-zbierz-tytuły-z-n-stron",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "7.1 Zadanie A: zbierz tytuły z N stron",
-    "text": "7.1 Zadanie A: zbierz tytuły z N stron\nNapisz funkcję collect_titles(n_pages, per_page=10), która:\n\nPobiera n_pages stron listy datasetów.\nZwraca listę słowników {\"id\": ..., \"title\": ...} ze wszystkich pobranych wyników.\nUżywa api_get lub api_get_retry.\n\nPrzetestuj z n_pages=3, per_page=10 i wypisz wyniki."
+    "objectID": "laby/lab_2.html#krok-1-zasoby-datasetu",
+    "href": "laby/lab_2.html#krok-1-zasoby-datasetu",
+    "title": "1 Cel",
+    "section": "5.3 Krok 1: zasoby datasetu",
+    "text": "5.3 Krok 1: zasoby datasetu\nMając id datasetu, pobierz jego zasoby. Korzystamy z fetch_with_retry — żądanie do API może się nie udać za pierwszym razem:\ndef fetch_resources(dataset_id):\n    \"\"\"Pobiera listę zasobów (plików) dla danego datasetu.\"\"\"\n    url = f\"{API}/datasets/{dataset_id}/resources\"\n    r = fetch_with_retry(url)\n    return r.json()[\"data\"]",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#zadanie-b-pipeline-wyszukiwanie-pobranie-pliku",
-    "href": "laby/lab_2.html#zadanie-b-pipeline-wyszukiwanie-pobranie-pliku",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "7.2 Zadanie B: pipeline wyszukiwanie → pobranie pliku",
-    "text": "7.2 Zadanie B: pipeline wyszukiwanie → pobranie pliku\nNapisz skrypt (lub funkcję), który:\n\nWyszukuje datasety po wybranym słowie kluczowym (q=...).\nDla pierwszego znalezionego datasetu pobiera listę zasobów.\nWybiera pierwszy zasób w formacie CSV (lub innym, który ma Download URL).\nPobiera plik i zapisuje go do katalogu lab_2_output/.\nWypisuje podsumowanie: tytuł datasetu, tytuł zasobu, rozmiar pobranego pliku.\n\nWskazówka: metadane w CSV (metadata.csv?lang=en) zawierają kolumnę Download URL. Możesz z niej skorzystać lub znaleźć URL w odpowiedzi JSON zasobów (pole link w attributes)."
+    "objectID": "laby/lab_2.html#krok-2-pobranie-pliku",
+    "href": "laby/lab_2.html#krok-2-pobranie-pliku",
+    "title": "1 Cel",
+    "section": "5.4 Krok 2: pobranie pliku",
+    "text": "5.4 Krok 2: pobranie pliku\nZasoby mają w attributes pole download_url — adres pliku do pobrania. To nie jest JSON, tylko plik binarny (CSV, XLSX, itp.):\ndef download_resource(resource, output_dir):\n    \"\"\"Pobiera plik zasobu i zapisuje na dysk.\n    \n    Parameters\n    ----------\n    resource : dict\n        Element z listy zasobów (słownik z \"attributes\").\n    output_dir : Path\n        Katalog docelowy.\n    \n    Returns\n    -------\n    Path or None\n        Ścieżka do zapisanego pliku, lub None jeśli brak URL.\n    \"\"\"\n    attrs = resource[\"attributes\"]\n    url = attrs.get(\"download_url\")\n    \n    if not url:\n        print(f\"  Brak download_url dla zasobu {resource['id']}\")\n        return None\n    \n    # Nazwa pliku z tytułu i formatu\n    title = attrs.get(\"title\", resource[\"id\"])\n    fmt = attrs.get(\"format\", \"bin\").lower()\n    filename = f\"{resource['id']}_{title[:50]}.{fmt}\"\n    \n    # Usuwamy znaki niebezpieczne w nazwie pliku\n    filename = filename.replace(\"/\", \"_\").replace(\"\\\\\", \"_\")\n    \n    try:\n        r = requests.get(url, timeout=30)\n        r.raise_for_status()\n    except requests.exceptions.RequestException as e:\n        print(f\"  Błąd pobierania {url}: {e}\")\n        return None\n    \n    path = output_dir / filename\n    path.write_bytes(r.content)\n    print(f\"  Pobrano: {path} ({len(r.content)} bajtów)\")\n    return path\nZwróć uwagę na różnice względem dotychczasowego kodu:\n\nr.content zamiast r.text — pobieramy bajty (plik binarny), nie tekst.\nwrite_bytes zamiast write_text — zapis binarny.\nSanityzacja nazwy pliku — usuwamy znaki, które mogłyby uszkodzić ścieżkę.\nObsługa braku URL — nie każdy zasób ma download_url.\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nJaka jest różnica między r.text a r.content? Kiedy używasz którego?",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#zadanie-c-stronicowanie-z-warunkiem-stopu",
-    "href": "laby/lab_2.html#zadanie-c-stronicowanie-z-warunkiem-stopu",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "7.3 Zadanie C: stronicowanie z warunkiem stopu",
-    "text": "7.3 Zadanie C: stronicowanie z warunkiem stopu\nNapisz funkcję search_all(query, max_results=50), która:\n\nWyszukuje datasety po frazie query.\nIteruje po stronach, aż zbierze max_results wyników lub skończą się strony.\nZwraca listę zebranych datasetów.\n\nPrzetestuj na kilku frazach i porównaj meta[\"count\"] (ile jest łącznie) z liczbą faktycznie pobranych wyników."
+    "objectID": "laby/lab_2.html#krok-3-cały-pipeline",
+    "href": "laby/lab_2.html#krok-3-cały-pipeline",
+    "title": "1 Cel",
+    "section": "5.5 Krok 3: cały pipeline",
+    "text": "5.5 Krok 3: cały pipeline\nŁączymy kroki w jedną funkcję. Wyszukiwanie opiera się na fetch_all_datasets z poprzedniej sekcji:\ndef pipeline(query, max_datasets=3, max_files_per_dataset=2):\n    \"\"\"Wyszukuje datasety, pobiera zasoby i zapisuje pliki.\n    \n    Parameters\n    ----------\n    query : str\n        Fraza wyszukiwania.\n    max_datasets : int\n        Maksymalna liczba datasetów do przetworzenia.\n    max_files_per_dataset : int\n        Maksymalna liczba plików na dataset.\n    \"\"\"\n    print(f\"=== Pipeline: '{query}' ===\\n\")\n    \n    # Krok 1: wyszukaj datasety\n    datasets = fetch_all_datasets(query, per_page=max_datasets, max_pages=1)\n    print(f\"\\nZnaleziono {len(datasets)} datasetów.\\n\")\n    \n    summary = []\n    \n    for ds in datasets[:max_datasets]:\n        ds_id = ds[\"id\"]\n        title = ds[\"attributes\"][\"title\"]\n        print(f\"--- Dataset [{ds_id}]: {title} ---\")\n        \n        # Krok 2: pobierz zasoby\n        try:\n            resources = fetch_resources(ds_id)\n        except requests.exceptions.RequestException as e:\n            print(f\"  Błąd pobierania zasobów: {e}\")\n            continue\n        \n        print(f\"  Zasoby: {len(resources)}\")\n        \n        # Krok 3: pobierz pliki\n        downloaded = []\n        for res in resources[:max_files_per_dataset]:\n            path = download_resource(res, OUT)\n            if path:\n                downloaded.append(str(path))\n            time.sleep(0.5)  # pauza między żądaniami — ta sama zasada co w stronicowaniu\n        \n        summary.append({\n            \"dataset_id\": ds_id,\n            \"title\": title,\n            \"resources_found\": len(resources),\n            \"files_downloaded\": downloaded,\n        })\n        \n        print()\n    \n    # Zapisz podsumowanie\n    save_json(summary, \"pipeline_summary.json\")\n    print(f\"\\n=== Gotowe. Podsumowanie w pipeline_summary.json ===\")",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
-    "objectID": "laby/lab_2.html#zadanie-d-dodatkowe-pobranie-wielu-plików",
-    "href": "laby/lab_2.html#zadanie-d-dodatkowe-pobranie-wielu-plików",
-    "title": "Lab 2: Nawigacja po API i automatyzacja pobierania danych",
-    "section": "7.4 Zadanie D (dodatkowe): pobranie wielu plików",
-    "text": "7.4 Zadanie D (dodatkowe): pobranie wielu plików\nRozszerz pipeline z Zadania B:\n\nDla wybranego datasetu pobierz wszystkie zasoby (nie tylko pierwszy).\nKażdy zasób zapisz do osobnego pliku w lab_2_output/{dataset_id}/.\nNa końcu wypisz tabelę podsumowującą: tytuł zasobu, format, rozmiar pobranego pliku, status (OK / błąd).\nDodaj obsługę błędów — jeśli pobranie jednego zasobu się nie uda, kontynuuj z następnym."
+    "objectID": "laby/lab_2.html#ćwiczenie-uruchom-pipeline",
+    "href": "laby/lab_2.html#ćwiczenie-uruchom-pipeline",
+    "title": "1 Cel",
+    "section": "5.6 Ćwiczenie: uruchom pipeline",
+    "text": "5.6 Ćwiczenie: uruchom pipeline\npipeline(\"transport\", max_datasets=2, max_files_per_dataset=1)\n\nSprawdź katalog lab2_output/ — czy widzisz pobrane pliki?\nOtwórz pipeline_summary.json — czy zawiera informacje o pobranych plikach?\nZmień frazę wyszukiwania na inną (np. \"szkoły\", \"powietrze\").\nCo się stanie, gdy dataset nie ma zasobów z download_url?\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy Twój pipeline obsługuje sytuację, gdy zasób nie ma download_url? Czy brak jednego pliku nie zatrzymuje całego procesu?",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
+  },
+  {
+    "objectID": "laby/lab_2.html#zadanie-a-stronicowanie-z-limitem-wyników",
+    "href": "laby/lab_2.html#zadanie-a-stronicowanie-z-limitem-wyników",
+    "title": "1 Cel",
+    "section": "6.1 Zadanie A: stronicowanie z limitem wyników",
+    "text": "6.1 Zadanie A: stronicowanie z limitem wyników\nNapisz funkcję fetch_datasets_until(query, target_count, per_page=10), która:\n\nPobiera strony wyników, aż zbierze co najmniej target_count datasetów (lub strony się skończą).\nZwraca listę datasetów (może być dłuższa niż target_count, jeśli ostatnia strona dodała nadmiar).\nWypisuje na bieżąco: numer strony, liczbę pobranych na stronie, łączną liczbę.\n\nPrzetestuj: fetch_datasets_until(\"szkoły\", 25, per_page=10).",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
+  },
+  {
+    "objectID": "laby/lab_2.html#zadanie-b-statystyki-zasobów",
+    "href": "laby/lab_2.html#zadanie-b-statystyki-zasobów",
+    "title": "1 Cel",
+    "section": "6.2 Zadanie B: statystyki zasobów",
+    "text": "6.2 Zadanie B: statystyki zasobów\nDla wybranej frazy wyszukiwania:\n\nPobierz pierwsze 10 datasetów.\nDla każdego pobierz listę zasobów.\nZbierz statystyki: ile zasobów ma każdy format (CSV, JSON, XLSX, itp.).\nWypisz podsumowanie: format → liczba zasobów.\nZapisz statystyki do format_stats.json.\n\nWskazówka: użyj słownika do zliczania (dict z .get(key, 0) + 1 lub collections.Counter).",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
+  },
+  {
+    "objectID": "laby/lab_2.html#zadanie-c-dodatkowe-odporny-pipeline",
+    "href": "laby/lab_2.html#zadanie-c-dodatkowe-odporny-pipeline",
+    "title": "1 Cel",
+    "section": "6.3 Zadanie C (dodatkowe): odporny pipeline",
+    "text": "6.3 Zadanie C (dodatkowe): odporny pipeline\nRozbuduj pipeline tak, żeby:\n\nUżywał fetch_with_retry wszędzie (wyszukiwanie, zasoby, pobieranie plików).\nLogował każdy błąd do listy errors (zamiast przerywać).\nNa końcu zapisywał zarówno summary.json (sukcesy), jak i errors.json (porażki).\nWypisywał podsumowanie: „Pobrano X plików, Y błędów”.",
+    "crumbs": [
+      "Laboratoria",
+      "author: \"Tomasz Rodak\""
+    ]
   },
   {
     "objectID": "laby/lab_0.html",
@@ -645,7 +738,7 @@
     "href": "index.html#laboratoria",
     "title": "Automatyczne pozyskiwanie danych",
     "section": "3 Laboratoria",
-    "text": "3 Laboratoria\n\nLaboratorium 0: Python — odświeżenie podstaw\nLaboratorium 1: HTTP i klienci HTTP",
+    "text": "3 Laboratoria\n\nLaboratorium 0: Python — odświeżenie podstaw\nLaboratorium 1: HTTP i klienci HTTP\nLaboratorium 2: Nawigacja po API — stronicowanie, pipeline, retry",
     "crumbs": [
       "Automatyczne pozyskiwanie danych"
     ]

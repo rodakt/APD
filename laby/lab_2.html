@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Tomasz Rodak">
 
-<title>Lab 2: Nawigacja po API i automatyzacja pobierania danych – Automatyczne pozyskiwanie danych</title>
+<title>lab_2 – Automatyczne pozyskiwanie danych</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -117,9 +116,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
-      Automatyczne pozyskiwanie danych
-      </li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_0.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_2.html">author: “Tomasz Rodak”</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -194,6 +191,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Lab 1: Klienci HTTP (curl, requests)</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">author: “Tomasz Rodak”</span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -207,436 +210,602 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#cel" id="toc-cel" class="nav-link active" data-scroll-target="#cel"><span class="header-section-number">1</span> Cel</a></li>
-  <li><a href="#powtórka-sesja-robocza" id="toc-powtórka-sesja-robocza" class="nav-link" data-scroll-target="#powtórka-sesja-robocza"><span class="header-section-number">2</span> Powtórka — sesja robocza</a>
+  <li><a href="#przygotowanie" id="toc-przygotowanie" class="nav-link" data-scroll-target="#przygotowanie"><span class="header-section-number">2</span> Przygotowanie</a>
   <ul class="collapse">
-  <li><a href="#przygotowanie" id="toc-przygotowanie" class="nav-link" data-scroll-target="#przygotowanie"><span class="header-section-number">2.1</span> Przygotowanie</a></li>
-  <li><a href="#szybki-test-połączenia" id="toc-szybki-test-połączenia" class="nav-link" data-scroll-target="#szybki-test-połączenia"><span class="header-section-number">2.2</span> Szybki test połączenia</a></li>
+  <li><a href="#instalacja-jeśli-potrzeba" id="toc-instalacja-jeśli-potrzeba" class="nav-link" data-scroll-target="#instalacja-jeśli-potrzeba"><span class="header-section-number">2.1</span> Instalacja (jeśli potrzeba)</a></li>
+  <li><a href="#szkielet-skryptu" id="toc-szkielet-skryptu" class="nav-link" data-scroll-target="#szkielet-skryptu"><span class="header-section-number">2.2</span> Szkielet skryptu</a></li>
   </ul></li>
-  <li><a href="#funkcja-pomocnicza-do-zapytań" id="toc-funkcja-pomocnicza-do-zapytań" class="nav-link" data-scroll-target="#funkcja-pomocnicza-do-zapytań"><span class="header-section-number">3</span> Funkcja pomocnicza do zapytań</a></li>
-  <li><a href="#pipeline-od-wyszukiwania-do-pliku" id="toc-pipeline-od-wyszukiwania-do-pliku" class="nav-link" data-scroll-target="#pipeline-od-wyszukiwania-do-pliku"><span class="header-section-number">4</span> Pipeline — od wyszukiwania do pliku</a>
+  <li><a href="#stronicowanie" id="toc-stronicowanie" class="nav-link" data-scroll-target="#stronicowanie"><span class="header-section-number">3</span> Stronicowanie</a>
   <ul class="collapse">
-  <li><a href="#krok-1-wyszukiwanie" id="toc-krok-1-wyszukiwanie" class="nav-link" data-scroll-target="#krok-1-wyszukiwanie"><span class="header-section-number">4.1</span> Krok 1: wyszukiwanie</a></li>
-  <li><a href="#krok-2-szczegóły-datasetu" id="toc-krok-2-szczegóły-datasetu" class="nav-link" data-scroll-target="#krok-2-szczegóły-datasetu"><span class="header-section-number">4.2</span> Krok 2: szczegóły datasetu</a></li>
-  <li><a href="#krok-3-lista-zasobów" id="toc-krok-3-lista-zasobów" class="nav-link" data-scroll-target="#krok-3-lista-zasobów"><span class="header-section-number">4.3</span> Krok 3: lista zasobów</a></li>
-  <li><a href="#krok-4-metadane-zasobów-jako-csv" id="toc-krok-4-metadane-zasobów-jako-csv" class="nav-link" data-scroll-target="#krok-4-metadane-zasobów-jako-csv"><span class="header-section-number">4.4</span> Krok 4: metadane zasobów jako CSV</a></li>
-  <li><a href="#krok-5-pobranie-realnego-pliku-danych" id="toc-krok-5-pobranie-realnego-pliku-danych" class="nav-link" data-scroll-target="#krok-5-pobranie-realnego-pliku-danych"><span class="header-section-number">4.5</span> Krok 5: pobranie realnego pliku danych</a></li>
+  <li><a href="#przypomnienie-mechanizm-stronicowania" id="toc-przypomnienie-mechanizm-stronicowania" class="nav-link" data-scroll-target="#przypomnienie-mechanizm-stronicowania"><span class="header-section-number">3.1</span> Przypomnienie: mechanizm stronicowania</a></li>
+  <li><a href="#demonstracja-ręczne-przejście-dwóch-stron" id="toc-demonstracja-ręczne-przejście-dwóch-stron" class="nav-link" data-scroll-target="#demonstracja-ręczne-przejście-dwóch-stron"><span class="header-section-number">3.2</span> Demonstracja: ręczne przejście dwóch stron</a></li>
+  <li><a href="#ćwiczenie-pętla-stronicowania" id="toc-ćwiczenie-pętla-stronicowania" class="nav-link" data-scroll-target="#ćwiczenie-pętla-stronicowania"><span class="header-section-number">3.3</span> Ćwiczenie: pętla stronicowania</a></li>
   </ul></li>
-  <li><a href="#stronicowanie-iteracja-po-wielu-stronach" id="toc-stronicowanie-iteracja-po-wielu-stronach" class="nav-link" data-scroll-target="#stronicowanie-iteracja-po-wielu-stronach"><span class="header-section-number">5</span> Stronicowanie — iteracja po wielu stronach</a>
+  <li><a href="#retry-obsługa-błędów-przejściowych" id="toc-retry-obsługa-błędów-przejściowych" class="nav-link" data-scroll-target="#retry-obsługa-błędów-przejściowych"><span class="header-section-number">4</span> Retry — obsługa błędów przejściowych</a>
   <ul class="collapse">
-  <li><a href="#podejście-1-pętla-po-numerach-stron" id="toc-podejście-1-pętla-po-numerach-stron" class="nav-link" data-scroll-target="#podejście-1-pętla-po-numerach-stron"><span class="header-section-number">5.1</span> Podejście 1: pętla po numerach stron</a></li>
-  <li><a href="#podejście-2-podążanie-za-linkiem-next" id="toc-podejście-2-podążanie-za-linkiem-next" class="nav-link" data-scroll-target="#podejście-2-podążanie-za-linkiem-next"><span class="header-section-number">5.2</span> Podejście 2: podążanie za linkiem <code>next</code></a></li>
+  <li><a href="#problem" id="toc-problem" class="nav-link" data-scroll-target="#problem"><span class="header-section-number">4.1</span> Problem</a></li>
+  <li><a href="#wzorzec-retry-z-backoffem" id="toc-wzorzec-retry-z-backoffem" class="nav-link" data-scroll-target="#wzorzec-retry-z-backoffem"><span class="header-section-number">4.2</span> Wzorzec retry z backoffem</a></li>
+  <li><a href="#ćwiczenie-test-retry" id="toc-ćwiczenie-test-retry" class="nav-link" data-scroll-target="#ćwiczenie-test-retry"><span class="header-section-number">4.3</span> Ćwiczenie: test retry</a></li>
   </ul></li>
-  <li><a href="#odporność-na-błędy-retry" id="toc-odporność-na-błędy-retry" class="nav-link" data-scroll-target="#odporność-na-błędy-retry"><span class="header-section-number">6</span> Odporność na błędy — retry</a>
+  <li><a href="#pipeline-od-wyszukiwania-do-pliku" id="toc-pipeline-od-wyszukiwania-do-pliku" class="nav-link" data-scroll-target="#pipeline-od-wyszukiwania-do-pliku"><span class="header-section-number">5</span> Pipeline: od wyszukiwania do pliku</a>
   <ul class="collapse">
-  <li><a href="#prosta-funkcja-z-retry" id="toc-prosta-funkcja-z-retry" class="nav-link" data-scroll-target="#prosta-funkcja-z-retry"><span class="header-section-number">6.1</span> Prosta funkcja z retry</a></li>
+  <li><a href="#czym-jest-pipeline" id="toc-czym-jest-pipeline" class="nav-link" data-scroll-target="#czym-jest-pipeline"><span class="header-section-number">5.1</span> Czym jest pipeline</a></li>
+  <li><a href="#schemat-zależności" id="toc-schemat-zależności" class="nav-link" data-scroll-target="#schemat-zależności"><span class="header-section-number">5.2</span> Schemat zależności</a></li>
+  <li><a href="#krok-1-zasoby-datasetu" id="toc-krok-1-zasoby-datasetu" class="nav-link" data-scroll-target="#krok-1-zasoby-datasetu"><span class="header-section-number">5.3</span> Krok 1: zasoby datasetu</a></li>
+  <li><a href="#krok-2-pobranie-pliku" id="toc-krok-2-pobranie-pliku" class="nav-link" data-scroll-target="#krok-2-pobranie-pliku"><span class="header-section-number">5.4</span> Krok 2: pobranie pliku</a></li>
+  <li><a href="#krok-3-cały-pipeline" id="toc-krok-3-cały-pipeline" class="nav-link" data-scroll-target="#krok-3-cały-pipeline"><span class="header-section-number">5.5</span> Krok 3: cały pipeline</a></li>
+  <li><a href="#ćwiczenie-uruchom-pipeline" id="toc-ćwiczenie-uruchom-pipeline" class="nav-link" data-scroll-target="#ćwiczenie-uruchom-pipeline"><span class="header-section-number">5.6</span> Ćwiczenie: uruchom pipeline</a></li>
   </ul></li>
-  <li><a href="#zadania-samodzielne" id="toc-zadania-samodzielne" class="nav-link" data-scroll-target="#zadania-samodzielne"><span class="header-section-number">7</span> Zadania samodzielne</a>
+  <li><a href="#zadania-samodzielne" id="toc-zadania-samodzielne" class="nav-link" data-scroll-target="#zadania-samodzielne"><span class="header-section-number">6</span> Zadania samodzielne</a>
   <ul class="collapse">
-  <li><a href="#zadanie-a-zbierz-tytuły-z-n-stron" id="toc-zadanie-a-zbierz-tytuły-z-n-stron" class="nav-link" data-scroll-target="#zadanie-a-zbierz-tytuły-z-n-stron"><span class="header-section-number">7.1</span> Zadanie A: zbierz tytuły z N stron</a></li>
-  <li><a href="#zadanie-b-pipeline-wyszukiwanie-pobranie-pliku" id="toc-zadanie-b-pipeline-wyszukiwanie-pobranie-pliku" class="nav-link" data-scroll-target="#zadanie-b-pipeline-wyszukiwanie-pobranie-pliku"><span class="header-section-number">7.2</span> Zadanie B: pipeline wyszukiwanie → pobranie pliku</a></li>
-  <li><a href="#zadanie-c-stronicowanie-z-warunkiem-stopu" id="toc-zadanie-c-stronicowanie-z-warunkiem-stopu" class="nav-link" data-scroll-target="#zadanie-c-stronicowanie-z-warunkiem-stopu"><span class="header-section-number">7.3</span> Zadanie C: stronicowanie z warunkiem stopu</a></li>
-  <li><a href="#zadanie-d-dodatkowe-pobranie-wielu-plików" id="toc-zadanie-d-dodatkowe-pobranie-wielu-plików" class="nav-link" data-scroll-target="#zadanie-d-dodatkowe-pobranie-wielu-plików"><span class="header-section-number">7.4</span> Zadanie D (dodatkowe): pobranie wielu plików</a></li>
+  <li><a href="#zadanie-a-stronicowanie-z-limitem-wyników" id="toc-zadanie-a-stronicowanie-z-limitem-wyników" class="nav-link" data-scroll-target="#zadanie-a-stronicowanie-z-limitem-wyników"><span class="header-section-number">6.1</span> Zadanie A: stronicowanie z limitem wyników</a></li>
+  <li><a href="#zadanie-b-statystyki-zasobów" id="toc-zadanie-b-statystyki-zasobów" class="nav-link" data-scroll-target="#zadanie-b-statystyki-zasobów"><span class="header-section-number">6.2</span> Zadanie B: statystyki zasobów</a></li>
+  <li><a href="#zadanie-c-dodatkowe-odporny-pipeline" id="toc-zadanie-c-dodatkowe-odporny-pipeline" class="nav-link" data-scroll-target="#zadanie-c-dodatkowe-odporny-pipeline"><span class="header-section-number">6.3</span> Zadanie C (dodatkowe): odporny pipeline</a></li>
   </ul></li>
-  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">8</span> Podsumowanie</a></li>
+  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">7</span> Podsumowanie</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Lab 2: Nawigacja po API i automatyzacja pobierania danych</h1>
-<p class="subtitle lead">Automatyczne pozyskiwanie danych — ćwiczenia</p>
-</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_0.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_2.html">author: “Tomasz Rodak”</a></li></ol></nav></header>
 
 
 
-<div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Tomasz Rodak </p>
-          </div>
-  </div>
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
+<p>v— title: “Lab 2: Nawigacja po API — stronicowanie, pipeline, retry” subtitle: “Automatyczne pozyskiwanie danych — ćwiczenia” author: “Tomasz Rodak” —</p>
 <section id="cel" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Cel</h1>
 <p>Zakres materiału:</p>
 <ul>
-<li>przechodzenie pełnego pipeline’u: wyszukanie datasetu → pobranie metadanych → pobranie realnego pliku danych,</li>
-<li>iteracja po stronach wyników API (stronicowanie w pętli),</li>
-<li>zapisywanie pobranych danych do plików (JSON, CSV, binarne),</li>
-<li>budowanie funkcji opakowujących zapytania HTTP z obsługą błędów.</li>
+<li>Automatyczne przechodzenie po wielu stronach wyników API (stronicowanie),</li>
+<li>Budowanie pipeline’u: wyszukiwanie → metadane → pobranie pliku,</li>
+<li>Pobieranie plików binarnych (CSV, XLSX) z adresów uzyskanych przez API,</li>
+<li>Obsługa błędów przejściowych — wzorzec retry z backoffem,</li>
+<li>Pisanie funkcji wielokrotnego użytku (reużywalny kod klienta API).</li>
 </ul>
-<p>Wymagania wstępne: ukończony Lab 1 (umiesz wysłać <code>GET</code> przez <code>requests</code>, znasz strukturę JSON:API, korzystałeś ze Swaggera).</p>
+<p>Narzędzia: Python (<code>requests</code>, <code>pathlib</code>, <code>json</code>, <code>time</code>).</p>
+<p>Kontynuujemy pracę z API dane.gov.pl — korzystamy z tych samych wzorców co w Lab 1 (<code>save_response</code>, stała <code>API</code>, katalog wyjściowy).</p>
 <hr>
 </section>
-<section id="powtórka-sesja-robocza" class="level1" data-number="2">
-<h1 data-number="2"><span class="header-section-number">2</span> Powtórka — sesja robocza</h1>
-<section id="przygotowanie" class="level2" data-number="2.1">
-<h2 data-number="2.1" class="anchored" data-anchor-id="przygotowanie"><span class="header-section-number">2.1</span> Przygotowanie</h2>
-<p>Utwórz folder roboczy i otwórz notatnik Jupyter lub skrypt <code>.py</code>.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>API <span class="op">=</span> <span class="st">"https://api.dane.gov.pl/1.4"</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>HEADERS <span class="op">=</span> {<span class="st">"Accept"</span>: <span class="st">"application/vnd.api+json"</span>}</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>TIMEOUT <span class="op">=</span> <span class="dv">15</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># folder na pobrane pliki</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>OUT <span class="op">=</span> Path(<span class="st">"lab_2_output"</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>OUT.mkdir(exist_ok<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Stałe <code>API</code>, <code>HEADERS</code>, <code>TIMEOUT</code> definiujemy raz — dzięki temu nie powtarzamy ich w każdym zapytaniu.</p>
+<section id="przygotowanie" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Przygotowanie</h1>
+<section id="instalacja-jeśli-potrzeba" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="instalacja-jeśli-potrzeba"><span class="header-section-number">2.1</span> Instalacja (jeśli potrzeba)</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install requests</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="szybki-test-połączenia" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="szybki-test-połączenia"><span class="header-section-number">2.2</span> Szybki test połączenia</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="ss">f"</span><span class="sc">{</span>API<span class="sc">}</span><span class="ss">/datasets"</span>, params<span class="op">=</span>{<span class="st">"page"</span>: <span class="dv">1</span>, <span class="st">"per_page"</span>: <span class="dv">1</span>},</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                 headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span>TIMEOUT)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>r.raise_for_status()</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"OK, status:"</span>, r.status_code)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="checkpoint">
-<p><strong>Checkpoint:</strong> Jeśli widzisz <code>OK, status: 200</code> — środowisko działa. Jeśli nie — sprawdź połączenie z internetem i poprawność URL-a.</p>
+<section id="szkielet-skryptu" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="szkielet-skryptu"><span class="header-section-number">2.2</span> Szkielet skryptu</h2>
+<p>Utwórz nowy skrypt <code>lab2_pipeline.py</code>. Zacznij od importów i konfiguracji — to jest rozszerzenie wzorca z Lab 1:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>API <span class="op">=</span> <span class="st">"https://api.dane.gov.pl/1.4"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>HEADERS <span class="op">=</span> {<span class="st">"Accept"</span>: <span class="st">"application/vnd.api+json"</span>}</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>OUT <span class="op">=</span> Path(<span class="st">"lab2_output"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>OUT.mkdir(exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> save_json(data, filename):</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Zapisuje dane do pliku JSON."""</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    path <span class="op">=</span> OUT <span class="op">/</span> filename</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    path.write_text(</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        json.dumps(data, ensure_ascii<span class="op">=</span><span class="va">False</span>, indent<span class="op">=</span><span class="dv">2</span>),</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        encoding<span class="op">=</span><span class="st">"utf-8"</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Zapisano: </span><span class="sc">{</span>path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> path</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Nowość względem Lab 1: stała <code>HEADERS</code> — wydzielamy powtarzające się nagłówki. Funkcja <code>save_json</code> zwraca ścieżkę — przyda się w pipeline.</p>
+<hr>
+</section>
+</section>
+<section id="stronicowanie" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Stronicowanie</h1>
+<section id="przypomnienie-mechanizm-stronicowania" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="przypomnienie-mechanizm-stronicowania"><span class="header-section-number">3.1</span> Przypomnienie: mechanizm stronicowania</h2>
+<p>W Lab 1 zobaczyliśmy, że odpowiedź API dane.gov.pl zawiera klucz <code>"links"</code> z adresem następnej strony:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"data"</span><span class="fu">:</span> <span class="ot">[</span><span class="er">...</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"links"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"self"</span><span class="fu">:</span> <span class="st">"https://api.dane.gov.pl/1.4/datasets?page=1&amp;per_page=5"</span><span class="fu">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"next"</span><span class="fu">:</span> <span class="st">"https://api.dane.gov.pl/1.4/datasets?page=2&amp;per_page=5"</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">},</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"meta"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"count"</span><span class="fu">:</span> <span class="dv">12345</span><span class="fu">}</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Gdy <code>"next"</code> jest obecny — jest kolejna strona. Gdy go brak (<code>None</code> lub brak klucza) — to ostatnia strona.</p>
+</section>
+<section id="demonstracja-ręczne-przejście-dwóch-stron" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="demonstracja-ręczne-przejście-dwóch-stron"><span class="header-section-number">3.2</span> Demonstracja: ręczne przejście dwóch stron</h2>
+<p>Zanim napiszemy pętlę, zobaczmy mechanizm krok po kroku:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Strona 1</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"</span><span class="sc">{</span>API<span class="sc">}</span><span class="ss">/datasets"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    params<span class="op">=</span>{<span class="st">"page"</span>: <span class="dv">1</span>, <span class="st">"per_page"</span>: <span class="dv">3</span>},</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    headers<span class="op">=</span>HEADERS,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    timeout<span class="op">=</span><span class="dv">10</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>r.raise_for_status()</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>page1 <span class="op">=</span> r.json()</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Strona 1 — liczba wyników:"</span>, <span class="bu">len</span>(page1[<span class="st">"data"</span>]))</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Następna strona:"</span>, page1[<span class="st">"links"</span>].get(<span class="st">"next"</span>))</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Strona 2 — używamy URL z links.next</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>next_url <span class="op">=</span> page1[<span class="st">"links"</span>][<span class="st">"next"</span>]</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>r2 <span class="op">=</span> requests.get(next_url, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>r2.raise_for_status()</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>page2 <span class="op">=</span> r2.json()</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Strona 2 — liczba wyników:"</span>, <span class="bu">len</span>(page2[<span class="st">"data"</span>]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Kluczowa obserwacja: <strong>nie konstruujemy URL-a strony 2 ręcznie</strong>. Używamy tego, co serwer podał w <code>links.next</code>. To jest wzorzec nawigacji po API — serwer mówi, dokąd iść dalej.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<hr>
-</section>
-</section>
-<section id="funkcja-pomocnicza-do-zapytań" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Funkcja pomocnicza do zapytań</h1>
-<p>W Labie 1 powtarzaliśmy ten sam wzorzec: <code>requests.get(...)</code>, <code>raise_for_status()</code>, <code>.json()</code>. Zamknijmy go w funkcji, żeby reszta kodu była czytelniejsza.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> api_get(endpoint, params<span class="op">=</span><span class="va">None</span>):</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Wysyła GET do API dane.gov.pl i zwraca sparsowany JSON.</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">    endpoint : str</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">        Ścieżka względem API, np. "/datasets" lub "/datasets/830/resources".</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">    params : dict, optional</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">        Parametry query string.</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">    dict</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">        Sparsowana odpowiedź JSON.</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">    Raises</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">    ------</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">    requests.exceptions.HTTPError</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">        Gdy serwer zwróci kod 4xx lub 5xx.</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co">    requests.exceptions.Timeout</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co">        Gdy serwer nie odpowie w ciągu TIMEOUT sekund.</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>API<span class="sc">}{</span>endpoint<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span>TIMEOUT)</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    r.raise_for_status()</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> r.json()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Od teraz zamiast pisać pełne zapytanie, możemy:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> api_get(<span class="st">"/datasets"</span>, {<span class="st">"page"</span>: <span class="dv">1</span>, <span class="st">"per_page"</span>: <span class="dv">5</span>})</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(data[<span class="st">"data"</span>]), <span class="st">"datasetów"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="key-concept">
-<p><strong>Dlaczego warto?</strong> W dalszej części labu będziemy wysyłać dziesiątki zapytań. Funkcja <code>api_get</code> eliminuje powtórzenia i daje jedno miejsce, w którym można dodać np. logowanie, retry, czy cache.</p>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
 </div>
-<hr>
+</div>
+<div class="callout-body-container callout-body">
+<p>Czy URL z <code>links.next</code> strony 1 zgadza się z tym, co sam byś skonstruował (<code>?page=2&amp;per_page=3</code>)? Porównaj oba.</p>
+</div>
+</div>
 </section>
-<section id="pipeline-od-wyszukiwania-do-pliku" class="level1" data-number="4">
-<h1 data-number="4"><span class="header-section-number">4</span> Pipeline — od wyszukiwania do pliku</h1>
-<p>Teraz przejdziemy pełną ścieżkę, jaką typowo pokonuje się przy automatycznym pobieraniu danych z API:</p>
-<pre><code>wyszukaj datasety → wybierz jeden → pobierz metadane zasobów → pobierz plik</code></pre>
-<section id="krok-1-wyszukiwanie" class="level2" data-number="4.1">
-<h2 data-number="4.1" class="anchored" data-anchor-id="krok-1-wyszukiwanie"><span class="header-section-number">4.1</span> Krok 1: wyszukiwanie</h2>
-<p>Szukamy datasetów związanych z wybranym tematem. Parametr wyszukiwania to <code>q</code> (możesz to sprawdzić w Swaggerze).</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"jakość powietrza"</span></span>
+<section id="ćwiczenie-pętla-stronicowania" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="ćwiczenie-pętla-stronicowania"><span class="header-section-number">3.3</span> Ćwiczenie: pętla stronicowania</h2>
+<p>Demonstracja powyżej pokazała mechanizm: pobierz stronę → weź <code>links.next</code> → pobierz następną → … → <code>links.next</code> jest <code>None</code> → koniec.</p>
+<p>Teraz zamknij ten mechanizm w funkcji. Poniżej jest szkielet — uzupełnij miejsca oznaczone komentarzami:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fetch_all_datasets(query, per_page<span class="op">=</span><span class="dv">5</span>, max_pages<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Pobiera datasety ze wszystkich stron wyników wyszukiwania.</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">    query : str</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">        Fraza wyszukiwania.</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">    per_page : int</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">        Liczba wyników na stronę.</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">    max_pages : int or None</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">        Limit stron (None = bez limitu).</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">    list</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">        Lista wszystkich datasetów (słowników z data).</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>API<span class="sc">}</span><span class="ss">/datasets"</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    params <span class="op">=</span> {<span class="st">"q"</span>: query, <span class="st">"per_page"</span>: per_page, <span class="st">"page"</span>: <span class="dv">1</span>}</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    all_datasets <span class="op">=</span> []</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    page_num <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> url <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        page_num <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 1. Sprawdź, czy nie przekroczono limitu stron (max_pages).</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    Jeśli tak — przerwij pętlę.</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 2. Wyślij żądanie GET na url z params i HEADERS.</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    Użyj raise_for_status().</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 3. Sparsuj odpowiedź JSON.</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    Wyciągnij listę datasetów (klucz "data") i dodaj do all_datasets.</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    Wypisz postęp: numer strony, ile pobrano, ile łącznie.</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 4. Ustal URL następnej strony: links.next (lub None, jeśli brak).</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    WAŻNE: przy kolejnych stronach ustaw params = None,</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    bo links.next to pełny URL z parametrami — nie chcesz ich podwajać.</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 5. Pauza między żądaniami — nie obciążaj cudzego serwera.</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.5</span>)</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> all_datasets</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Dlaczego <code>params = None</code> po pierwszej stronie?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Przy pierwszym żądaniu konstruujemy URL z parametrami (<code>q</code>, <code>per_page</code>, <code>page</code>). Ale <code>links.next</code> to <strong>pełny URL</strong> z parametrami już wbudowanymi. Gdybyśmy dalej przekazywali <code>params</code>, <code>requests</code> dodałby je <em>ponownie</em> — podwojone parametry.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Dlaczego <code>time.sleep</code>?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To nie jest wymóg techniczny — to etykieta. API dane.gov.pl jest serwisem publicznym. Wysyłanie wielu żądań bez przerwy może obciążyć serwer i pogorszyć usługę dla innych. Pół sekundy między stronami to rozsądne minimum.</p>
+</div>
+</div>
+<p>Przetestuj:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>datasets <span class="op">=</span> fetch_all_datasets(<span class="st">"transport"</span>, per_page<span class="op">=</span><span class="dv">5</span>, max_pages<span class="op">=</span><span class="dv">3</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> api_get(<span class="st">"/datasets"</span>, {<span class="st">"q"</span>: query, <span class="st">"per_page"</span>: <span class="dv">5</span>})</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> data[<span class="st">"data"</span>]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ds <span class="kw">in</span> datasets:</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  [</span><span class="sc">{</span>ds[<span class="st">'id'</span>]<span class="sc">}</span><span class="ss">] </span><span class="sc">{</span>ds[<span class="st">'attributes'</span>][<span class="st">'title'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Znaleziono </span><span class="sc">{</span>data[<span class="st">'meta'</span>][<span class="st">'count'</span>]<span class="sc">}</span><span class="ss"> wyników, wyświetlam </span><span class="sc">{</span><span class="bu">len</span>(results)<span class="sc">}</span><span class="ss">:</span><span class="ch">\n</span><span class="ss">"</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ds <span class="kw">in</span> results:</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> ds[<span class="st">"attributes"</span>]</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  [</span><span class="sc">{</span>ds[<span class="st">'id'</span>]<span class="sc">}</span><span class="ss">] </span><span class="sc">{</span>a[<span class="st">'title'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"       kategoria: </span><span class="sc">{</span>a<span class="sc">.</span>get(<span class="st">'category'</span>, <span class="st">'?'</span>)<span class="sc">}</span><span class="ss">, "</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"zasoby: </span><span class="sc">{</span>a<span class="sc">.</span>get(<span class="st">'resources_count'</span>, <span class="st">'?'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Wybierz dataset, który ma przynajmniej kilka zasobów (<code>resources_count</code> &gt; 0).</p>
-</section>
-<section id="krok-2-szczegóły-datasetu" class="level2" data-number="4.2">
-<h2 data-number="4.2" class="anchored" data-anchor-id="krok-2-szczegóły-datasetu"><span class="header-section-number">4.2</span> Krok 2: szczegóły datasetu</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>DATASET_ID <span class="op">=</span> <span class="st">"..."</span>  <span class="co"># ← wklej id z kroku 1</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ds_data <span class="op">=</span> api_get(<span class="ss">f"/datasets/</span><span class="sc">{</span>DATASET_ID<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>ds <span class="op">=</span> ds_data[<span class="st">"data"</span>]</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>attrs <span class="op">=</span> ds[<span class="st">"attributes"</span>]</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Tytuł:"</span>, attrs[<span class="st">"title"</span>])</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Opis:"</span>, attrs.get(<span class="st">"notes"</span>, <span class="st">"(brak)"</span>)[:<span class="dv">300</span>])</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Licencja:"</span>, attrs.get(<span class="st">"license_condition_db_or_copyrighted"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="krok-3-lista-zasobów" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="krok-3-lista-zasobów"><span class="header-section-number">4.3</span> Krok 3: lista zasobów</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res_data <span class="op">=</span> api_get(<span class="ss">f"/datasets/</span><span class="sc">{</span>DATASET_ID<span class="sc">}</span><span class="ss">/resources"</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>resources <span class="op">=</span> res_data[<span class="st">"data"</span>]</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Zasoby (</span><span class="sc">{</span><span class="bu">len</span>(resources)<span class="sc">}</span><span class="ss">):</span><span class="ch">\n</span><span class="ss">"</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> res <span class="kw">in</span> resources:</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    ra <span class="op">=</span> res[<span class="st">"attributes"</span>]</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  [</span><span class="sc">{</span>res[<span class="st">'id'</span>]<span class="sc">}</span><span class="ss">] </span><span class="sc">{</span>ra<span class="sc">.</span>get(<span class="st">'title'</span>, <span class="st">'(bez tytułu)'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"       format: </span><span class="sc">{</span>ra<span class="sc">.</span>get(<span class="st">'format'</span>, <span class="st">'?'</span>)<span class="sc">}</span><span class="ss">, "</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"rozmiar: </span><span class="sc">{</span>ra<span class="sc">.</span>get(<span class="st">'file_size'</span>, <span class="st">'?'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="krok-4-metadane-zasobów-jako-csv" class="level2" data-number="4.4">
-<h2 data-number="4.4" class="anchored" data-anchor-id="krok-4-metadane-zasobów-jako-csv"><span class="header-section-number">4.4</span> Krok 4: metadane zasobów jako CSV</h2>
-<p>API dane.gov.pl umożliwia pobranie metadanych zasobów jako plik CSV. To nie jest odpowiedź JSON:API — to zwykły plik CSV.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>csv_url <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>API<span class="sc">}</span><span class="ss">/datasets/</span><span class="sc">{</span>DATASET_ID<span class="sc">}</span><span class="ss">/resources/metadata.csv"</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(csv_url, params<span class="op">=</span>{<span class="st">"lang"</span>: <span class="st">"en"</span>}, timeout<span class="op">=</span>TIMEOUT)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>r.raise_for_status()</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>csv_path <span class="op">=</span> OUT <span class="op">/</span> <span class="ss">f"resources_</span><span class="sc">{</span>DATASET_ID<span class="sc">}</span><span class="ss">_metadata.csv"</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>csv_path.write_text(r.text, encoding<span class="op">=</span><span class="st">"utf-8"</span>)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Zapisano: </span><span class="sc">{</span>csv_path<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span><span class="bu">len</span>(r.text)<span class="sc">}</span><span class="ss"> znaków)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Podgląd:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(csv_path, sep<span class="op">=</span><span class="st">";"</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Kolumny:"</span>, <span class="bu">list</span>(df.columns))</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Wiersze: </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>df[[<span class="st">"Resource title"</span>, <span class="st">"File format"</span>, <span class="st">"File size"</span>, <span class="st">"Download URL"</span>]].head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="checkpoint">
-<p><strong>Checkpoint:</strong> Czy widzisz kolumnę <code>Download URL</code> z adresami do pobrania plików? Jeśli kolumna jest pusta albo nie istnieje — wybierz inny dataset z kroku 1 i powtórz od kroku 2.</p>
-</div>
-</section>
-<section id="krok-5-pobranie-realnego-pliku-danych" class="level2" data-number="4.5">
-<h2 data-number="4.5" class="anchored" data-anchor-id="krok-5-pobranie-realnego-pliku-danych"><span class="header-section-number">4.5</span> Krok 5: pobranie realnego pliku danych</h2>
-<p>Wybierz jeden adres z kolumny <code>Download URL</code>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>download_url <span class="op">=</span> df[<span class="st">"Download URL"</span>].dropna().iloc[<span class="dv">0</span>]</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Pobieram:"</span>, download_url)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Pobieranie pliku binarnego (z obsługą przekierowań — <code>requests</code> robi to domyślnie):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(download_url, timeout<span class="op">=</span><span class="dv">30</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>r.raise_for_status()</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># nazwa pliku z nagłówka lub z URL-a</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> download_url.split(<span class="st">"/"</span>)[<span class="op">-</span><span class="dv">1</span>] <span class="kw">or</span> <span class="st">"downloaded_file"</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>file_path <span class="op">=</span> OUT <span class="op">/</span> filename</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>file_path.write_bytes(r.content)</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Zapisano: </span><span class="sc">{</span>file_path<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span><span class="bu">len</span>(r.content)<span class="sc">}</span><span class="ss"> bajtów)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="key-concept">
-<p><strong>Uwaga o dużych plikach.</strong> Powyższy kod wczytuje cały plik do pamięci (<code>r.content</code>). Dla plików większych niż ~100 MB lepiej pobierać strumieniowo:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> requests.get(download_url, stream<span class="op">=</span><span class="va">True</span>, timeout<span class="op">=</span><span class="dv">30</span>) <span class="im">as</span> r:</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    r.raise_for_status()</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(file_path, <span class="st">"wb"</span>) <span class="im">as</span> f:</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> chunk <span class="kw">in</span> r.iter_content(chunk_size<span class="op">=</span><span class="dv">8192</span>):</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>            f.write(chunk)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Na potrzeby tego labu zwykłe pobranie wystarczy.</p>
-</div>
-<div class="checkpoint">
-<p><strong>Checkpoint:</strong> Przeszedłeś pełny pipeline: wyszukiwanie → dataset → zasoby → metadane CSV → pobranie pliku. To jest rdzeń automatycznego pozyskiwania danych z API.</p>
-</div>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>save_json(datasets, <span class="st">"datasets_transport.json"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ol type="1">
+<li>Czy pętla zatrzymuje się po 3 stronach (limit), nawet jeśli jest ich więcej?</li>
+<li>Ile datasetów zebrałeś? Ile jest łącznie datasetów pasujących do frazy? (Sprawdź <code>meta.count</code> w dowolnej odpowiedzi API.)</li>
+</ol>
 <hr>
 </section>
 </section>
-<section id="stronicowanie-iteracja-po-wielu-stronach" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Stronicowanie — iteracja po wielu stronach</h1>
-<p>API dane.gov.pl zwraca wyniki stronicowane. Na jednej stronie jest najwyżej <code>per_page</code> wyników (domyślnie 20). Żeby pobrać wszystkie, trzeba iterować po stronach.</p>
-<section id="podejście-1-pętla-po-numerach-stron" class="level2" data-number="5.1">
-<h2 data-number="5.1" class="anchored" data-anchor-id="podejście-1-pętla-po-numerach-stron"><span class="header-section-number">5.1</span> Podejście 1: pętla po numerach stron</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>page <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>per_page <span class="op">=</span> <span class="dv">5</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>all_datasets <span class="op">=</span> []</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">True</span>:</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> api_get(<span class="st">"/datasets"</span>, {<span class="st">"page"</span>: page, <span class="st">"per_page"</span>: per_page})</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    items <span class="op">=</span> data[<span class="st">"data"</span>]</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> items:</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    all_datasets.extend(items)</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Strona </span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">: pobrano </span><span class="sc">{</span><span class="bu">len</span>(items)<span class="sc">}</span><span class="ss"> datasetów "</span></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"(łącznie: </span><span class="sc">{</span><span class="bu">len</span>(all_datasets)<span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># sprawdź, czy jest następna strona</span></span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    next_link <span class="op">=</span> data.get(<span class="st">"links"</span>, {}).get(<span class="st">"next"</span>)</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> next_link <span class="kw">is</span> <span class="va">None</span>:</span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    page <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># bezpiecznik: nie pobieraj więcej niż 5 stron w tym ćwiczeniu</span></span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> page <span class="op">&gt;</span> <span class="dv">5</span>:</span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Przerwano po 5 stronach (bezpiecznik)."</span>)</span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Pobrano łącznie: </span><span class="sc">{</span><span class="bu">len</span>(all_datasets)<span class="sc">}</span><span class="ss"> datasetów"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="podejście-2-podążanie-za-linkiem-next" class="level2" data-number="5.2">
-<h2 data-number="5.2" class="anchored" data-anchor-id="podejście-2-podążanie-za-linkiem-next"><span class="header-section-number">5.2</span> Podejście 2: podążanie za linkiem <code>next</code></h2>
-<p>Zamiast ręcznie zwiększać <code>page</code>, można podążać za adresem <code>next</code> z odpowiedzi. To jest bardziej odporny wzorzec — nie zakłada, że numeracja stron zaczyna się od 1 ani że jest ciągła.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>API<span class="sc">}</span><span class="ss">/datasets"</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>params <span class="op">=</span> {<span class="st">"per_page"</span>: <span class="dv">5</span>}</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>all_datasets <span class="op">=</span> []</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>page_count <span class="op">=</span> <span class="dv">0</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> url <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span>TIMEOUT)</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    r.raise_for_status()</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> r.json()</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    all_datasets.extend(data[<span class="st">"data"</span>])</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    page_count <span class="op">+=</span> <span class="dv">1</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Strona </span><span class="sc">{</span>page_count<span class="sc">}</span><span class="ss">: +</span><span class="sc">{</span><span class="bu">len</span>(data[<span class="st">'data'</span>])<span class="sc">}</span><span class="ss"> "</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"(łącznie: </span><span class="sc">{</span><span class="bu">len</span>(all_datasets)<span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># następna strona — link jest pełnym URL-em</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> data.get(<span class="st">"links"</span>, {}).get(<span class="st">"next"</span>)</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    params <span class="op">=</span> <span class="va">None</span>  <span class="co"># parametry są już wbudowane w URL z linku next</span></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> page_count <span class="op">&gt;=</span> <span class="dv">5</span>:</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Przerwano po 5 stronach (bezpiecznik)."</span>)</span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="key-concept">
-<p><strong>Bezpiecznik</strong> (<code>if page &gt;= N: break</code>) jest ważny przy nauce i debugowaniu. API dane.gov.pl ma tysiące datasetów — bez limitu pętla potrwa bardzo długo i obciąży serwer. W kodzie produkcyjnym bezpiecznik zastąpisz właściwym warunkiem stopu (np. „pobierz wszystkie do 2024 roku”).</p>
-</div>
-<div class="checkpoint">
-<p><strong>Checkpoint:</strong> Czy obie metody dały te same <code>id</code> datasetów? Porównaj:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># zakładając, że wyniki z podejścia 1 są w all_datasets_v1,</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># a z podejścia 2 w all_datasets_v2:</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>ids_v1 <span class="op">=</span> [d[<span class="st">"id"</span>] <span class="cf">for</span> d <span class="kw">in</span> all_datasets_v1]</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>ids_v2 <span class="op">=</span> [d[<span class="st">"id"</span>] <span class="cf">for</span> d <span class="kw">in</span> all_datasets_v2]</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Identyczne:"</span>, ids_v1 <span class="op">==</span> ids_v2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<hr>
-</section>
-</section>
-<section id="odporność-na-błędy-retry" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Odporność na błędy — retry</h1>
-<p>W praktyce zapytania do API mogą się nie powieść z powodów przejściowych: serwer jest chwilowo przeciążony (503), przekroczono limit zapytań (429), albo sieć „czkawkała” (timeout). Rozsądną strategią jest <strong>ponowienie</strong> (retry) po krótkiej przerwie.</p>
-<section id="prosta-funkcja-z-retry" class="level2" data-number="6.1">
-<h2 data-number="6.1" class="anchored" data-anchor-id="prosta-funkcja-z-retry"><span class="header-section-number">6.1</span> Prosta funkcja z retry</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> api_get_retry(endpoint, params<span class="op">=</span><span class="va">None</span>, max_retries<span class="op">=</span><span class="dv">3</span>, backoff<span class="op">=</span><span class="fl">2.0</span>):</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""GET z automatycznym ponawianiem przy błędach przejściowych."""</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>API<span class="sc">}{</span>endpoint<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> attempt <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, max_retries <span class="op">+</span> <span class="dv">1</span>):</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>            r <span class="op">=</span> requests.get(url, params<span class="op">=</span>params, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span>TIMEOUT)</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> r.status_code <span class="op">==</span> <span class="dv">429</span>:</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>                wait <span class="op">=</span> <span class="bu">float</span>(r.headers.get(<span class="st">"Retry-After"</span>, backoff <span class="op">*</span> attempt))</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"  429 Too Many Requests, czekam </span><span class="sc">{</span>wait<span class="sc">}</span><span class="ss">s..."</span>)</span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                time.sleep(wait)</span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>            r.raise_for_status()</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> r.json()</span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> requests.exceptions.Timeout:</span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  Timeout (próba </span><span class="sc">{</span>attempt<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>max_retries<span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> attempt <span class="op">&lt;</span> max_retries:</span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>                time.sleep(backoff <span class="op">*</span> attempt)</span>
-<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> requests.exceptions.HTTPError <span class="im">as</span> e:</span>
-<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> r.status_code <span class="op">&gt;=</span> <span class="dv">500</span>:</span>
-<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"  Błąd serwera </span><span class="sc">{</span>r<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss"> (próba </span><span class="sc">{</span>attempt<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>max_retries<span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> attempt <span class="op">&lt;</span> max_retries:</span>
-<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>                    time.sleep(backoff <span class="op">*</span> attempt)</span>
-<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
-<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span>  <span class="co"># 4xx (poza 429) — nie ponawiamy</span></span>
-<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="ss">f"Nie udało się pobrać </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss"> po </span><span class="sc">{</span>max_retries<span class="sc">}</span><span class="ss"> próbach"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Kluczowe elementy:</p>
+<section id="retry-obsługa-błędów-przejściowych" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Retry — obsługa błędów przejściowych</h1>
+<section id="problem" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="problem"><span class="header-section-number">4.1</span> Problem</h2>
+<p>Serwer nie zawsze odpowiada poprawnie. Mogą wystąpić:</p>
 <ul>
-<li><strong>429 (Too Many Requests)</strong> — serwer mówi „za szybko”; czekamy tyle, ile każe nagłówek <code>Retry-After</code> (lub domyślnie),</li>
-<li><strong>5xx (błąd serwera)</strong> — problem po stronie serwera, warto spróbować ponownie,</li>
-<li><strong>4xx (poza 429)</strong> — błąd klienta (np. 404), ponawianie nie pomoże, od razu rzucamy wyjątek,</li>
-<li><strong>backoff</strong> — czas oczekiwania rośnie z każdą próbą (2s, 4s, 6s), żeby nie zalewać serwera.</li>
+<li><strong>Timeout</strong> — serwer nie zdążył odpowiedzieć,</li>
+<li><strong>503 Service Unavailable</strong> — serwer chwilowo przeciążony,</li>
+<li><strong>429 Too Many Requests</strong> — przekroczono limit zapytań,</li>
+<li><strong>Błąd połączenia</strong> — chwilowy problem sieciowy.</li>
 </ul>
-<p>Test:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># powinno działać normalnie</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> api_get_retry(<span class="st">"/datasets"</span>, {<span class="st">"page"</span>: <span class="dv">1</span>, <span class="st">"per_page"</span>: <span class="dv">2</span>})</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"OK:"</span>, data[<span class="st">"data"</span>][<span class="dv">0</span>][<span class="st">"attributes"</span>][<span class="st">"title"</span>])</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co"># powinno rzucić wyjątek (404, nie ponawiamy)</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    api_get_retry(<span class="st">"/datasets/999999999"</span>)</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> requests.exceptions.HTTPError <span class="im">as</span> e:</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Błąd (zgodnie z oczekiwaniem):"</span>, e)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="checkpoint">
-<p><strong>Checkpoint:</strong> Czy rozumiesz, dlaczego 404 nie jest ponawiane, a 503 tak? W automatyzacji to rozróżnienie decyduje o tym, czy skrypt „zawiesza się” na godzinę, czy szybko informuje o prawdziwym problemie.</p>
+<p>Jednokrotna porażka nie oznacza, że dane są niedostępne — często wystarczy <strong>poczekać i spróbować ponownie</strong>.</p>
+</section>
+<section id="wzorzec-retry-z-backoffem" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="wzorzec-retry-z-backoffem"><span class="header-section-number">4.2</span> Wzorzec retry z backoffem</h2>
+<p><strong>Backoff</strong> oznacza zwiększanie czasu oczekiwania między kolejnymi próbami. Dzięki temu nie zalewamy serwera żądaniami, gdy ma problemy:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fetch_with_retry(url, params<span class="op">=</span><span class="va">None</span>, max_retries<span class="op">=</span><span class="dv">3</span>, backoff<span class="op">=</span><span class="fl">1.0</span>, timeout<span class="op">=</span><span class="dv">10</span>):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Pobiera URL z automatycznym ponawianiem przy błędach przejściowych.</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">    url : str</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">        Adres do pobrania.</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">    params : dict or None</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">        Parametry query string.</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">    max_retries : int</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co">        Maksymalna liczba prób.</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co">    backoff : float</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co">        Początkowy czas oczekiwania (sekundy). Podwaja się z każdą próbą.</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co">    timeout : float</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co">        Timeout pojedynczego żądania.</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co">    requests.Response</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="co">        Obiekt odpowiedzi (jeśli sukces).</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co">    Raises</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co">    ------</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co">    requests.exceptions.RequestException</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="co">        Jeśli wszystkie próby się nie powiodą.</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> attempt <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, max_retries <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>            r <span class="op">=</span> requests.get(</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>                url, params<span class="op">=</span>params, headers<span class="op">=</span>HEADERS, timeout<span class="op">=</span>timeout</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> r.status_code <span class="kw">in</span> (<span class="dv">429</span>, <span class="dv">503</span>):</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>                wait <span class="op">=</span> backoff <span class="op">*</span> (<span class="dv">2</span> <span class="op">**</span> (attempt <span class="op">-</span> <span class="dv">1</span>))</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"  [</span><span class="sc">{</span>r<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">] Próba </span><span class="sc">{</span>attempt<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>max_retries<span class="sc">}</span><span class="ss">, "</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>                      <span class="ss">f"czekam </span><span class="sc">{</span>wait<span class="sc">:.1f}</span><span class="ss">s..."</span>)</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>                time.sleep(wait)</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>            r.raise_for_status()</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> r</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> requests.exceptions.Timeout:</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>            wait <span class="op">=</span> backoff <span class="op">*</span> (<span class="dv">2</span> <span class="op">**</span> (attempt <span class="op">-</span> <span class="dv">1</span>))</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  [Timeout] Próba </span><span class="sc">{</span>attempt<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>max_retries<span class="sc">}</span><span class="ss">, "</span></span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>                  <span class="ss">f"czekam </span><span class="sc">{</span>wait<span class="sc">:.1f}</span><span class="ss">s..."</span>)</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>            time.sleep(wait)</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> requests.exceptions.<span class="pp">ConnectionError</span>:</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>            wait <span class="op">=</span> backoff <span class="op">*</span> (<span class="dv">2</span> <span class="op">**</span> (attempt <span class="op">-</span> <span class="dv">1</span>))</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  [ConnectionError] Próba </span><span class="sc">{</span>attempt<span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>max_retries<span class="sc">}</span><span class="ss">, "</span></span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>                  <span class="ss">f"czekam </span><span class="sc">{</span>wait<span class="sc">:.1f}</span><span class="ss">s..."</span>)</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>            time.sleep(wait)</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">raise</span> requests.exceptions.RequestException(</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Nie udało się pobrać </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss"> po </span><span class="sc">{</span>max_retries<span class="sc">}</span><span class="ss"> próbach"</span></span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>    )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Analiza wzorca:</p>
+<ul>
+<li><strong>Pętla <code>for</code></strong> z ograniczoną liczbą prób — nigdy nie robimy nieskończonego retry.</li>
+<li><strong>Backoff wykładniczy</strong>: 1s → 2s → 4s. Serwer dostaje czas na odzyskanie.</li>
+<li><strong>Kody 429/503</strong>: nie rzucamy wyjątku — czekamy i próbujemy ponownie.</li>
+<li><strong>Timeout i ConnectionError</strong>: łapiemy i ponawiamy.</li>
+<li><strong>Inne błędy</strong> (np. 404): <code>raise_for_status()</code> rzuca wyjątek natychmiast — bo 404 się nie „naprawi” po chwili.</li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Retry-After
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Niektóre serwery zwracają nagłówek <code>Retry-After</code> z kodem 429 lub 503 — mówi on, ile sekund czekać. Nasz kod tego nie wykorzystuje, ale w produkcyjnym kodzie warto to sprawdzić: <code>r.headers.get("Retry-After")</code> i użyć tej wartości zamiast stałego backoffu.</p>
+</div>
+</div>
+</section>
+<section id="ćwiczenie-test-retry" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="ćwiczenie-test-retry"><span class="header-section-number">4.3</span> Ćwiczenie: test retry</h2>
+<p>Użyj httpbin do symulacji błędów:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># httpbin.org/status/503 zawsze zwraca 503</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> fetch_with_retry(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"https://httpbin.org/status/503"</span>, max_retries<span class="op">=</span><span class="dv">3</span>, backoff<span class="op">=</span><span class="fl">0.5</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Ostateczny błąd: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ol type="1">
+<li>Ile prób wykonał program? Ile łącznie czekał?</li>
+<li>Zmień <code>max_retries</code> na 5. Jak zmieni się łączny czas oczekiwania?</li>
+<li>Sprawdź, że <code>fetch_with_retry("https://httpbin.org/json")</code> zwraca odpowiedź bez retry.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Czy widzisz logi z każdej próby (numer, czas oczekiwania)? Czy program ostatecznie rzuca wyjątek po wyczerpaniu prób?</p>
+</div>
 </div>
 <hr>
 </section>
 </section>
-<section id="zadania-samodzielne" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Zadania samodzielne</h1>
-<section id="zadanie-a-zbierz-tytuły-z-n-stron" class="level2" data-number="7.1">
-<h2 data-number="7.1" class="anchored" data-anchor-id="zadanie-a-zbierz-tytuły-z-n-stron"><span class="header-section-number">7.1</span> Zadanie A: zbierz tytuły z N stron</h2>
-<p>Napisz funkcję <code>collect_titles(n_pages, per_page=10)</code>, która:</p>
-<ol type="1">
-<li>Pobiera <code>n_pages</code> stron listy datasetów.</li>
-<li>Zwraca listę słowników <code>{"id": ..., "title": ...}</code> ze wszystkich pobranych wyników.</li>
-<li>Używa <code>api_get</code> lub <code>api_get_retry</code>.</li>
-</ol>
-<p>Przetestuj z <code>n_pages=3, per_page=10</code> i wypisz wyniki.</p>
+<section id="pipeline-od-wyszukiwania-do-pliku" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Pipeline: od wyszukiwania do pliku</h1>
+<section id="czym-jest-pipeline" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="czym-jest-pipeline"><span class="header-section-number">5.1</span> Czym jest pipeline</h2>
+<p>Pipeline to łańcuch kroków, w którym <strong>wynik jednego kroku jest wejściem następnego</strong>:</p>
+<pre><code>wyszukiwanie → lista datasetów → wybór jednego → lista zasobów → pobranie pliku</code></pre>
+<p>W Lab 1 przeszliśmy te kroki ręcznie (kopiując <code>id</code> z jednego zapytania do następnego). Teraz <strong>automatyzujemy cały łańcuch</strong>.</p>
 </section>
-<section id="zadanie-b-pipeline-wyszukiwanie-pobranie-pliku" class="level2" data-number="7.2">
-<h2 data-number="7.2" class="anchored" data-anchor-id="zadanie-b-pipeline-wyszukiwanie-pobranie-pliku"><span class="header-section-number">7.2</span> Zadanie B: pipeline wyszukiwanie → pobranie pliku</h2>
-<p>Napisz skrypt (lub funkcję), który:</p>
-<ol type="1">
-<li>Wyszukuje datasety po wybranym słowie kluczowym (<code>q=...</code>).</li>
-<li>Dla pierwszego znalezionego datasetu pobiera listę zasobów.</li>
-<li>Wybiera pierwszy zasób w formacie CSV (lub innym, który ma <code>Download URL</code>).</li>
-<li>Pobiera plik i zapisuje go do katalogu <code>lab_2_output/</code>.</li>
-<li>Wypisuje podsumowanie: tytuł datasetu, tytuł zasobu, rozmiar pobranego pliku.</li>
-</ol>
-<p>Wskazówka: metadane w CSV (<code>metadata.csv?lang=en</code>) zawierają kolumnę <code>Download URL</code>. Możesz z niej skorzystać lub znaleźć URL w odpowiedzi JSON zasobów (pole <code>link</code> w <code>attributes</code>).</p>
+<section id="schemat-zależności" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="schemat-zależności"><span class="header-section-number">5.2</span> Schemat zależności</h2>
+<p>Poniższy schemat pokazuje, które funkcje wywołują które i co przepływa między nimi:</p>
+<pre><code>fetch_all_datasets("transport", ...)
+│
+▼
+[dataset_1, dataset_2, ...]
+│
+├── fetch_resources(dataset_1["id"])
+│   ▼
+│   [resource_A, resource_B]
+│   ├── download_resource(resource_A) → plik.csv
+│   └── download_resource(resource_B) → plik.xlsx
+│
+├── fetch_resources(dataset_2["id"])
+│   ▼
+│   [resource_C]
+│   └── download_resource(resource_C) → plik.json
+│
+▼
+save_json(summary) → pipeline_summary.json</code></pre>
+<p>Każdy poziom to osobna funkcja. Każda strzałka to jedno lub więcej żądań HTTP do API. Funkcja <code>pipeline</code> orkiestruje całość.</p>
 </section>
-<section id="zadanie-c-stronicowanie-z-warunkiem-stopu" class="level2" data-number="7.3">
-<h2 data-number="7.3" class="anchored" data-anchor-id="zadanie-c-stronicowanie-z-warunkiem-stopu"><span class="header-section-number">7.3</span> Zadanie C: stronicowanie z warunkiem stopu</h2>
-<p>Napisz funkcję <code>search_all(query, max_results=50)</code>, która:</p>
-<ol type="1">
-<li>Wyszukuje datasety po frazie <code>query</code>.</li>
-<li>Iteruje po stronach, aż zbierze <code>max_results</code> wyników <strong>lub</strong> skończą się strony.</li>
-<li>Zwraca listę zebranych datasetów.</li>
-</ol>
-<p>Przetestuj na kilku frazach i porównaj <code>meta["count"]</code> (ile jest łącznie) z liczbą faktycznie pobranych wyników.</p>
+<section id="krok-1-zasoby-datasetu" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="krok-1-zasoby-datasetu"><span class="header-section-number">5.3</span> Krok 1: zasoby datasetu</h2>
+<p>Mając <code>id</code> datasetu, pobierz jego zasoby. Korzystamy z <code>fetch_with_retry</code> — żądanie do API może się nie udać za pierwszym razem:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fetch_resources(dataset_id):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Pobiera listę zasobów (plików) dla danego datasetu."""</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>API<span class="sc">}</span><span class="ss">/datasets/</span><span class="sc">{</span>dataset_id<span class="sc">}</span><span class="ss">/resources"</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> fetch_with_retry(url)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> r.json()[<span class="st">"data"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="zadanie-d-dodatkowe-pobranie-wielu-plików" class="level2" data-number="7.4">
-<h2 data-number="7.4" class="anchored" data-anchor-id="zadanie-d-dodatkowe-pobranie-wielu-plików"><span class="header-section-number">7.4</span> Zadanie D (dodatkowe): pobranie wielu plików</h2>
-<p>Rozszerz pipeline z Zadania B:</p>
+<section id="krok-2-pobranie-pliku" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="krok-2-pobranie-pliku"><span class="header-section-number">5.4</span> Krok 2: pobranie pliku</h2>
+<p>Zasoby mają w <code>attributes</code> pole <code>download_url</code> — adres pliku do pobrania. To nie jest JSON, tylko plik binarny (CSV, XLSX, itp.):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> download_resource(resource, output_dir):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Pobiera plik zasobu i zapisuje na dysk.</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">    resource : dict</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co">        Element z listy zasobów (słownik z "attributes").</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="co">    output_dir : Path</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">        Katalog docelowy.</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="co">    Path or None</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co">        Ścieżka do zapisanego pliku, lub None jeśli brak URL.</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    attrs <span class="op">=</span> resource[<span class="st">"attributes"</span>]</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> attrs.get(<span class="st">"download_url"</span>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> url:</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Brak download_url dla zasobu </span><span class="sc">{</span>resource[<span class="st">'id'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Nazwa pliku z tytułu i formatu</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> attrs.get(<span class="st">"title"</span>, resource[<span class="st">"id"</span>])</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    fmt <span class="op">=</span> attrs.get(<span class="st">"format"</span>, <span class="st">"bin"</span>).lower()</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    filename <span class="op">=</span> <span class="ss">f"</span><span class="sc">{</span>resource[<span class="st">'id'</span>]<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>title[:<span class="dv">50</span>]<span class="sc">}</span><span class="ss">.</span><span class="sc">{</span>fmt<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Usuwamy znaki niebezpieczne w nazwie pliku</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>    filename <span class="op">=</span> filename.replace(<span class="st">"/"</span>, <span class="st">"_"</span>).replace(<span class="st">"</span><span class="ch">\\</span><span class="st">"</span>, <span class="st">"_"</span>)</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>        r <span class="op">=</span> requests.get(url, timeout<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>        r.raise_for_status()</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Błąd pobierania </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>    path <span class="op">=</span> output_dir <span class="op">/</span> filename</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>    path.write_bytes(r.content)</span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Pobrano: </span><span class="sc">{</span>path<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span><span class="bu">len</span>(r.content)<span class="sc">}</span><span class="ss"> bajtów)"</span>)</span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> path</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Zwróć uwagę na różnice względem dotychczasowego kodu:</p>
+<ul>
+<li><strong><code>r.content</code></strong> zamiast <code>r.text</code> — pobieramy bajty (plik binarny), nie tekst.</li>
+<li><strong><code>write_bytes</code></strong> zamiast <code>write_text</code> — zapis binarny.</li>
+<li><strong>Sanityzacja nazwy pliku</strong> — usuwamy znaki, które mogłyby uszkodzić ścieżkę.</li>
+<li><strong>Obsługa braku URL</strong> — nie każdy zasób ma <code>download_url</code>.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Jaka jest różnica między <code>r.text</code> a <code>r.content</code>? Kiedy używasz którego?</p>
+</div>
+</div>
+</section>
+<section id="krok-3-cały-pipeline" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="krok-3-cały-pipeline"><span class="header-section-number">5.5</span> Krok 3: cały pipeline</h2>
+<p>Łączymy kroki w jedną funkcję. Wyszukiwanie opiera się na <code>fetch_all_datasets</code> z poprzedniej sekcji:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pipeline(query, max_datasets<span class="op">=</span><span class="dv">3</span>, max_files_per_dataset<span class="op">=</span><span class="dv">2</span>):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Wyszukuje datasety, pobiera zasoby i zapisuje pliki.</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">    query : str</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">        Fraza wyszukiwania.</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">    max_datasets : int</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">        Maksymalna liczba datasetów do przetworzenia.</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">    max_files_per_dataset : int</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">        Maksymalna liczba plików na dataset.</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"=== Pipeline: '</span><span class="sc">{</span>query<span class="sc">}</span><span class="ss">' ===</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Krok 1: wyszukaj datasety</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    datasets <span class="op">=</span> fetch_all_datasets(query, per_page<span class="op">=</span>max_datasets, max_pages<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Znaleziono </span><span class="sc">{</span><span class="bu">len</span>(datasets)<span class="sc">}</span><span class="ss"> datasetów.</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    summary <span class="op">=</span> []</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ds <span class="kw">in</span> datasets[:max_datasets]:</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>        ds_id <span class="op">=</span> ds[<span class="st">"id"</span>]</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>        title <span class="op">=</span> ds[<span class="st">"attributes"</span>][<span class="st">"title"</span>]</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"--- Dataset [</span><span class="sc">{</span>ds_id<span class="sc">}</span><span class="ss">]: </span><span class="sc">{</span>title<span class="sc">}</span><span class="ss"> ---"</span>)</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Krok 2: pobierz zasoby</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>            resources <span class="op">=</span> fetch_resources(ds_id)</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> requests.exceptions.RequestException <span class="im">as</span> e:</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  Błąd pobierania zasobów: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Zasoby: </span><span class="sc">{</span><span class="bu">len</span>(resources)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Krok 3: pobierz pliki</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>        downloaded <span class="op">=</span> []</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> res <span class="kw">in</span> resources[:max_files_per_dataset]:</span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>            path <span class="op">=</span> download_resource(res, OUT)</span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> path:</span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>                downloaded.append(<span class="bu">str</span>(path))</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>            time.sleep(<span class="fl">0.5</span>)  <span class="co"># pauza między żądaniami — ta sama zasada co w stronicowaniu</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>        summary.append({</span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>            <span class="st">"dataset_id"</span>: ds_id,</span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>            <span class="st">"title"</span>: title,</span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a>            <span class="st">"resources_found"</span>: <span class="bu">len</span>(resources),</span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>            <span class="st">"files_downloaded"</span>: downloaded,</span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>()</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Zapisz podsumowanie</span></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>    save_json(summary, <span class="st">"pipeline_summary.json"</span>)</span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">=== Gotowe. Podsumowanie w pipeline_summary.json ==="</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="ćwiczenie-uruchom-pipeline" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="ćwiczenie-uruchom-pipeline"><span class="header-section-number">5.6</span> Ćwiczenie: uruchom pipeline</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>pipeline(<span class="st">"transport"</span>, max_datasets<span class="op">=</span><span class="dv">2</span>, max_files_per_dataset<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ol type="1">
-<li>Dla wybranego datasetu pobierz <strong>wszystkie</strong> zasoby (nie tylko pierwszy).</li>
-<li>Każdy zasób zapisz do osobnego pliku w <code>lab_2_output/{dataset_id}/</code>.</li>
-<li>Na końcu wypisz tabelę podsumowującą: tytuł zasobu, format, rozmiar pobranego pliku, status (OK / błąd).</li>
-<li>Dodaj obsługę błędów — jeśli pobranie jednego zasobu się nie uda, kontynuuj z następnym.</li>
+<li>Sprawdź katalog <code>lab2_output/</code> — czy widzisz pobrane pliki?</li>
+<li>Otwórz <code>pipeline_summary.json</code> — czy zawiera informacje o pobranych plikach?</li>
+<li>Zmień frazę wyszukiwania na inną (np. <code>"szkoły"</code>, <code>"powietrze"</code>).</li>
+<li>Co się stanie, gdy dataset nie ma zasobów z <code>download_url</code>?</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Czy Twój pipeline obsługuje sytuację, gdy zasób nie ma <code>download_url</code>? Czy brak jednego pliku nie zatrzymuje całego procesu?</p>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="zadania-samodzielne" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Zadania samodzielne</h1>
+<section id="zadanie-a-stronicowanie-z-limitem-wyników" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="zadanie-a-stronicowanie-z-limitem-wyników"><span class="header-section-number">6.1</span> Zadanie A: stronicowanie z limitem wyników</h2>
+<p>Napisz funkcję <code>fetch_datasets_until(query, target_count, per_page=10)</code>, która:</p>
+<ol type="1">
+<li>Pobiera strony wyników, aż zbierze <strong>co najmniej <code>target_count</code> datasetów</strong> (lub strony się skończą).</li>
+<li>Zwraca listę datasetów (może być dłuższa niż <code>target_count</code>, jeśli ostatnia strona dodała nadmiar).</li>
+<li>Wypisuje na bieżąco: numer strony, liczbę pobranych na stronie, łączną liczbę.</li>
+</ol>
+<p>Przetestuj: <code>fetch_datasets_until("szkoły", 25, per_page=10)</code>.</p>
+</section>
+<section id="zadanie-b-statystyki-zasobów" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="zadanie-b-statystyki-zasobów"><span class="header-section-number">6.2</span> Zadanie B: statystyki zasobów</h2>
+<p>Dla wybranej frazy wyszukiwania:</p>
+<ol type="1">
+<li>Pobierz pierwsze 10 datasetów.</li>
+<li>Dla każdego pobierz listę zasobów.</li>
+<li>Zbierz statystyki: ile zasobów ma każdy format (<code>CSV</code>, <code>JSON</code>, <code>XLSX</code>, itp.).</li>
+<li>Wypisz podsumowanie: format → liczba zasobów.</li>
+<li>Zapisz statystyki do <code>format_stats.json</code>.</li>
+</ol>
+<p>Wskazówka: użyj słownika do zliczania (<code>dict</code> z <code>.get(key, 0) + 1</code> lub <code>collections.Counter</code>).</p>
+</section>
+<section id="zadanie-c-dodatkowe-odporny-pipeline" class="level2" data-number="6.3">
+<h2 data-number="6.3" class="anchored" data-anchor-id="zadanie-c-dodatkowe-odporny-pipeline"><span class="header-section-number">6.3</span> Zadanie C (dodatkowe): odporny pipeline</h2>
+<p>Rozbuduj pipeline tak, żeby:</p>
+<ol type="1">
+<li>Używał <code>fetch_with_retry</code> <strong>wszędzie</strong> (wyszukiwanie, zasoby, pobieranie plików).</li>
+<li>Logował każdy błąd do listy <code>errors</code> (zamiast przerywać).</li>
+<li>Na końcu zapisywał zarówno <code>summary.json</code> (sukcesy), jak i <code>errors.json</code> (porażki).</li>
+<li>Wypisywał podsumowanie: „Pobrano X plików, Y błędów”.</li>
 </ol>
 <hr>
 </section>
 </section>
-<section id="podsumowanie" class="level1" data-number="8">
-<h1 data-number="8"><span class="header-section-number">8</span> Podsumowanie</h1>
+<section id="podsumowanie" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Podsumowanie</h1>
 <p>W tym labie:</p>
 <ul>
-<li>zbudowałeś funkcję pomocniczą <code>api_get</code> eliminującą powtórzenia,</li>
-<li>przeszedłeś pełny pipeline: wyszukiwanie → metadane → pobranie pliku,</li>
-<li>opanowałeś dwa wzorce stronicowania (numeracja stron / podążanie za <code>next</code>),</li>
-<li>napisałeś funkcję z retry i zróżnicowaną obsługą kodów błędów,</li>
-<li>automatyzowałeś pozyskiwanie danych w zadaniach samodzielnych.</li>
+<li>napisałeś pętlę stronicowania — automatyczne przechodzenie po stronach wyników API,</li>
+<li>zaimplementowałeś wzorzec retry z backoffem wykładniczym — odporność na błędy przejściowe,</li>
+<li>zbudowałeś pipeline: wyszukiwanie → zasoby → pobranie pliku — pełen łańcuch automatycznej akwizycji danych,</li>
+<li>pobrałeś realne pliki danych (CSV, XLSX) z API dane.gov.pl,</li>
+<li>rozbudowałeś funkcje wielokrotnego użytku (<code>fetch_with_retry</code>, <code>fetch_all_datasets</code>).</li>
 </ul>
-<p>Masz teraz narzędzia, żeby pobierać dane z dowolnego API opartego na HTTP i REST. W kolejnych zajęciach: web scraping (dane ze stron, które nie mają API) i praca z formatami danych.</p>
+<p>W następnych zajęciach: budujemy własny serwer HTTP (Flask) — kontrolowane środowisko, na którym będziemy ćwiczyć parsowanie HTML i crawling.</p>
 
 
 </section>
