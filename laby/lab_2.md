@@ -1,430 +1,538 @@
----
-title: "Lab 2: Nawigacja po API i automatyzacja pobierania danych"
+v---
+title: "Lab 2: Nawigacja po API — stronicowanie, pipeline, retry"
 subtitle: "Automatyczne pozyskiwanie danych — ćwiczenia"
 author: "Tomasz Rodak"
 ---
 
-# Cel 
+
+# Cel
 
 Zakres materiału:
 
-* przechodzenie pełnego pipeline'u: wyszukanie datasetu → pobranie metadanych → pobranie realnego pliku danych,
-* iteracja po stronach wyników API (stronicowanie w pętli),
-* zapisywanie pobranych danych do plików (JSON, CSV, binarne),
-* budowanie funkcji opakowujących zapytania HTTP z obsługą błędów.
+* Automatyczne przechodzenie po wielu stronach wyników API (stronicowanie),
+* Budowanie pipeline'u: wyszukiwanie → metadane → pobranie pliku,
+* Pobieranie plików binarnych (CSV, XLSX) z adresów uzyskanych przez API,
+* Obsługa błędów przejściowych — wzorzec retry z backoffem,
+* Pisanie funkcji wielokrotnego użytku (reużywalny kod klienta API).
 
-Wymagania wstępne: ukończony Lab 1 (umiesz wysłać `GET` przez `requests`, znasz strukturę JSON:API, korzystałeś ze Swaggera).
+Narzędzia: Python (`requests`, `pathlib`, `json`, `time`).
+
+Kontynuujemy pracę z API dane.gov.pl — korzystamy z tych samych wzorców co w Lab 1 (`save_response`, stała `API`, katalog wyjściowy).
 
 ---
 
-# Powtórka — sesja robocza
+# Przygotowanie
 
-## Przygotowanie
+## Instalacja (jeśli potrzeba)
 
-Utwórz folder roboczy i otwórz notatnik Jupyter lub skrypt `.py`.
+```bash
+pip install requests
+```
+
+## Szkielet skryptu
+
+Utwórz nowy skrypt `lab2_pipeline.py`. Zacznij od importów i konfiguracji — to jest rozszerzenie wzorca z Lab 1:
 
 ```python
+import json
+import time
 import requests
 from pathlib import Path
 
 API = "https://api.dane.gov.pl/1.4"
 HEADERS = {"Accept": "application/vnd.api+json"}
-TIMEOUT = 15
-
-# folder na pobrane pliki
-OUT = Path("lab_2_output")
+OUT = Path("lab2_output")
 OUT.mkdir(exist_ok=True)
+
+
+def save_json(data, filename):
+    """Zapisuje dane do pliku JSON."""
+    path = OUT / filename
+    path.write_text(
+        json.dumps(data, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    print(f"Zapisano: {path}")
+    return path
 ```
 
-Stałe `API`, `HEADERS`, `TIMEOUT` definiujemy raz — dzięki temu nie powtarzamy ich w każdym zapytaniu.
-
-## Szybki test połączenia
-
-```python
-r = requests.get(f"{API}/datasets", params={"page": 1, "per_page": 1},
-                 headers=HEADERS, timeout=TIMEOUT)
-r.raise_for_status()
-print("OK, status:", r.status_code)
-```
-
-::: checkpoint
-**Checkpoint:** Jeśli widzisz `OK, status: 200` — środowisko działa. Jeśli nie — sprawdź połączenie z internetem i poprawność URL-a.
-:::
+Nowość względem Lab 1: stała `HEADERS` — wydzielamy powtarzające się nagłówki. Funkcja `save_json` zwraca ścieżkę — przyda się w pipeline.
 
 ---
 
-# Funkcja pomocnicza do zapytań
+# Stronicowanie
 
-W Labie 1 powtarzaliśmy ten sam wzorzec: `requests.get(...)`, `raise_for_status()`, `.json()`. Zamknijmy go w funkcji, żeby reszta kodu była czytelniejsza.
+## Przypomnienie: mechanizm stronicowania
+
+W Lab 1 zobaczyliśmy, że odpowiedź API dane.gov.pl zawiera klucz `"links"` z adresem następnej strony:
+
+```json
+{
+  "data": [...],
+  "links": {
+    "self": "https://api.dane.gov.pl/1.4/datasets?page=1&per_page=5",
+    "next": "https://api.dane.gov.pl/1.4/datasets?page=2&per_page=5"
+  },
+  "meta": {"count": 12345}
+}
+```
+
+Gdy `"next"` jest obecny — jest kolejna strona. Gdy go brak (`None` lub brak klucza) — to ostatnia strona.
+
+## Demonstracja: ręczne przejście dwóch stron
+
+Zanim napiszemy pętlę, zobaczmy mechanizm krok po kroku:
 
 ```python
-def api_get(endpoint, params=None):
-    """Wysyła GET do API dane.gov.pl i zwraca sparsowany JSON.
+# Strona 1
+r = requests.get(
+    f"{API}/datasets",
+    params={"page": 1, "per_page": 3},
+    headers=HEADERS,
+    timeout=10,
+)
+r.raise_for_status()
+page1 = r.json()
+
+print("Strona 1 — liczba wyników:", len(page1["data"]))
+print("Następna strona:", page1["links"].get("next"))
+
+# Strona 2 — używamy URL z links.next
+next_url = page1["links"]["next"]
+r2 = requests.get(next_url, headers=HEADERS, timeout=10)
+r2.raise_for_status()
+page2 = r2.json()
+
+print("Strona 2 — liczba wyników:", len(page2["data"]))
+```
+
+Kluczowa obserwacja: **nie konstruujemy URL-a strony 2 ręcznie**. Używamy tego, co serwer podał w `links.next`. To jest wzorzec nawigacji po API — serwer mówi, dokąd iść dalej.
+
+::: {.callout-note}
+## Checkpoint
+Czy URL z `links.next` strony 1 zgadza się z tym, co sam byś skonstruował (`?page=2&per_page=3`)? Porównaj oba.
+:::
+
+## Ćwiczenie: pętla stronicowania
+
+Demonstracja powyżej pokazała mechanizm: pobierz stronę → weź `links.next` → pobierz następną → ... → `links.next` jest `None` → koniec.
+
+Teraz zamknij ten mechanizm w funkcji. Poniżej jest szkielet — uzupełnij miejsca oznaczone komentarzami:
+
+```python
+def fetch_all_datasets(query, per_page=5, max_pages=None):
+    """Pobiera datasety ze wszystkich stron wyników wyszukiwania.
     
     Parameters
     ----------
-    endpoint : str
-        Ścieżka względem API, np. "/datasets" lub "/datasets/830/resources".
-    params : dict, optional
-        Parametry query string.
+    query : str
+        Fraza wyszukiwania.
+    per_page : int
+        Liczba wyników na stronę.
+    max_pages : int or None
+        Limit stron (None = bez limitu).
     
     Returns
     -------
-    dict
-        Sparsowana odpowiedź JSON.
+    list
+        Lista wszystkich datasetów (słowników z data).
+    """
+    url = f"{API}/datasets"
+    params = {"q": query, "per_page": per_page, "page": 1}
+    
+    all_datasets = []
+    page_num = 0
+    
+    while url is not None:
+        page_num += 1
+        
+        # 1. Sprawdź, czy nie przekroczono limitu stron (max_pages).
+        #    Jeśli tak — przerwij pętlę.
+        # --- Twój kod ---
+        
+        # 2. Wyślij żądanie GET na url z params i HEADERS.
+        #    Użyj raise_for_status().
+        # --- Twój kod ---
+        
+        # 3. Sparsuj odpowiedź JSON.
+        #    Wyciągnij listę datasetów (klucz "data") i dodaj do all_datasets.
+        #    Wypisz postęp: numer strony, ile pobrano, ile łącznie.
+        # --- Twój kod ---
+        
+        # 4. Ustal URL następnej strony: links.next (lub None, jeśli brak).
+        #    WAŻNE: przy kolejnych stronach ustaw params = None,
+        #    bo links.next to pełny URL z parametrami — nie chcesz ich podwajać.
+        # --- Twój kod ---
+        
+        # 5. Pauza między żądaniami — nie obciążaj cudzego serwera.
+        time.sleep(0.5)
+    
+    return all_datasets
+```
+
+::: {.callout-tip}
+## Dlaczego `params = None` po pierwszej stronie?
+Przy pierwszym żądaniu konstruujemy URL z parametrami (`q`, `per_page`, `page`). Ale `links.next` to **pełny URL** z parametrami już wbudowanymi. Gdybyśmy dalej przekazywali `params`, `requests` dodałby je *ponownie* — podwojone parametry.
+:::
+
+::: {.callout-tip}
+## Dlaczego `time.sleep`?
+To nie jest wymóg techniczny — to etykieta. API dane.gov.pl jest serwisem publicznym. Wysyłanie wielu żądań bez przerwy może obciążyć serwer i pogorszyć usługę dla innych. Pół sekundy między stronami to rozsądne minimum.
+:::
+
+Przetestuj:
+
+```python
+datasets = fetch_all_datasets("transport", per_page=5, max_pages=3)
+
+for ds in datasets:
+    print(f"  [{ds['id']}] {ds['attributes']['title']}")
+
+save_json(datasets, "datasets_transport.json")
+```
+
+1. Czy pętla zatrzymuje się po 3 stronach (limit), nawet jeśli jest ich więcej?
+2. Ile datasetów zebrałeś? Ile jest łącznie datasetów pasujących do frazy? (Sprawdź `meta.count` w dowolnej odpowiedzi API.)
+
+---
+
+# Retry — obsługa błędów przejściowych
+
+## Problem
+
+Serwer nie zawsze odpowiada poprawnie. Mogą wystąpić:
+
+* **Timeout** — serwer nie zdążył odpowiedzieć,
+* **503 Service Unavailable** — serwer chwilowo przeciążony,
+* **429 Too Many Requests** — przekroczono limit zapytań,
+* **Błąd połączenia** — chwilowy problem sieciowy.
+
+Jednokrotna porażka nie oznacza, że dane są niedostępne — często wystarczy **poczekać i spróbować ponownie**.
+
+## Wzorzec retry z backoffem
+
+**Backoff** oznacza zwiększanie czasu oczekiwania między kolejnymi próbami. Dzięki temu nie zalewamy serwera żądaniami, gdy ma problemy:
+
+```python
+def fetch_with_retry(url, params=None, max_retries=3, backoff=1.0, timeout=10):
+    """Pobiera URL z automatycznym ponawianiem przy błędach przejściowych.
+    
+    Parameters
+    ----------
+    url : str
+        Adres do pobrania.
+    params : dict or None
+        Parametry query string.
+    max_retries : int
+        Maksymalna liczba prób.
+    backoff : float
+        Początkowy czas oczekiwania (sekundy). Podwaja się z każdą próbą.
+    timeout : float
+        Timeout pojedynczego żądania.
+    
+    Returns
+    -------
+    requests.Response
+        Obiekt odpowiedzi (jeśli sukces).
     
     Raises
     ------
-    requests.exceptions.HTTPError
-        Gdy serwer zwróci kod 4xx lub 5xx.
-    requests.exceptions.Timeout
-        Gdy serwer nie odpowie w ciągu TIMEOUT sekund.
+    requests.exceptions.RequestException
+        Jeśli wszystkie próby się nie powiodą.
     """
-    url = f"{API}{endpoint}"
-    r = requests.get(url, params=params, headers=HEADERS, timeout=TIMEOUT)
-    r.raise_for_status()
-    return r.json()
-```
-
-Od teraz zamiast pisać pełne zapytanie, możemy:
-
-```python
-data = api_get("/datasets", {"page": 1, "per_page": 5})
-print(len(data["data"]), "datasetów")
-```
-
-::: key-concept
-**Dlaczego warto?** W dalszej części labu będziemy wysyłać dziesiątki zapytań. Funkcja `api_get` eliminuje powtórzenia i daje jedno miejsce, w którym można dodać np. logowanie, retry, czy cache.
-:::
-
----
-
-# Pipeline — od wyszukiwania do pliku
-
-Teraz przejdziemy pełną ścieżkę, jaką typowo pokonuje się przy automatycznym pobieraniu danych z API:
-
-```
-wyszukaj datasety → wybierz jeden → pobierz metadane zasobów → pobierz plik
-```
-
-## Krok 1: wyszukiwanie
-
-Szukamy datasetów związanych z wybranym tematem. Parametr wyszukiwania to `q` (możesz to sprawdzić w Swaggerze).
-
-```python
-query = "jakość powietrza"
-
-data = api_get("/datasets", {"q": query, "per_page": 5})
-results = data["data"]
-
-print(f"Znaleziono {data['meta']['count']} wyników, wyświetlam {len(results)}:\n")
-for ds in results:
-    a = ds["attributes"]
-    print(f"  [{ds['id']}] {a['title']}")
-    print(f"       kategoria: {a.get('category', '?')}, "
-          f"zasoby: {a.get('resources_count', '?')}")
-    print()
-```
-
-Wybierz dataset, który ma przynajmniej kilka zasobów (`resources_count` > 0).
-
-## Krok 2: szczegóły datasetu
-
-```python
-DATASET_ID = "..."  # ← wklej id z kroku 1
-
-ds_data = api_get(f"/datasets/{DATASET_ID}")
-ds = ds_data["data"]
-attrs = ds["attributes"]
-
-print("Tytuł:", attrs["title"])
-print("Opis:", attrs.get("notes", "(brak)")[:300])
-print("Licencja:", attrs.get("license_condition_db_or_copyrighted"))
-```
-
-## Krok 3: lista zasobów
-
-```python
-res_data = api_get(f"/datasets/{DATASET_ID}/resources")
-resources = res_data["data"]
-
-print(f"Zasoby ({len(resources)}):\n")
-for res in resources:
-    ra = res["attributes"]
-    print(f"  [{res['id']}] {ra.get('title', '(bez tytułu)')}")
-    print(f"       format: {ra.get('format', '?')}, "
-          f"rozmiar: {ra.get('file_size', '?')}")
-    print()
-```
-
-## Krok 4: metadane zasobów jako CSV
-
-API dane.gov.pl umożliwia pobranie metadanych zasobów jako plik CSV. To nie jest odpowiedź JSON:API — to zwykły plik CSV.
-
-```python
-csv_url = f"{API}/datasets/{DATASET_ID}/resources/metadata.csv"
-
-r = requests.get(csv_url, params={"lang": "en"}, timeout=TIMEOUT)
-r.raise_for_status()
-
-csv_path = OUT / f"resources_{DATASET_ID}_metadata.csv"
-csv_path.write_text(r.text, encoding="utf-8")
-print(f"Zapisano: {csv_path} ({len(r.text)} znaków)")
-```
-
-Podgląd:
-
-```python
-import pandas as pd
-
-df = pd.read_csv(csv_path, sep=";")
-print("Kolumny:", list(df.columns))
-print(f"Wiersze: {len(df)}\n")
-df[["Resource title", "File format", "File size", "Download URL"]].head()
-```
-
-::: checkpoint
-**Checkpoint:** Czy widzisz kolumnę `Download URL` z adresami do pobrania plików? Jeśli kolumna jest pusta albo nie istnieje — wybierz inny dataset z kroku 1 i powtórz od kroku 2.
-:::
-
-## Krok 5: pobranie realnego pliku danych
-
-Wybierz jeden adres z kolumny `Download URL`:
-
-```python
-download_url = df["Download URL"].dropna().iloc[0]
-print("Pobieram:", download_url)
-```
-
-Pobieranie pliku binarnego (z obsługą przekierowań — `requests` robi to domyślnie):
-
-```python
-r = requests.get(download_url, timeout=30)
-r.raise_for_status()
-
-# nazwa pliku z nagłówka lub z URL-a
-filename = download_url.split("/")[-1] or "downloaded_file"
-file_path = OUT / filename
-
-file_path.write_bytes(r.content)
-print(f"Zapisano: {file_path} ({len(r.content)} bajtów)")
-```
-
-::: key-concept
-**Uwaga o dużych plikach.** Powyższy kod wczytuje cały plik do pamięci (`r.content`). Dla plików większych niż ~100 MB lepiej pobierać strumieniowo:
-
-```python
-with requests.get(download_url, stream=True, timeout=30) as r:
-    r.raise_for_status()
-    with open(file_path, "wb") as f:
-        for chunk in r.iter_content(chunk_size=8192):
-            f.write(chunk)
-```
-
-Na potrzeby tego labu zwykłe pobranie wystarczy.
-:::
-
-::: checkpoint
-**Checkpoint:** Przeszedłeś pełny pipeline: wyszukiwanie → dataset → zasoby → metadane CSV → pobranie pliku. To jest rdzeń automatycznego pozyskiwania danych z API.
-:::
-
----
-
-# Stronicowanie — iteracja po wielu stronach
-
-API dane.gov.pl zwraca wyniki stronicowane. Na jednej stronie jest najwyżej `per_page` wyników (domyślnie 20). Żeby pobrać wszystkie, trzeba iterować po stronach.
-
-## Podejście 1: pętla po numerach stron
-
-```python
-page = 1
-per_page = 5
-all_datasets = []
-
-while True:
-    data = api_get("/datasets", {"page": page, "per_page": per_page})
-    items = data["data"]
-    
-    if not items:
-        break
-    
-    all_datasets.extend(items)
-    print(f"Strona {page}: pobrano {len(items)} datasetów "
-          f"(łącznie: {len(all_datasets)})")
-    
-    # sprawdź, czy jest następna strona
-    next_link = data.get("links", {}).get("next")
-    if next_link is None:
-        break
-    
-    page += 1
-    
-    # bezpiecznik: nie pobieraj więcej niż 5 stron w tym ćwiczeniu
-    if page > 5:
-        print("Przerwano po 5 stronach (bezpiecznik).")
-        break
-
-print(f"\nPobrano łącznie: {len(all_datasets)} datasetów")
-```
-
-## Podejście 2: podążanie za linkiem `next`
-
-Zamiast ręcznie zwiększać `page`, można podążać za adresem `next` z odpowiedzi. To jest bardziej odporny wzorzec — nie zakłada, że numeracja stron zaczyna się od 1 ani że jest ciągła.
-
-```python
-url = f"{API}/datasets"
-params = {"per_page": 5}
-all_datasets = []
-page_count = 0
-
-while url is not None:
-    r = requests.get(url, params=params, headers=HEADERS, timeout=TIMEOUT)
-    r.raise_for_status()
-    data = r.json()
-    
-    all_datasets.extend(data["data"])
-    page_count += 1
-    print(f"Strona {page_count}: +{len(data['data'])} "
-          f"(łącznie: {len(all_datasets)})")
-    
-    # następna strona — link jest pełnym URL-em
-    url = data.get("links", {}).get("next")
-    params = None  # parametry są już wbudowane w URL z linku next
-    
-    if page_count >= 5:
-        print("Przerwano po 5 stronach (bezpiecznik).")
-        break
-```
-
-::: key-concept
-**Bezpiecznik** (`if page >= N: break`) jest ważny przy nauce i debugowaniu. API dane.gov.pl ma tysiące datasetów — bez limitu pętla potrwa bardzo długo i obciąży serwer. W kodzie produkcyjnym bezpiecznik zastąpisz właściwym warunkiem stopu (np. „pobierz wszystkie do 2024 roku").
-:::
-
-::: checkpoint
-**Checkpoint:** Czy obie metody dały te same `id` datasetów? Porównaj:
-
-```python
-# zakładając, że wyniki z podejścia 1 są w all_datasets_v1,
-# a z podejścia 2 w all_datasets_v2:
-ids_v1 = [d["id"] for d in all_datasets_v1]
-ids_v2 = [d["id"] for d in all_datasets_v2]
-print("Identyczne:", ids_v1 == ids_v2)
-```
-:::
-
----
-
-# Odporność na błędy — retry
-
-W praktyce zapytania do API mogą się nie powieść z powodów przejściowych: serwer jest chwilowo przeciążony (503), przekroczono limit zapytań (429), albo sieć „czkawkała" (timeout). Rozsądną strategią jest **ponowienie** (retry) po krótkiej przerwie.
-
-## Prosta funkcja z retry
-
-```python
-import time
-
-def api_get_retry(endpoint, params=None, max_retries=3, backoff=2.0):
-    """GET z automatycznym ponawianiem przy błędach przejściowych."""
-    url = f"{API}{endpoint}"
-    
     for attempt in range(1, max_retries + 1):
         try:
-            r = requests.get(url, params=params, headers=HEADERS, timeout=TIMEOUT)
+            r = requests.get(
+                url, params=params, headers=HEADERS, timeout=timeout
+            )
             
-            if r.status_code == 429:
-                wait = float(r.headers.get("Retry-After", backoff * attempt))
-                print(f"  429 Too Many Requests, czekam {wait}s...")
+            if r.status_code in (429, 503):
+                wait = backoff * (2 ** (attempt - 1))
+                print(f"  [{r.status_code}] Próba {attempt}/{max_retries}, "
+                      f"czekam {wait:.1f}s...")
                 time.sleep(wait)
                 continue
             
             r.raise_for_status()
-            return r.json()
-        
+            return r
+            
         except requests.exceptions.Timeout:
-            print(f"  Timeout (próba {attempt}/{max_retries})")
-            if attempt < max_retries:
-                time.sleep(backoff * attempt)
+            wait = backoff * (2 ** (attempt - 1))
+            print(f"  [Timeout] Próba {attempt}/{max_retries}, "
+                  f"czekam {wait:.1f}s...")
+            time.sleep(wait)
         
-        except requests.exceptions.HTTPError as e:
-            if r.status_code >= 500:
-                print(f"  Błąd serwera {r.status_code} (próba {attempt}/{max_retries})")
-                if attempt < max_retries:
-                    time.sleep(backoff * attempt)
-            else:
-                raise  # 4xx (poza 429) — nie ponawiamy
+        except requests.exceptions.ConnectionError:
+            wait = backoff * (2 ** (attempt - 1))
+            print(f"  [ConnectionError] Próba {attempt}/{max_retries}, "
+                  f"czekam {wait:.1f}s...")
+            time.sleep(wait)
     
-    raise RuntimeError(f"Nie udało się pobrać {url} po {max_retries} próbach")
+    raise requests.exceptions.RequestException(
+        f"Nie udało się pobrać {url} po {max_retries} próbach"
+    )
 ```
 
-Kluczowe elementy:
+Analiza wzorca:
 
-* **429 (Too Many Requests)** — serwer mówi „za szybko"; czekamy tyle, ile każe nagłówek `Retry-After` (lub domyślnie),
-* **5xx (błąd serwera)** — problem po stronie serwera, warto spróbować ponownie,
-* **4xx (poza 429)** — błąd klienta (np. 404), ponawianie nie pomoże, od razu rzucamy wyjątek,
-* **backoff** — czas oczekiwania rośnie z każdą próbą (2s, 4s, 6s), żeby nie zalewać serwera.
+* **Pętla `for`** z ograniczoną liczbą prób — nigdy nie robimy nieskończonego retry.
+* **Backoff wykładniczy**: 1s → 2s → 4s. Serwer dostaje czas na odzyskanie.
+* **Kody 429/503**: nie rzucamy wyjątku — czekamy i próbujemy ponownie.
+* **Timeout i ConnectionError**: łapiemy i ponawiamy.
+* **Inne błędy** (np. 404): `raise_for_status()` rzuca wyjątek natychmiast — bo 404 się nie „naprawi" po chwili.
 
-Test:
+::: {.callout-tip}
+## Retry-After
+Niektóre serwery zwracają nagłówek `Retry-After` z kodem 429 lub 503 — mówi on, ile sekund czekać. Nasz kod tego nie wykorzystuje, ale w produkcyjnym kodzie warto to sprawdzić: `r.headers.get("Retry-After")` i użyć tej wartości zamiast stałego backoffu.
+:::
+
+## Ćwiczenie: test retry
+
+Użyj httpbin do symulacji błędów:
 
 ```python
-# powinno działać normalnie
-data = api_get_retry("/datasets", {"page": 1, "per_page": 2})
-print("OK:", data["data"][0]["attributes"]["title"])
-
-# powinno rzucić wyjątek (404, nie ponawiamy)
+# httpbin.org/status/503 zawsze zwraca 503
 try:
-    api_get_retry("/datasets/999999999")
-except requests.exceptions.HTTPError as e:
-    print("Błąd (zgodnie z oczekiwaniem):", e)
+    r = fetch_with_retry(
+        "https://httpbin.org/status/503", max_retries=3, backoff=0.5
+    )
+except requests.exceptions.RequestException as e:
+    print(f"Ostateczny błąd: {e}")
 ```
 
-::: checkpoint
-**Checkpoint:** Czy rozumiesz, dlaczego 404 nie jest ponawiane, a 503 tak? W automatyzacji to rozróżnienie decyduje o tym, czy skrypt „zawiesza się" na godzinę, czy szybko informuje o prawdziwym problemie.
+1. Ile prób wykonał program? Ile łącznie czekał?
+2. Zmień `max_retries` na 5. Jak zmieni się łączny czas oczekiwania?
+3. Sprawdź, że `fetch_with_retry("https://httpbin.org/json")` zwraca odpowiedź bez retry.
+
+::: {.callout-note}
+## Checkpoint
+Czy widzisz logi z każdej próby (numer, czas oczekiwania)? Czy program ostatecznie rzuca wyjątek po wyczerpaniu prób?
+:::
+
+---
+
+# Pipeline: od wyszukiwania do pliku
+
+## Czym jest pipeline
+
+Pipeline to łańcuch kroków, w którym **wynik jednego kroku jest wejściem następnego**:
+
+```
+wyszukiwanie → lista datasetów → wybór jednego → lista zasobów → pobranie pliku
+```
+
+W Lab 1 przeszliśmy te kroki ręcznie (kopiując `id` z jednego zapytania do następnego). Teraz **automatyzujemy cały łańcuch**.
+
+## Schemat zależności
+
+Poniższy schemat pokazuje, które funkcje wywołują które i co przepływa między nimi:
+
+```
+fetch_all_datasets("transport", ...)
+│
+▼
+[dataset_1, dataset_2, ...]
+│
+├── fetch_resources(dataset_1["id"])
+│   ▼
+│   [resource_A, resource_B]
+│   ├── download_resource(resource_A) → plik.csv
+│   └── download_resource(resource_B) → plik.xlsx
+│
+├── fetch_resources(dataset_2["id"])
+│   ▼
+│   [resource_C]
+│   └── download_resource(resource_C) → plik.json
+│
+▼
+save_json(summary) → pipeline_summary.json
+```
+
+Każdy poziom to osobna funkcja. Każda strzałka to jedno lub więcej żądań HTTP do API. Funkcja `pipeline` orkiestruje całość.
+
+## Krok 1: zasoby datasetu
+
+Mając `id` datasetu, pobierz jego zasoby. Korzystamy z `fetch_with_retry` — żądanie do API może się nie udać za pierwszym razem:
+
+```python
+def fetch_resources(dataset_id):
+    """Pobiera listę zasobów (plików) dla danego datasetu."""
+    url = f"{API}/datasets/{dataset_id}/resources"
+    r = fetch_with_retry(url)
+    return r.json()["data"]
+```
+
+## Krok 2: pobranie pliku
+
+Zasoby mają w `attributes` pole `download_url` — adres pliku do pobrania. To nie jest JSON, tylko plik binarny (CSV, XLSX, itp.):
+
+```python
+def download_resource(resource, output_dir):
+    """Pobiera plik zasobu i zapisuje na dysk.
+    
+    Parameters
+    ----------
+    resource : dict
+        Element z listy zasobów (słownik z "attributes").
+    output_dir : Path
+        Katalog docelowy.
+    
+    Returns
+    -------
+    Path or None
+        Ścieżka do zapisanego pliku, lub None jeśli brak URL.
+    """
+    attrs = resource["attributes"]
+    url = attrs.get("download_url")
+    
+    if not url:
+        print(f"  Brak download_url dla zasobu {resource['id']}")
+        return None
+    
+    # Nazwa pliku z tytułu i formatu
+    title = attrs.get("title", resource["id"])
+    fmt = attrs.get("format", "bin").lower()
+    filename = f"{resource['id']}_{title[:50]}.{fmt}"
+    
+    # Usuwamy znaki niebezpieczne w nazwie pliku
+    filename = filename.replace("/", "_").replace("\\", "_")
+    
+    try:
+        r = requests.get(url, timeout=30)
+        r.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"  Błąd pobierania {url}: {e}")
+        return None
+    
+    path = output_dir / filename
+    path.write_bytes(r.content)
+    print(f"  Pobrano: {path} ({len(r.content)} bajtów)")
+    return path
+```
+
+Zwróć uwagę na różnice względem dotychczasowego kodu:
+
+* **`r.content`** zamiast `r.text` — pobieramy bajty (plik binarny), nie tekst.
+* **`write_bytes`** zamiast `write_text` — zapis binarny.
+* **Sanityzacja nazwy pliku** — usuwamy znaki, które mogłyby uszkodzić ścieżkę.
+* **Obsługa braku URL** — nie każdy zasób ma `download_url`.
+
+::: {.callout-note}
+## Checkpoint
+Jaka jest różnica między `r.text` a `r.content`? Kiedy używasz którego?
+:::
+
+## Krok 3: cały pipeline
+
+Łączymy kroki w jedną funkcję. Wyszukiwanie opiera się na `fetch_all_datasets` z poprzedniej sekcji:
+
+```python
+def pipeline(query, max_datasets=3, max_files_per_dataset=2):
+    """Wyszukuje datasety, pobiera zasoby i zapisuje pliki.
+    
+    Parameters
+    ----------
+    query : str
+        Fraza wyszukiwania.
+    max_datasets : int
+        Maksymalna liczba datasetów do przetworzenia.
+    max_files_per_dataset : int
+        Maksymalna liczba plików na dataset.
+    """
+    print(f"=== Pipeline: '{query}' ===\n")
+    
+    # Krok 1: wyszukaj datasety
+    datasets = fetch_all_datasets(query, per_page=max_datasets, max_pages=1)
+    print(f"\nZnaleziono {len(datasets)} datasetów.\n")
+    
+    summary = []
+    
+    for ds in datasets[:max_datasets]:
+        ds_id = ds["id"]
+        title = ds["attributes"]["title"]
+        print(f"--- Dataset [{ds_id}]: {title} ---")
+        
+        # Krok 2: pobierz zasoby
+        try:
+            resources = fetch_resources(ds_id)
+        except requests.exceptions.RequestException as e:
+            print(f"  Błąd pobierania zasobów: {e}")
+            continue
+        
+        print(f"  Zasoby: {len(resources)}")
+        
+        # Krok 3: pobierz pliki
+        downloaded = []
+        for res in resources[:max_files_per_dataset]:
+            path = download_resource(res, OUT)
+            if path:
+                downloaded.append(str(path))
+            time.sleep(0.5)  # pauza między żądaniami — ta sama zasada co w stronicowaniu
+        
+        summary.append({
+            "dataset_id": ds_id,
+            "title": title,
+            "resources_found": len(resources),
+            "files_downloaded": downloaded,
+        })
+        
+        print()
+    
+    # Zapisz podsumowanie
+    save_json(summary, "pipeline_summary.json")
+    print(f"\n=== Gotowe. Podsumowanie w pipeline_summary.json ===")
+```
+
+## Ćwiczenie: uruchom pipeline
+
+```python
+pipeline("transport", max_datasets=2, max_files_per_dataset=1)
+```
+
+1. Sprawdź katalog `lab2_output/` — czy widzisz pobrane pliki?
+2. Otwórz `pipeline_summary.json` — czy zawiera informacje o pobranych plikach?
+3. Zmień frazę wyszukiwania na inną (np. `"szkoły"`, `"powietrze"`).
+4. Co się stanie, gdy dataset nie ma zasobów z `download_url`?
+
+::: {.callout-note}
+## Checkpoint
+Czy Twój pipeline obsługuje sytuację, gdy zasób nie ma `download_url`? Czy brak jednego pliku nie zatrzymuje całego procesu?
 :::
 
 ---
 
 # Zadania samodzielne
 
-## Zadanie A: zbierz tytuły z N stron
+## Zadanie A: stronicowanie z limitem wyników
 
-Napisz funkcję `collect_titles(n_pages, per_page=10)`, która:
+Napisz funkcję `fetch_datasets_until(query, target_count, per_page=10)`, która:
 
-1. Pobiera `n_pages` stron listy datasetów.
-2. Zwraca listę słowników `{"id": ..., "title": ...}` ze wszystkich pobranych wyników.
-3. Używa `api_get` lub `api_get_retry`.
+1. Pobiera strony wyników, aż zbierze **co najmniej `target_count` datasetów** (lub strony się skończą).
+2. Zwraca listę datasetów (może być dłuższa niż `target_count`, jeśli ostatnia strona dodała nadmiar).
+3. Wypisuje na bieżąco: numer strony, liczbę pobranych na stronie, łączną liczbę.
 
-Przetestuj z `n_pages=3, per_page=10` i wypisz wyniki.
+Przetestuj: `fetch_datasets_until("szkoły", 25, per_page=10)`.
 
-## Zadanie B: pipeline wyszukiwanie → pobranie pliku
+## Zadanie B: statystyki zasobów
 
-Napisz skrypt (lub funkcję), który:
+Dla wybranej frazy wyszukiwania:
 
-1. Wyszukuje datasety po wybranym słowie kluczowym (`q=...`).
-2. Dla pierwszego znalezionego datasetu pobiera listę zasobów.
-3. Wybiera pierwszy zasób w formacie CSV (lub innym, który ma `Download URL`).
-4. Pobiera plik i zapisuje go do katalogu `lab_2_output/`.
-5. Wypisuje podsumowanie: tytuł datasetu, tytuł zasobu, rozmiar pobranego pliku.
+1. Pobierz pierwsze 10 datasetów.
+2. Dla każdego pobierz listę zasobów.
+3. Zbierz statystyki: ile zasobów ma każdy format (`CSV`, `JSON`, `XLSX`, itp.).
+4. Wypisz podsumowanie: format → liczba zasobów.
+5. Zapisz statystyki do `format_stats.json`.
 
-Wskazówka: metadane w CSV (`metadata.csv?lang=en`) zawierają kolumnę `Download URL`. Możesz z niej skorzystać lub znaleźć URL w odpowiedzi JSON zasobów (pole `link` w `attributes`).
+Wskazówka: użyj słownika do zliczania (`dict` z `.get(key, 0) + 1` lub `collections.Counter`).
 
-## Zadanie C: stronicowanie z warunkiem stopu
+## Zadanie C (dodatkowe): odporny pipeline
 
-Napisz funkcję `search_all(query, max_results=50)`, która:
+Rozbuduj pipeline tak, żeby:
 
-1. Wyszukuje datasety po frazie `query`.
-2. Iteruje po stronach, aż zbierze `max_results` wyników **lub** skończą się strony.
-3. Zwraca listę zebranych datasetów.
-
-Przetestuj na kilku frazach i porównaj `meta["count"]` (ile jest łącznie) z liczbą faktycznie pobranych wyników.
-
-## Zadanie D (dodatkowe): pobranie wielu plików
-
-Rozszerz pipeline z Zadania B:
-
-1. Dla wybranego datasetu pobierz **wszystkie** zasoby (nie tylko pierwszy).
-2. Każdy zasób zapisz do osobnego pliku w `lab_2_output/{dataset_id}/`.
-3. Na końcu wypisz tabelę podsumowującą: tytuł zasobu, format, rozmiar pobranego pliku, status (OK / błąd).
-4. Dodaj obsługę błędów — jeśli pobranie jednego zasobu się nie uda, kontynuuj z następnym.
+1. Używał `fetch_with_retry` **wszędzie** (wyszukiwanie, zasoby, pobieranie plików).
+2. Logował każdy błąd do listy `errors` (zamiast przerywać).
+3. Na końcu zapisywał zarówno `summary.json` (sukcesy), jak i `errors.json` (porażki).
+4. Wypisywał podsumowanie: „Pobrano X plików, Y błędów".
 
 ---
 
@@ -432,10 +540,10 @@ Rozszerz pipeline z Zadania B:
 
 W tym labie:
 
-* zbudowałeś funkcję pomocniczą `api_get` eliminującą powtórzenia,
-* przeszedłeś pełny pipeline: wyszukiwanie → metadane → pobranie pliku,
-* opanowałeś dwa wzorce stronicowania (numeracja stron / podążanie za `next`),
-* napisałeś funkcję z retry i zróżnicowaną obsługą kodów błędów,
-* automatyzowałeś pozyskiwanie danych w zadaniach samodzielnych.
+* napisałeś pętlę stronicowania — automatyczne przechodzenie po stronach wyników API,
+* zaimplementowałeś wzorzec retry z backoffem wykładniczym — odporność na błędy przejściowe,
+* zbudowałeś pipeline: wyszukiwanie → zasoby → pobranie pliku — pełen łańcuch automatycznej akwizycji danych,
+* pobrałeś realne pliki danych (CSV, XLSX) z API dane.gov.pl,
+* rozbudowałeś funkcje wielokrotnego użytku (`fetch_with_retry`, `fetch_all_datasets`).
 
-Masz teraz narzędzia, żeby pobierać dane z dowolnego API opartego na HTTP i REST. W kolejnych zajęciach: web scraping (dane ze stron, które nie mają API) i praca z formatami danych.
+W następnych zajęciach: budujemy własny serwer HTTP (Flask) — kontrolowane środowisko, na którym będziemy ćwiczyć parsowanie HTML i crawling.

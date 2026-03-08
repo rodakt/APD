@@ -66,8 +66,9 @@ Thumbs.db
 *.synctex.gz
 *.pdf
 
-# folder metadanych
+# folder metadanych i robocze
 meta/
+sandbox/
 
 # --- Pliki tymczasowe i robocze (rozszerzone) ---
 *_tmp.*
