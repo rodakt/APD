@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Wykład 3: HTML jako drzewo — selekcja danych – Automatyczne pozyskiwanie danych</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-b2594a383c4077ccf38c5dc50f43008b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_3.html">Wykład 3: HTML jako drzewo — selekcja danych</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Automatyczne pozyskiwanie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automatyczne pozyskiwanie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: HTTP i klienci HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: Serwer HTTP - framework Flask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_3.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Wykład 3: HTML jako drzewo — selekcja danych</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Python — odświeżenie podstaw</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Klienci HTTP (curl, requests)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">author: “Tomasz Rodak”</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#cele-i-zakres" id="toc-cele-i-zakres" class="nav-link active" data-scroll-target="#cele-i-zakres"><span class="header-section-number">1</span> Cele i zakres</a></li>
+  <li><a href="#od-tekstu-do-drzewa" id="toc-od-tekstu-do-drzewa" class="nav-link" data-scroll-target="#od-tekstu-do-drzewa"><span class="header-section-number">2</span> Od tekstu do drzewa</a>
+  <ul class="collapse">
+  <li><a href="#dlaczego-nie-regex" id="toc-dlaczego-nie-regex" class="nav-link" data-scroll-target="#dlaczego-nie-regex"><span class="header-section-number">2.1</span> Dlaczego nie regex</a></li>
+  <li><a href="#html-przypomnienie-składni" id="toc-html-przypomnienie-składni" class="nav-link" data-scroll-target="#html-przypomnienie-składni"><span class="header-section-number">2.2</span> HTML — przypomnienie składni</a></li>
+  <li><a href="#model-drzewa-dom" id="toc-model-drzewa-dom" class="nav-link" data-scroll-target="#model-drzewa-dom"><span class="header-section-number">2.3</span> Model drzewa (DOM)</a></li>
+  </ul></li>
+  <li><a href="#beautifulsoup-nawigacja-po-drzewie" id="toc-beautifulsoup-nawigacja-po-drzewie" class="nav-link" data-scroll-target="#beautifulsoup-nawigacja-po-drzewie"><span class="header-section-number">3</span> BeautifulSoup — nawigacja po drzewie</a>
+  <ul class="collapse">
+  <li><a href="#instalacja-i-parsowanie" id="toc-instalacja-i-parsowanie" class="nav-link" data-scroll-target="#instalacja-i-parsowanie"><span class="header-section-number">3.1</span> Instalacja i parsowanie</a></li>
+  <li><a href="#wyszukiwanie-elementów-find-i-find_all" id="toc-wyszukiwanie-elementów-find-i-find_all" class="nav-link" data-scroll-target="#wyszukiwanie-elementów-find-i-find_all"><span class="header-section-number">3.2</span> Wyszukiwanie elementów: <code>find</code> i <code>find_all</code></a></li>
+  <li><a href="#filtrowanie-po-atrybutach" id="toc-filtrowanie-po-atrybutach" class="nav-link" data-scroll-target="#filtrowanie-po-atrybutach"><span class="header-section-number">3.3</span> Filtrowanie po atrybutach</a></li>
+  <li><a href="#wyciąganie-danych-z-elementu" id="toc-wyciąganie-danych-z-elementu" class="nav-link" data-scroll-target="#wyciąganie-danych-z-elementu"><span class="header-section-number">3.4</span> Wyciąganie danych z elementu</a></li>
+  <li><a href="#nawigacja-po-drzewie" id="toc-nawigacja-po-drzewie" class="nav-link" data-scroll-target="#nawigacja-po-drzewie"><span class="header-section-number">3.5</span> Nawigacja po drzewie</a></li>
+  <li><a href="#pełny-przykład-ekstrakcja-tabeli" id="toc-pełny-przykład-ekstrakcja-tabeli" class="nav-link" data-scroll-target="#pełny-przykład-ekstrakcja-tabeli"><span class="header-section-number">3.6</span> Pełny przykład: ekstrakcja tabeli</a></li>
+  </ul></li>
+  <li><a href="#selektory-css" id="toc-selektory-css" class="nav-link" data-scroll-target="#selektory-css"><span class="header-section-number">4</span> Selektory CSS</a>
+  <ul class="collapse">
+  <li><a href="#po-co-kolejna-metoda" id="toc-po-co-kolejna-metoda" class="nav-link" data-scroll-target="#po-co-kolejna-metoda"><span class="header-section-number">4.1</span> Po co kolejna metoda</a></li>
+  <li><a href="#składnia-selektorów-minimum-do-pracy" id="toc-składnia-selektorów-minimum-do-pracy" class="nav-link" data-scroll-target="#składnia-selektorów-minimum-do-pracy"><span class="header-section-number">4.2</span> Składnia selektorów — minimum do pracy</a></li>
+  <li><a href="#pseudoklasy" id="toc-pseudoklasy" class="nav-link" data-scroll-target="#pseudoklasy"><span class="header-section-number">4.3</span> Pseudoklasy</a></li>
+  <li><a href="#select-i-select_one" id="toc-select-i-select_one" class="nav-link" data-scroll-target="#select-i-select_one"><span class="header-section-number">4.4</span> <code>select</code> i <code>select_one</code></a></li>
+  <li><a href="#porównanie-find_all-vs-select" id="toc-porównanie-find_all-vs-select" class="nav-link" data-scroll-target="#porównanie-find_all-vs-select"><span class="header-section-number">4.5</span> Porównanie: <code>find_all</code> vs <code>select</code></a></li>
+  </ul></li>
+  <li><a href="#xpath" id="toc-xpath" class="nav-link" data-scroll-target="#xpath"><span class="header-section-number">5</span> XPath</a>
+  <ul class="collapse">
+  <li><a href="#dlaczego-jeszcze-jedna-metoda" id="toc-dlaczego-jeszcze-jedna-metoda" class="nav-link" data-scroll-target="#dlaczego-jeszcze-jedna-metoda"><span class="header-section-number">5.1</span> Dlaczego jeszcze jedna metoda</a></li>
+  <li><a href="#narzędzie-lxml" id="toc-narzędzie-lxml" class="nav-link" data-scroll-target="#narzędzie-lxml"><span class="header-section-number">5.2</span> Narzędzie: <code>lxml</code></a></li>
+  <li><a href="#ścieżki-absolutne-i-względne" id="toc-ścieżki-absolutne-i-względne" class="nav-link" data-scroll-target="#ścieżki-absolutne-i-względne"><span class="header-section-number">5.3</span> Ścieżki: absolutne i względne</a></li>
+  <li><a href="#predykaty-filtrowanie-wyników" id="toc-predykaty-filtrowanie-wyników" class="nav-link" data-scroll-target="#predykaty-filtrowanie-wyników"><span class="header-section-number">5.4</span> Predykaty — filtrowanie wyników</a></li>
+  <li><a href="#wyciąganie-danych" id="toc-wyciąganie-danych" class="nav-link" data-scroll-target="#wyciąganie-danych"><span class="header-section-number">5.5</span> Wyciąganie danych</a></li>
+  <li><a href="#osie-poruszanie-się-w-wielu-kierunkach" id="toc-osie-poruszanie-się-w-wielu-kierunkach" class="nav-link" data-scroll-target="#osie-poruszanie-się-w-wielu-kierunkach"><span class="header-section-number">5.6</span> Osie — poruszanie się w wielu kierunkach</a></li>
+  <li><a href="#kombinowanie-predykatów-i-osi" id="toc-kombinowanie-predykatów-i-osi" class="nav-link" data-scroll-target="#kombinowanie-predykatów-i-osi"><span class="header-section-number">5.7</span> Kombinowanie predykatów i osi</a></li>
+  <li><a href="#pełny-przykład-ekstrakcja-tabeli-z-lxml" id="toc-pełny-przykład-ekstrakcja-tabeli-z-lxml" class="nav-link" data-scroll-target="#pełny-przykład-ekstrakcja-tabeli-z-lxml"><span class="header-section-number">5.8</span> Pełny przykład: ekstrakcja tabeli z lxml</a></li>
+  </ul></li>
+  <li><a href="#trzy-metody-porównanie" id="toc-trzy-metody-porównanie" class="nav-link" data-scroll-target="#trzy-metody-porównanie"><span class="header-section-number">6</span> Trzy metody — porównanie</a></li>
+  <li><a href="#devtools-selektor-prosto-z-przeglądarki" id="toc-devtools-selektor-prosto-z-przeglądarki" class="nav-link" data-scroll-target="#devtools-selektor-prosto-z-przeglądarki"><span class="header-section-number">7</span> DevTools — selektor prosto z przeglądarki</a></li>
+  <li><a href="#uwagi-praktyczne" id="toc-uwagi-praktyczne" class="nav-link" data-scroll-target="#uwagi-praktyczne"><span class="header-section-number">8</span> Uwagi praktyczne</a>
+  <ul class="collapse">
+  <li><a href="#parser-html.parser-vs-lxml" id="toc-parser-html.parser-vs-lxml" class="nav-link" data-scroll-target="#parser-html.parser-vs-lxml"><span class="header-section-number">8.1</span> Parser: <code>html.parser</code> vs <code>lxml</code></a></li>
+  <li><a href="#kodowanie-znaków" id="toc-kodowanie-znaków" class="nav-link" data-scroll-target="#kodowanie-znaków"><span class="header-section-number">8.2</span> Kodowanie znaków</a></li>
+  <li><a href="#biały-tekst-i-.text-vs-.get_textstriptrue" id="toc-biały-tekst-i-.text-vs-.get_textstriptrue" class="nav-link" data-scroll-target="#biały-tekst-i-.text-vs-.get_textstriptrue"><span class="header-section-number">8.3</span> Biały tekst i <code>.text</code> vs <code>.get_text(strip=True)</code></a></li>
+  </ul></li>
+  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">9</span> Podsumowanie</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_3.html">Wykład 3: HTML jako drzewo — selekcja danych</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Wykład 3: HTML jako drzewo — selekcja danych</h1>
+<p class="subtitle lead">Automatyczne pozyskiwanie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="cele-i-zakres" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="cele-i-zakres"><span class="header-section-number">1</span> Cele i zakres</h2>
+<p>Dane z surowego HTML można pozyskiwać, korzystając z wyrażeń regularnych i metod na łańcuchach znaków. Na dłuższą metę jest to jednak niewygodne i podatne na błędy. Teraz omówimy bardziej specjalistyczne narzędzia — parsery HTML, które rozumieją strukturę dokumentu i budują na jej podstawie drzewo obiektów.</p>
+<p>Zakres obejmuje:</p>
+<ul>
+<li>HTML jako drzewo — struktura dokumentu, model DOM,</li>
+<li>BeautifulSoup — nawigacja po drzewie i wyszukiwanie elementów,</li>
+<li>selektory CSS — zwięzły język zapytań do drzewa HTML,</li>
+<li>XPath — najpotężniejszy mechanizm selekcji: osie, predykaty, funkcje,</li>
+<li>porównanie trzech metod na tych samych danych.</li>
+</ul>
+<hr>
+</section>
+<section id="od-tekstu-do-drzewa" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="od-tekstu-do-drzewa"><span class="header-section-number">2</span> Od tekstu do drzewa</h2>
+<section id="dlaczego-nie-regex" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="dlaczego-nie-regex"><span class="header-section-number">2.1</span> Dlaczego nie regex</h3>
+<p>Dane z HTML można wyciągać, używając wyrażeń regularnych lub metod na stringach (<code>split</code>, <code>index</code>, itd.). To podejście działa, gdy HTML jest prosty i przewidywalny — np. własny serwer Flask z prostymi szablonami. Jednak w realnym świecie HTML jest często złożony, nieuporządkowany i pełen wyjątków. Regex szybko staje się nieczytelny i podatny na błędy.</p>
+<p>Rozważmy fragment:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">"/page/1"</span><span class="dt">&gt;</span>Strona 1<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">"/page/2"</span><span class="ot"> class</span><span class="op">=</span><span class="st">"active"</span><span class="dt">&gt;</span>Strona 2<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- &lt;a href="/page/old"&gt;stary link&lt;/a&gt; --&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href </span><span class="op">=</span> <span class="st">"/page/3"</span><span class="ot"> </span><span class="dt">&gt;</span>Strona 3<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Regex <code>href="([^"]+)"</code> znajdzie też link z komentarza. Nie poradzi sobie ze spacjami wokół <code>=</code> w ostatniej linii. Przy bardziej złożonym HTML — zagnieżdżonych tabelach, atrybutach z cudzysłowami, warunkowych komentarzach — wyrażenia regularne stają się nieczytelne i błędogenne.</p>
+<p>Rozwiązanie: <strong>parser HTML</strong>, który rozumie strukturę dokumentu i buduje z tekstu <strong>drzewo</strong>, po którym możemy nawigować.</p>
+</section>
+<section id="html-przypomnienie-składni" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="html-przypomnienie-składni"><span class="header-section-number">2.2</span> HTML — przypomnienie składni</h3>
+<p><strong>Tag</strong> (element) to podstawowa jednostka HTML:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> href</span><span class="op">=</span><span class="st">"/next"</span><span class="ot"> class</span><span class="op">=</span><span class="st">"link"</span><span class="dt">&gt;</span>Kliknij<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li><code>a</code> — nazwa tagu,</li>
+<li><code>href="/next"</code>, <code>class="link"</code> — <strong>atrybuty</strong> (pary klucz–wartość),</li>
+<li><code>Kliknij</code> — <strong>zawartość tekstowa</strong> (text content),</li>
+<li><code>&lt;/a&gt;</code> — tag zamykający.</li>
+</ul>
+<p><strong>Zagnieżdżenie</strong> tworzy hierarchię:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Tytuł<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">ul</span><span class="dt">&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">li</span><span class="dt">&gt;</span>Element 1<span class="dt">&lt;/</span><span class="kw">li</span><span class="dt">&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">li</span><span class="dt">&gt;</span>Element 2<span class="dt">&lt;/</span><span class="kw">li</span><span class="dt">&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;/</span><span class="kw">ul</span><span class="dt">&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>&lt;div&gt;</code> zawiera <code>&lt;h1&gt;</code> i <code>&lt;ul&gt;</code>, a <code>&lt;ul&gt;</code> zawiera dwa <code>&lt;li&gt;</code>. To jest <strong>drzewo</strong>.</p>
+</section>
+<section id="model-drzewa-dom" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="model-drzewa-dom"><span class="header-section-number">2.3</span> Model drzewa (DOM)</h3>
+<p>Każdy dokument HTML ma strukturę drzewa. Powyższy fragment wygląda tak:</p>
+<pre><code>div
+├── h1
+│   └── "Tytuł"
+├── ul
+│   ├── li
+│   │   └── "Element 1"
+│   └── li
+│       └── "Element 2"</code></pre>
+<p>Terminologia:</p>
+<ul>
+<li><strong>korzeń</strong> (root) — najwyższy element (tu: <code>div</code>),</li>
+<li><strong>dziecko</strong> (child) — element bezpośrednio zagnieżdżony (<code>h1</code> jest dzieckiem <code>div</code>),</li>
+<li><strong>potomek</strong> (descendant) — element na dowolnym poziomie zagnieżdżenia (<code>li</code> jest potomkiem <code>div</code>, ale nie dzieckiem),</li>
+<li><strong>rodzic</strong> (parent) — element nadrzędny (<code>ul</code> jest rodzicem <code>li</code>),</li>
+<li><strong>rodzeństwo</strong> (sibling) — elementy na tym samym poziomie (<code>h1</code> i <code>ul</code> są rodzeństwem).</li>
+</ul>
+<p>Parser HTML (np. BeautifulSoup, lxml) zamienia surowy tekst na takie drzewo. Od tego momentu nie operujemy na stringach — operujemy na <strong>węzłach drzewa</strong>, które mają rodziców, dzieci, atrybuty i tekst.</p>
+<hr>
+</section>
+</section>
+<section id="beautifulsoup-nawigacja-po-drzewie" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="beautifulsoup-nawigacja-po-drzewie"><span class="header-section-number">3</span> BeautifulSoup — nawigacja po drzewie</h2>
+<section id="instalacja-i-parsowanie" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="instalacja-i-parsowanie"><span class="header-section-number">3.1</span> Instalacja i parsowanie</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install beautifulsoup4</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>html <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;html&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;body&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="st">  &lt;h1&gt;Produkty&lt;/h1&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="st">  &lt;table class="data"&gt;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;tr&gt;&lt;th&gt;Nazwa&lt;/th&gt;&lt;th&gt;Cena&lt;/th&gt;&lt;/tr&gt;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;tr&gt;&lt;td&gt;Jabłko&lt;/td&gt;&lt;td class="price"&gt;3.50&lt;/td&gt;&lt;/tr&gt;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;tr&gt;&lt;td&gt;Gruszka&lt;/td&gt;&lt;td class="price"&gt;4.20&lt;/td&gt;&lt;/tr&gt;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;tr&gt;&lt;td&gt;Śliwka&lt;/td&gt;&lt;td class="price"&gt;5.00&lt;/td&gt;&lt;/tr&gt;</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="st">  &lt;/table&gt;</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="st">  &lt;a href="/page/2"&gt;Następna strona&lt;/a&gt;</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;/body&gt;</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;/html&gt;</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>soup <span class="op">=</span> BeautifulSoup(html, <span class="st">"html.parser"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>BeautifulSoup(html, "html.parser")</code> parsuje tekst i zwraca obiekt reprezentujący korzeń drzewa. <code>"html.parser"</code> to parser z biblioteki standardowej Pythona — nie wymaga dodatkowych instalacji.</p>
+</section>
+<section id="wyszukiwanie-elementów-find-i-find_all" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="wyszukiwanie-elementów-find-i-find_all"><span class="header-section-number">3.2</span> Wyszukiwanie elementów: <code>find</code> i <code>find_all</code></h3>
+<p><strong><code>find(tag, attrs)</code></strong> — zwraca <strong>pierwszy</strong> pasujący element (lub <code>None</code>):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>h1 <span class="op">=</span> soup.find(<span class="st">"h1"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(h1.text)  <span class="co"># "Produkty"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong><code>find_all(tag, attrs)</code></strong> — zwraca <strong>listę</strong> wszystkich pasujących:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> soup.find_all(<span class="st">"tr"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(rows))  <span class="co"># 4 (nagłówek + 3 wiersze danych)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Pierwszy argument może być też <strong>listą tagów</strong> — wtedy <code>find_all</code> zwraca elementy pasujące do dowolnego z nich:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Wszystkie nagłówki h1, h2 i h3 w dokumencie</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>headers <span class="op">=</span> soup.find_all([<span class="st">"h1"</span>, <span class="st">"h2"</span>, <span class="st">"h3"</span>])</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Wszystkie linki: zarówno &lt;a&gt; jak i &lt;link&gt;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>all_links <span class="op">=</span> soup.find_all([<span class="st">"a"</span>, <span class="st">"link"</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="filtrowanie-po-atrybutach" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="filtrowanie-po-atrybutach"><span class="header-section-number">3.3</span> Filtrowanie po atrybutach</h3>
+<p>Atrybuty podajemy jako argumenty nazwane:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Wszystkie td z klasą "price"</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>prices <span class="op">=</span> soup.find_all(<span class="st">"td"</span>, class_<span class="op">=</span><span class="st">"price"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> td <span class="kw">in</span> prices:</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(td.text)  <span class="co"># 3.50, 4.20, 5.00</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Uwaga: <code>class</code> jest słowem kluczowym Pythona, dlatego BeautifulSoup używa <code>class_</code> (z podkreśleniem).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Wszystkie linki (tagi &lt;a&gt; z atrybutem href)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>links <span class="op">=</span> soup.find_all(<span class="st">"a"</span>, href<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> a <span class="kw">in</span> links:</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(a[<span class="st">"href"</span>], a.text)  <span class="co"># /page/2 Następna strona</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>href=True</code> oznacza: „tag musi mieć atrybut <code>href</code>” (dowolna wartość).</p>
+</section>
+<section id="wyciąganie-danych-z-elementu" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="wyciąganie-danych-z-elementu"><span class="header-section-number">3.4</span> Wyciąganie danych z elementu</h3>
+<p>Każdy znaleziony element to obiekt <code>Tag</code> z atrybutami:</p>
+<ul>
+<li><code>.text</code> / <code>.get_text()</code> — zawartość tekstowa (rekurencyjnie, ze wszystkich potomków),</li>
+<li><code>.string</code> — tekst, tylko jeśli element ma dokładnie jedno dziecko tekstowe,</li>
+<li><code>["atrybut"]</code> — wartość atrybutu (rzuca <code>KeyError</code>, jeśli brak),</li>
+<li><code>.get("atrybut", domyślna)</code> — wartość atrybutu (bezpieczna wersja),</li>
+<li><code>.attrs</code> — słownik wszystkich atrybutów,</li>
+<li><code>.name</code> — nazwa tagu (np. <code>"td"</code>, <code>"a"</code>).</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>link <span class="op">=</span> soup.find(<span class="st">"a"</span>, href<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(link.name)            <span class="co"># "a"</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(link[<span class="st">"href"</span>])         <span class="co"># "/page/2"</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(link.get(<span class="st">"class"</span>))   <span class="co"># None (brak klasy)</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(link.text)            <span class="co"># "Następna strona"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="nawigacja-po-drzewie" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="nawigacja-po-drzewie"><span class="header-section-number">3.5</span> Nawigacja po drzewie</h3>
+<p>Oprócz wyszukiwania (<code>find</code>, <code>find_all</code>) można nawigować po relacjach rodzic–dziecko–rodzeństwo:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> soup.find(<span class="st">"table"</span>, class_<span class="op">=</span><span class="st">"data"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Dzieci (bezpośrednie)</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> child <span class="kw">in</span> table.children:</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> child.name:  <span class="co"># pomijamy białe znaki (NavigableString)</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(child.name)  <span class="co"># "tr", "tr", "tr", "tr"</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Rodzic</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>first_td <span class="op">=</span> soup.find(<span class="st">"td"</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(first_td.parent.name)  <span class="co"># "tr"</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Rodzeństwo</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>first_row <span class="op">=</span> table.find(<span class="st">"tr"</span>)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>second_row <span class="op">=</span> first_row.find_next_sibling(<span class="st">"tr"</span>)</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(second_row.text)  <span class="co"># "Jabłko3.50"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Nawigacja jest przydatna, gdy struktura jest regularna i chcemy „przeskoczyć” do sąsiedniego elementu — np. znaleźć komórkę obok nagłówka.</p>
+</section>
+<section id="pełny-przykład-ekstrakcja-tabeli" class="level3" data-number="3.6">
+<h3 data-number="3.6" class="anchored" data-anchor-id="pełny-przykład-ekstrakcja-tabeli"><span class="header-section-number">3.6</span> Pełny przykład: ekstrakcja tabeli</h3>
+<p>Łączymy powyższe techniki w kompletny wzorzec:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> soup.find(<span class="st">"table"</span>, class_<span class="op">=</span><span class="st">"data"</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> table.find_all(<span class="st">"tr"</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Pomijamy wiersz nagłówkowy (pierwszy tr)</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row <span class="kw">in</span> rows[<span class="dv">1</span>:]:</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    cells <span class="op">=</span> row.find_all(<span class="st">"td"</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> cells[<span class="dv">0</span>].text</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    price <span class="op">=</span> cells[<span class="dv">1</span>].text</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>price<span class="sc">}</span><span class="ss"> zł"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wynik:</p>
+<pre><code>  Jabłko: 3.50 zł
+  Gruszka: 4.20 zł
+  Śliwka: 5.00 zł</code></pre>
+<p>To jest wzorzec, który będzie się powtarzał: <strong>znajdź kontener → iteruj po elementach → wyciągnij dane z każdego</strong>. Zmienia się selektor i struktura — logika pozostaje ta sama.</p>
+<hr>
+</section>
+</section>
+<section id="selektory-css" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="selektory-css"><span class="header-section-number">4</span> Selektory CSS</h2>
+<section id="po-co-kolejna-metoda" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="po-co-kolejna-metoda"><span class="header-section-number">4.1</span> Po co kolejna metoda</h3>
+<p><code>find_all("td", class_="price")</code> działa, ale przy bardziej złożonych strukturach staje się rozwlekły. Selektory CSS to <strong>zwięzły język zapytań</strong> do drzewa HTML — ten sam, którego używa przeglądarka do stosowania stylów. W DevTools (F12 → Elements → prawy klik → Copy selector).</p>
+<p>W BeautifulSoup selektory CSS są dostępne przez metody <code>select</code> i <code>select_one</code>.</p>
+</section>
+<section id="składnia-selektorów-minimum-do-pracy" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="składnia-selektorów-minimum-do-pracy"><span class="header-section-number">4.2</span> Składnia selektorów — minimum do pracy</h3>
+<p><strong>Selektor typu</strong> — nazwa tagu:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>soup.select(<span class="st">"p"</span>)         <span class="co"># wszystkie &lt;p&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>soup.select(<span class="st">"a"</span>)         <span class="co"># wszystkie &lt;a&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Selektor klasy</strong> — <code>.nazwaklasy</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>soup.select(<span class="st">".price"</span>)    <span class="co"># wszystkie elementy z class="price"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Selektor ID</strong> — <code>#identyfikator</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>soup.select(<span class="st">"#main"</span>)     <span class="co"># element z id="main"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Selektor atrybutu</strong> — <code>[atrybut]</code> lub <code>[atrybut=wartość]</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>soup.select(<span class="st">"[href]"</span>)              <span class="co"># elementy z atrybutem href</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>soup.select(<span class="st">'[data-type="csv"]'</span>)   <span class="co"># elementy z data-type="csv"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Potomek</strong> — spacja między selektorami:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>soup.select(<span class="st">"table td"</span>)           <span class="co"># wszystkie &lt;td&gt; wewnątrz &lt;table&gt; (dowolna głębokość)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Dziecko bezpośrednie</strong> — <code>&gt;</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>soup.select(<span class="st">"ul &gt; li"</span>)            <span class="co"># &lt;li&gt; będące bezpośrednimi dziećmi &lt;ul&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Kombinacja selektorów:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>soup.select(<span class="st">"table.data td.price"</span>)  <span class="co"># &lt;td class="price"&gt; wewnątrz &lt;table class="data"&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Czytamy od lewej do prawej: „znajdź <code>&lt;table&gt;</code> z klasą <code>data</code>, a w nim wszystkie <code>&lt;td&gt;</code> z klasą <code>price</code>“.</p>
+</section>
+<section id="pseudoklasy" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="pseudoklasy"><span class="header-section-number">4.3</span> Pseudoklasy</h3>
+<p><strong><code>:first-child</code></strong> — pierwszy element wśród rodzeństwa:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>soup.select(<span class="st">"tr:first-child"</span>)     <span class="co"># pierwszy &lt;tr&gt; w każdym rodzicu</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong><code>:nth-child(n)</code></strong> — n-ty element (numeracja od 1):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>soup.select(<span class="st">"tr:nth-child(2)"</span>)    <span class="co"># drugi &lt;tr&gt; (pierwszy wiersz danych, jeśli pierwszy to nagłówek)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong><code>:not(selektor)</code></strong> — wykluczenie:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>soup.select(<span class="st">"td:not(.price)"</span>)     <span class="co"># &lt;td&gt; bez klasy "price"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="select-i-select_one" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="select-i-select_one"><span class="header-section-number">4.4</span> <code>select</code> i <code>select_one</code></h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lista wyników (jak find_all)</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>cells <span class="op">=</span> soup.select(<span class="st">"table.data td.price"</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> td <span class="kw">in</span> cells:</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(td.text)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Pierwszy wynik (jak find)</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>link <span class="op">=</span> soup.select_one(<span class="st">"a[href]"</span>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(link[<span class="st">"href"</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="porównanie-find_all-vs-select" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="porównanie-find_all-vs-select"><span class="header-section-number">4.5</span> Porównanie: <code>find_all</code> vs <code>select</code></h3>
+<p>To samo zadanie — wyciągnięcie cen z tabeli:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># BeautifulSoup API</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>prices <span class="op">=</span> soup.find_all(<span class="st">"td"</span>, class_<span class="op">=</span><span class="st">"price"</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Selektory CSS</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>prices <span class="op">=</span> soup.select(<span class="st">"td.price"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Efekt identyczny. Selektor CSS jest krótszy. Przy bardziej złożonych zapytaniach różnica rośnie:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Wszystkie linki wewnątrz div-a z id="nav", które mają klasę "active"</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co"># BeautifulSoup API:</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>div <span class="op">=</span> soup.find(<span class="st">"div"</span>, <span class="bu">id</span><span class="op">=</span><span class="st">"nav"</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>links <span class="op">=</span> div.find_all(<span class="st">"a"</span>, class_<span class="op">=</span><span class="st">"active"</span>) <span class="cf">if</span> div <span class="cf">else</span> []</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Selektory CSS:</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>links <span class="op">=</span> soup.select(<span class="st">"div#nav a.active"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Jedna linia zamiast dwóch, bez warunku <code>if div</code>.</p>
+<hr>
+</section>
+</section>
+<section id="xpath" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="xpath"><span class="header-section-number">5</span> XPath</h2>
+<section id="dlaczego-jeszcze-jedna-metoda" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="dlaczego-jeszcze-jedna-metoda"><span class="header-section-number">5.1</span> Dlaczego jeszcze jedna metoda</h3>
+<p>Selektory CSS są zwięzłe, ale mają ograniczenia. Nie potrafią:</p>
+<ul>
+<li>selekcjonować po <strong>zawartości tekstowej</strong> elementu (np. „znajdź <code>&lt;a&gt;</code>, którego tekst zawiera słowo «Następna»“),</li>
+<li>poruszać się <strong>w górę</strong> drzewa (od dziecka do rodzica),</li>
+<li>wybierać <strong>rodzeństwa</strong> w określonym kierunku (np. „element bezpośrednio po nagłówku”),</li>
+<li>stosować <strong>warunków arytmetycznych</strong> (np. „wiersze o indeksie &gt; 1”).</li>
+</ul>
+<p><strong>XPath</strong> to język zapytań do dokumentów XML/HTML, który to wszystko potrafi. Jest standardem W3C — używany w Scrapy, <code>lxml</code>, narzędziach do testowania (Selenium) i przetwarzaniu XML.</p>
+</section>
+<section id="narzędzie-lxml" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="narzędzie-lxml"><span class="header-section-number">5.2</span> Narzędzie: <code>lxml</code></h3>
+<p>BeautifulSoup nie obsługuje XPath. Do tego potrzebujemy biblioteki <code>lxml</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install lxml</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lxml <span class="im">import</span> etree</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>html <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;html&gt;</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;body&gt;</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="st">  &lt;h1&gt;Produkty&lt;/h1&gt;</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="st">  &lt;table class="data"&gt;</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;tr&gt;&lt;th&gt;Nazwa&lt;/th&gt;&lt;th&gt;Cena&lt;/th&gt;&lt;/tr&gt;</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;tr&gt;&lt;td&gt;Jabłko&lt;/td&gt;&lt;td class="price"&gt;3.50&lt;/td&gt;&lt;/tr&gt;</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;tr&gt;&lt;td&gt;Gruszka&lt;/td&gt;&lt;td class="price"&gt;4.20&lt;/td&gt;&lt;/tr&gt;</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;tr&gt;&lt;td&gt;Śliwka&lt;/td&gt;&lt;td class="price"&gt;5.00&lt;/td&gt;&lt;/tr&gt;</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="st">  &lt;/table&gt;</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="st">  &lt;a href="/page/2"&gt;Następna strona&lt;/a&gt;</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;/body&gt;</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;/html&gt;</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> etree.HTML(html)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>etree.HTML(html)</code> parsuje tekst HTML i zwraca korzeń drzewa. Metoda <code>.xpath(wyrażenie)</code> zwraca listę wyników.</p>
+</section>
+<section id="ścieżki-absolutne-i-względne" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="ścieżki-absolutne-i-względne"><span class="header-section-number">5.3</span> Ścieżki: absolutne i względne</h3>
+<p><strong>Ścieżka absolutna</strong> — od korzenia, przez kolejne poziomy:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">"/html/body/h1"</span>)           <span class="co"># [&lt;Element h1&gt;]</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">"/html/body/table/tr/td"</span>)  <span class="co"># wszystkie &lt;td&gt; w tabeli</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Ścieżka względna</strong> — <code>//</code> oznacza „gdziekolwiek w drzewie”:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">"//h1"</span>)            <span class="co"># wszystkie &lt;h1&gt; w dokumencie</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">"//td"</span>)            <span class="co"># wszystkie &lt;td&gt; w dokumencie</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>W praktyce prawie zawsze używamy <code>//</code> — ścieżki absolutne są niestabilne (zmieniają się, gdy zmieni się struktura strony).</p>
+</section>
+<section id="predykaty-filtrowanie-wyników" class="level3" data-number="5.4">
+<h3 data-number="5.4" class="anchored" data-anchor-id="predykaty-filtrowanie-wyników"><span class="header-section-number">5.4</span> Predykaty — filtrowanie wyników</h3>
+<p>Predykaty w nawiasach kwadratowych <code>[]</code> filtrują wyniki:</p>
+<p><strong>Po atrybucie:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//td[@class="price"]'</span>)    <span class="co"># &lt;td&gt; z class="price"</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//a[@href]'</span>)              <span class="co"># &lt;a&gt; z atrybutem href</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Po pozycji:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//tr[1]'</span>)          <span class="co"># pierwszy &lt;tr&gt; (XPath liczy od 1)</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//tr[position()&gt;1]'</span>)  <span class="co"># wszystkie &lt;tr&gt; oprócz pierwszego</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//tr[last()]'</span>)     <span class="co"># ostatni &lt;tr&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Po tekście:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//a[text()="Następna strona"]'</span>)           <span class="co"># &lt;a&gt; z dokładnym tekstem</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//a[contains(text(),"Następna")]'</span>)         <span class="co"># &lt;a&gt; z tekstem zawierającym "Następna"</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//td[contains(@class,"price")]'</span>)           <span class="co"># &lt;td&gt; z klasą zawierającą "price"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Selekcja po tekście to coś, czego CSS selektory <strong>nie potrafią</strong>. W scrapingu jest przydatna — np. „znajdź link z napisem «Następna strona»” bez znajomości jego <code>href</code>.</p>
+</section>
+<section id="wyciąganie-danych" class="level3" data-number="5.5">
+<h3 data-number="5.5" class="anchored" data-anchor-id="wyciąganie-danych"><span class="header-section-number">5.5</span> Wyciąganie danych</h3>
+<p>XPath może zwracać <strong>elementy</strong> lub <strong>wartości</strong> (teksty, atrybuty):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Elementy</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>elements <span class="op">=</span> tree.xpath(<span class="st">'//td[@class="price"]'</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> el <span class="kw">in</span> elements:</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(el.text)  <span class="co"># "3.50", "4.20", "5.00"</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Bezpośrednio tekst</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>texts <span class="op">=</span> tree.xpath(<span class="st">'//td[@class="price"]/text()'</span>)</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(texts)  <span class="co"># ["3.50", "4.20", "5.00"]</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Bezpośrednio atrybuty</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>hrefs <span class="op">=</span> tree.xpath(<span class="st">'//a/@href'</span>)</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(hrefs)  <span class="co"># ["/page/2"]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Różnica: <code>//td[@class="price"]</code> zwraca listę obiektów <code>Element</code>, a <code>//td[@class="price"]/text()</code> zwraca listę stringów. Analogicznie <code>//a/@href</code> zwraca wartości atrybutu, nie elementy.</p>
+</section>
+<section id="osie-poruszanie-się-w-wielu-kierunkach" class="level3" data-number="5.6">
+<h3 data-number="5.6" class="anchored" data-anchor-id="osie-poruszanie-się-w-wielu-kierunkach"><span class="header-section-number">5.6</span> Osie — poruszanie się w wielu kierunkach</h3>
+<p>Domyślna oś to <code>child</code> — schodzenie w dół drzewa. XPath oferuje wiele osi, z których najważniejsze to:</p>
+<p><strong><code>parent</code></strong> — rodzic elementu:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Znajdź &lt;tr&gt; będący rodzicem &lt;td&gt; z ceną "5.00"</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//td[text()="5.00"]/parent::tr'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Skrót: <code>..</code> oznacza <code>parent::node()</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//td[text()="5.00"]/..'</span>)  <span class="co"># to samo</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong><code>following-sibling</code></strong> — rodzeństwo po bieżącym elemencie:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Znajdź &lt;td&gt;, które jest rodzeństwem &lt;td&gt; z tekstem "Jabłko"</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//td[text()="Jabłko"]/following-sibling::td'</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="co"># → [&lt;td class="price"&gt;3.50&lt;/td&gt;]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>To jest potężny wzorzec: „mam komórkę z nazwą — daj mi komórkę obok z ceną”. CSS selektory nie mają odpowiednika.</p>
+<p><strong><code>preceding-sibling</code></strong> — rodzeństwo przed bieżącym elementem:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cena "4.20" — jaka jest nazwa tego produktu?</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//td[text()="4.20"]/preceding-sibling::td'</span>)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="co"># → [&lt;td&gt;Gruszka&lt;/td&gt;]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong><code>ancestor</code></strong> — przodkowie (rodzic, dziadek, itd.):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Znajdź &lt;table&gt; będący przodkiem &lt;td&gt; z klasą "price"</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//td[@class="price"]/ancestor::table'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="kombinowanie-predykatów-i-osi" class="level3" data-number="5.7">
+<h3 data-number="5.7" class="anchored" data-anchor-id="kombinowanie-predykatów-i-osi"><span class="header-section-number">5.7</span> Kombinowanie predykatów i osi</h3>
+<p>XPath pozwala budować złożone zapytania:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Wiersze tabeli "data", które zawierają cenę &gt; 4.00</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (XPath porównuje tekstowo, ale number() konwertuje)</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>tree.xpath(<span class="st">'//table[@class="data"]//tr[td[@class="price" and number(text()) &gt; 4.0]]'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>To jest zapytanie, którego nie da się wyrazić jednym selektorem CSS.</p>
+</section>
+<section id="pełny-przykład-ekstrakcja-tabeli-z-lxml" class="level3" data-number="5.8">
+<h3 data-number="5.8" class="anchored" data-anchor-id="pełny-przykład-ekstrakcja-tabeli-z-lxml"><span class="header-section-number">5.8</span> Pełny przykład: ekstrakcja tabeli z lxml</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lxml <span class="im">import</span> etree</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> etree.HTML(html)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Pomijamy nagłówek: tr[position()&gt;1]</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> tree.xpath(<span class="st">'//table[@class="data"]//tr[position()&gt;1]'</span>)</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row <span class="kw">in</span> rows:</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> row.xpath(<span class="st">'td[1]/text()'</span>)[<span class="dv">0</span>]</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>    price <span class="op">=</span> row.xpath(<span class="st">'td[2]/text()'</span>)[<span class="dv">0</span>]</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>price<span class="sc">}</span><span class="ss"> zł"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wynik identyczny jak w wersji BeautifulSoup. Różnica: XPath robi selekcję i filtrowanie (pominięcie nagłówka) w jednym wyrażeniu.</p>
+<hr>
+</section>
+</section>
+<section id="trzy-metody-porównanie" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="trzy-metody-porównanie"><span class="header-section-number">6</span> Trzy metody — porównanie</h2>
+<p>To samo zadanie — wyciągnięcie cen z tabeli o klasie <code>data</code> — rozwiązane trzema sposobami:</p>
+<p><strong>BeautifulSoup API:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>soup <span class="op">=</span> BeautifulSoup(html, <span class="st">"html.parser"</span>)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> td <span class="kw">in</span> soup.find_all(<span class="st">"td"</span>, class_<span class="op">=</span><span class="st">"price"</span>):</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(td.text)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Selektory CSS (w BeautifulSoup):</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> td <span class="kw">in</span> soup.select(<span class="st">"table.data td.price"</span>):</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(td.text)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>XPath (lxml):</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lxml <span class="im">import</span> etree</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> etree.HTML(html)</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> price <span class="kw">in</span> tree.xpath(<span class="st">'//table[@class="data"]//td[@class="price"]/text()'</span>):</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(price)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Zestawienie:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metoda</th>
+<th>Narzędzie</th>
+<th>Mocna strona</th>
+<th>Ograniczenie</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>API BeautifulSoup</td>
+<td><code>find</code> / <code>find_all</code></td>
+<td>Intuicyjne, pythonowe API</td>
+<td>Rozwlekłe przy złożonych zapytaniach</td>
+</tr>
+<tr class="even">
+<td>Selektory CSS</td>
+<td><code>select</code> / <code>select_one</code></td>
+<td>Zwięzłe, znane z przeglądarki</td>
+<td>Brak selekcji po tekście, brak osi w górę</td>
+</tr>
+<tr class="odd">
+<td>XPath</td>
+<td><code>lxml</code> + <code>xpath()</code></td>
+<td>Najpotężniejsze: osie, predykaty, funkcje</td>
+<td>Składnia mniej intuicyjna na początku</td>
+</tr>
+</tbody>
+</table>
+<p>W praktyce wybór zależy od zadania:</p>
+<ul>
+<li><strong>Proste ekstrakcje</strong> (lista linków, komórki tabeli) — CSS selektory wystarczą i są najkrótsze.</li>
+<li><strong>Nawigacja po relacjach</strong> (komórka obok nagłówka, rodzic elementu) — XPath z osiami.</li>
+<li><strong>Szybkie prototypowanie</strong> w konsoli — <code>find</code> / <code>find_all</code>, bo nie trzeba pamiętać składni.</li>
+<li><strong>Scrapy</strong> (Wykład 6) — wspiera zarówno CSS, jak i XPath natywnie.</li>
+</ul>
+<p>Nie trzeba wybierać jednej metody. W jednym projekcie można używać CSS do prostych rzeczy i XPath tam, gdzie potrzebna jest większa precyzja.</p>
+<hr>
+</section>
+<section id="devtools-selektor-prosto-z-przeglądarki" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="devtools-selektor-prosto-z-przeglądarki"><span class="header-section-number">7</span> DevTools — selektor prosto z przeglądarki</h2>
+<p>Przeglądarki (Chrome, Firefox) mają wbudowane narzędzia, które pomagają budować selektory:</p>
+<ol type="1">
+<li>Otwórz stronę w przeglądarce.</li>
+<li>Kliknij prawym przyciskiem na interesujący element → <strong>Zbadaj</strong> (Inspect).</li>
+<li>W panelu Elements kliknij prawym na podświetlony tag → <strong>Copy</strong> → <strong>Copy selector</strong> lub <strong>Copy XPath</strong>.</li>
+</ol>
+<p>Przeglądarka wygeneruje selektor wskazujący na ten konkretny element. Wygenerowane selektory bywają jednak zbyt specyficzne — zawierają długie ścieżki i indeksy, np.:</p>
+<pre><code>#page &gt; div:nth-child(3) &gt; table &gt; tbody &gt; tr:nth-child(2) &gt; td:nth-child(2)</code></pre>
+<p>To działa na jednym elemencie, ale nie uogólnia się na „wszystkie ceny w tabeli”. Dlatego DevTools traktujemy jako <strong>punkt startowy</strong> — podpowiedź, nie gotowe rozwiązanie. Selektor produkcyjny piszemy ręcznie, tak żeby wyciągał <strong>klasę danych</strong>, nie jeden konkretny element.</p>
+<hr>
+</section>
+<section id="uwagi-praktyczne" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="uwagi-praktyczne"><span class="header-section-number">8</span> Uwagi praktyczne</h2>
+<section id="parser-html.parser-vs-lxml" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="parser-html.parser-vs-lxml"><span class="header-section-number">8.1</span> Parser: <code>html.parser</code> vs <code>lxml</code></h3>
+<p>BeautifulSoup obsługuje kilka parserów:</p>
+<ul>
+<li><code>"html.parser"</code> — z biblioteki standardowej, wystarczający w większości przypadków,</li>
+<li><code>"lxml"</code> — szybszy, lepiej radzi sobie z uszkodzonym HTML-em.</li>
+</ul>
+<p>W labach używamy <code>"html.parser"</code> (zero dodatkowych zależności dla BeautifulSoup). Osobno importujemy <code>lxml.etree</code> do XPath.</p>
+</section>
+<section id="kodowanie-znaków" class="level3" data-number="8.2">
+<h3 data-number="8.2" class="anchored" data-anchor-id="kodowanie-znaków"><span class="header-section-number">8.2</span> Kodowanie znaków</h3>
+<p>HTML z serwera przychodzi jako odpowiedź HTTP. Biblioteka <code>requests</code> automatycznie dekoduje tekst (na podstawie nagłówka <code>Content-Type</code> i detekcji). Dlatego <code>r.text</code> zwraca gotowy <code>str</code>, który można od razu podać do BeautifulSoup:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="st">"http://localhost:5000/page"</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>soup <span class="op">=</span> BeautifulSoup(r.text, <span class="st">"html.parser"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Dla <code>lxml</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> etree.HTML(r.text)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="biały-tekst-i-.text-vs-.get_textstriptrue" class="level3" data-number="8.3">
+<h3 data-number="8.3" class="anchored" data-anchor-id="biały-tekst-i-.text-vs-.get_textstriptrue"><span class="header-section-number">8.3</span> Biały tekst i <code>.text</code> vs <code>.get_text(strip=True)</code></h3>
+<p><code>.text</code> zwraca cały tekst z elementu i jego potomków — łącznie z białymi znakami (wcięcia, newline). <code>.get_text(strip=True)</code> usuwa białe znaki z początku i końca każdego fragmentu:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>cell <span class="op">=</span> soup.find(<span class="st">"td"</span>)</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">repr</span>(cell.text))                    <span class="co"># "\n    Jabłko\n  "</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">repr</span>(cell.get_text(strip<span class="op">=</span><span class="va">True</span>)))    <span class="co"># "Jabłko"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>W scrapingu prawie zawsze chcemy <code>strip=True</code> lub ręczny <code>.strip()</code>.</p>
+<hr>
+</section>
+</section>
+<section id="podsumowanie" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="podsumowanie"><span class="header-section-number">9</span> Podsumowanie</h2>
+<p>Na tym wykładzie:</p>
+<ul>
+<li>zobaczyliśmy, że regex jest niewygodny w podczas przeszukiwania HTML — i zastąpiliśmy go parserem, który buduje drzewo,</li>
+<li>poznaliśmy BeautifulSoup: <code>find</code>, <code>find_all</code>, nawigację po drzewie (rodzic, dzieci, rodzeństwo),</li>
+<li>nauczyliśmy się selektorów CSS: zwięzła składnia do prostych i średnio złożonych zapytań,</li>
+<li>wprowadziliśmy XPath jako najpotężniejsze narzędzie selekcji: predykaty, selekcja po tekście, osie (<code>following-sibling</code>, <code>parent</code>, <code>ancestor</code>),</li>
+<li>porównaliśmy trzy metody na tych samych danych i zobaczyliśmy, kiedy która jest najlepsza.</li>
+</ul>
+<p><strong>Co dalej:</strong></p>
+<ul>
+<li><strong>Lab 5</strong>: BeautifulSoup + selektory CSS — parsowanie stron z lokalnego serwera Flask (tabele, listy, zagnieżdżone struktury).</li>
+<li><strong>Lab 6</strong>: XPath na tych samych stronach — porównanie trzech metod, trudniejsze przypadki: osie (<code>following-sibling</code>, <code>ancestor</code>), predykaty pozycyjne i tekstowe.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/APD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
