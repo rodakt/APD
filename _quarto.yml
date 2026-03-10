@@ -18,6 +18,7 @@ website:
         contents:
           - wyklady/wyklad_1.md
           - wyklady/wyklad_2.md
+          - wyklady/wyklad_3.md
       - section: "Laboratoria"
         contents:
           - laby/lab_0.md
