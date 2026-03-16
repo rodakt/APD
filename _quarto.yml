@@ -24,6 +24,7 @@ website:
           - laby/lab_0.md
           - laby/lab_1.md
           - laby/lab_2.md
+          - laby/lab_3.md
 
 format:
   html:

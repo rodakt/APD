@@ -1,4 +1,4 @@
-v---
+---
 title: "Lab 2: Nawigacja po API — stronicowanie, pipeline, retry"
 subtitle: "Automatyczne pozyskiwanie danych — ćwiczenia"
 author: "Tomasz Rodak"

@@ -17,6 +17,7 @@ Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z si
 - [Laboratorium 0: Python — odświeżenie podstaw](laby/lab_0.md)
 - [Laboratorium 1: HTTP i klienci HTTP](laby/lab_1.md)
 - [Laboratorium 2: Nawigacja po API — stronicowanie, pipeline, retry](laby/lab_2.md)
+- [Laboratorium 3: Tworzenie serwera HTTP w Flask](laby/lab_3.md)
 
 ## Zaliczenie
 
