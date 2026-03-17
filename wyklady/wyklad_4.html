@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Wykład 4: Cookies, sesje i formularze – Automatyczne pozyskiwanie danych</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-b2594a383c4077ccf38c5dc50f43008b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_4.html">Wykład 4: Cookies, sesje i formularze</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Automatyczne pozyskiwanie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automatyczne pozyskiwanie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: HTTP i klienci HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: Serwer HTTP - framework Flask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 3: HTML jako drzewo — selekcja danych</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_4.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Wykład 4: Cookies, sesje i formularze</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Python — odświeżenie podstaw</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Klienci HTTP (curl, requests)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: Nawigacja po API — stronicowanie, pipeline, retry</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 3: Tworzenie serwera HTTP w Flask</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#cele-i-zakres" id="toc-cele-i-zakres" class="nav-link active" data-scroll-target="#cele-i-zakres"><span class="header-section-number">1</span> Cele i zakres</a></li>
+  <li><a href="#http-jest-bezstanowy" id="toc-http-jest-bezstanowy" class="nav-link" data-scroll-target="#http-jest-bezstanowy"><span class="header-section-number">2</span> HTTP jest bezstanowy</a></li>
+  <li><a href="#cookies-mechanizm-http" id="toc-cookies-mechanizm-http" class="nav-link" data-scroll-target="#cookies-mechanizm-http"><span class="header-section-number">3</span> Cookies — mechanizm HTTP</a>
+  <ul class="collapse">
+  <li><a href="#czym-jest-cookie" id="toc-czym-jest-cookie" class="nav-link" data-scroll-target="#czym-jest-cookie"><span class="header-section-number">3.1</span> Czym jest cookie</a></li>
+  <li><a href="#przepływ-set-cookie-i-cookie" id="toc-przepływ-set-cookie-i-cookie" class="nav-link" data-scroll-target="#przepływ-set-cookie-i-cookie"><span class="header-section-number">3.2</span> Przepływ: Set-Cookie i Cookie</a></li>
+  <li><a href="#demo-flask-ustawianie-i-odczytywanie-cookies" id="toc-demo-flask-ustawianie-i-odczytywanie-cookies" class="nav-link" data-scroll-target="#demo-flask-ustawianie-i-odczytywanie-cookies"><span class="header-section-number">3.3</span> Demo Flask: ustawianie i odczytywanie cookies</a></li>
+  <li><a href="#atrybuty-cookies" id="toc-atrybuty-cookies" class="nav-link" data-scroll-target="#atrybuty-cookies"><span class="header-section-number">3.4</span> Atrybuty cookies</a></li>
+  </ul></li>
+  <li><a href="#sesje-stan-po-stronie-serwera" id="toc-sesje-stan-po-stronie-serwera" class="nav-link" data-scroll-target="#sesje-stan-po-stronie-serwera"><span class="header-section-number">4</span> Sesje — stan po stronie serwera</a>
+  <ul class="collapse">
+  <li><a href="#problem-dane-w-cookie" id="toc-problem-dane-w-cookie" class="nav-link" data-scroll-target="#problem-dane-w-cookie"><span class="header-section-number">4.1</span> Problem: dane w cookie</a></li>
+  <li><a href="#flask.session" id="toc-flask.session" class="nav-link" data-scroll-target="#flask.session"><span class="header-section-number">4.2</span> <code>flask.session</code></a></li>
+  <li><a href="#devtools-podgląd-cookies" id="toc-devtools-podgląd-cookies" class="nav-link" data-scroll-target="#devtools-podgląd-cookies"><span class="header-section-number">4.3</span> DevTools: podgląd cookies</a></li>
+  </ul></li>
+  <li><a href="#formularze-html-post-z-przeglądarki" id="toc-formularze-html-post-z-przeglądarki" class="nav-link" data-scroll-target="#formularze-html-post-z-przeglądarki"><span class="header-section-number">5</span> Formularze HTML — POST z przeglądarki</a>
+  <ul class="collapse">
+  <li><a href="#json-api-vs-formularz-html" id="toc-json-api-vs-formularz-html" class="nav-link" data-scroll-target="#json-api-vs-formularz-html"><span class="header-section-number">5.1</span> JSON API vs formularz HTML</a></li>
+  <li><a href="#anatomia-formularza" id="toc-anatomia-formularza" class="nav-link" data-scroll-target="#anatomia-formularza"><span class="header-section-number">5.2</span> Anatomia formularza</a></li>
+  <li><a href="#demo-flask-formularz-logowania" id="toc-demo-flask-formularz-logowania" class="nav-link" data-scroll-target="#demo-flask-formularz-logowania"><span class="header-section-number">5.3</span> Demo Flask: formularz logowania</a></li>
+  </ul></li>
+  <li><a href="#requests.session-klient-z-pamięcią" id="toc-requests.session-klient-z-pamięcią" class="nav-link" data-scroll-target="#requests.session-klient-z-pamięcią"><span class="header-section-number">6</span> <code>requests.Session</code> — klient z pamięcią</a>
+  <ul class="collapse">
+  <li><a href="#problem-requests.get-nie-pamięta-cookies" id="toc-problem-requests.get-nie-pamięta-cookies" class="nav-link" data-scroll-target="#problem-requests.get-nie-pamięta-cookies"><span class="header-section-number">6.1</span> Problem: <code>requests.get</code> nie pamięta cookies</a></li>
+  <li><a href="#requests.session" id="toc-requests.session" class="nav-link" data-scroll-target="#requests.session"><span class="header-section-number">6.2</span> <code>requests.Session()</code></a></li>
+  <li><a href="#curl-z-cookies" id="toc-curl-z-cookies" class="nav-link" data-scroll-target="#curl-z-cookies"><span class="header-section-number">6.3</span> <code>curl</code> z cookies</a></li>
+  <li><a href="#wzorzec-scraping-strony-z-logowaniem" id="toc-wzorzec-scraping-strony-z-logowaniem" class="nav-link" data-scroll-target="#wzorzec-scraping-strony-z-logowaniem"><span class="header-section-number">6.4</span> Wzorzec: scraping strony z logowaniem</a></li>
+  </ul></li>
+  <li><a href="#kontrola-dostępu-401-i-403" id="toc-kontrola-dostępu-401-i-403" class="nav-link" data-scroll-target="#kontrola-dostępu-401-i-403"><span class="header-section-number">7</span> Kontrola dostępu: 401 i 403</a></li>
+  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">8</span> Podsumowanie</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_4.html">Wykład 4: Cookies, sesje i formularze</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Wykład 4: Cookies, sesje i formularze</h1>
+<p class="subtitle lead">Automatyczne pozyskiwanie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="cele-i-zakres" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="cele-i-zakres"><span class="header-section-number">1</span> Cele i zakres</h2>
+<p>Na poprzednich wykładach nauczyliśmy się budować serwery Flask, parsować HTML i wyciągać z niego dane. Brakowało jednak jednego elementu: <strong>stanu</strong>. Serwery, które budowaliśmy, traktowały każde żądanie identycznie — nie rozróżniały klientów. Teraz zobaczymy, jak serwer „zapamiętuje” klienta między żądaniami i jak to wykorzystać w scrapingu.</p>
+<p>Zakres obejmuje:</p>
+<ul>
+<li>bezstanowość HTTP — dlaczego serwer nie pamięta klienta,</li>
+<li>cookies — mechanizm na poziomie nagłówków HTTP (<code>Set-Cookie</code> / <code>Cookie</code>),</li>
+<li>sesje — dane przechowywane na serwerze, identyfikowane przez cookie,</li>
+<li>formularze HTML — jak przeglądarka wysyła dane POST (kontrast z JSON API z Labu 3),</li>
+<li><code>requests.Session</code> — automatyczne utrzymywanie cookies w kliencie programowym,</li>
+<li>kody 401 i 403 — kontrola dostępu z perspektywy scrapingu.</li>
+</ul>
+<hr>
+</section>
+<section id="http-jest-bezstanowy" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="http-jest-bezstanowy"><span class="header-section-number">2</span> HTTP jest bezstanowy</h2>
+<p>Na Wykładzie 1 wspomnieliśmy, że HTTP jest protokołem <strong>bezstanowym</strong>: serwer przetwarza każde żądanie niezależnie i nie przechowuje informacji o wcześniejszych żądaniach tego samego klienta. Dwa kolejne żądania od tego samego klienta są dla serwera nierozróżnialne.</p>
+<p>Rozważmy prosty serwer z Labu 3:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/messages"</span>, methods<span class="op">=</span>[<span class="st">"GET"</span>])</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_messages():</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jsonify(messages)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Ten endpoint zwraca tę samą listę wiadomości niezależnie od tego, kto pyta. Nie ma pojęcia „zalogowany użytkownik” ani „Twoje wiadomości”. Każdy klient widzi to samo.</p>
+<p>W praktyce wiele stron wymaga jednak rozróżniania klientów. Przykłady:</p>
+<ul>
+<li>sklep internetowy musi wiedzieć, co jest w <strong>Twoim</strong> koszyku,</li>
+<li>serwis bankowy musi wiedzieć, że <strong>Ty</strong> jesteś zalogowany,</li>
+<li>formularz wyszukiwania zapamiętuje <strong>Twoje</strong> ostatnie zapytanie.</li>
+</ul>
+<p>Skoro HTTP nie przechowuje stanu, potrzebujemy mechanizmu, który ten stan doda. Tym mechanizmem są <strong>cookies</strong>.</p>
+<hr>
+</section>
+<section id="cookies-mechanizm-http" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="cookies-mechanizm-http"><span class="header-section-number">3</span> Cookies — mechanizm HTTP</h2>
+<section id="czym-jest-cookie" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="czym-jest-cookie"><span class="header-section-number">3.1</span> Czym jest cookie</h3>
+<p>Cookie to para klucz–wartość, którą serwer prosi klienta o zapamiętanie. Mechanizm działa na poziomie <strong>nagłówków HTTP</strong> — nie wymaga żadnych specjalnych protokołów ani rozszerzeń:</p>
+<ol type="1">
+<li>Serwer wysyła w odpowiedzi nagłówek <code>Set-Cookie: klucz=wartość</code>.</li>
+<li>Klient (przeglądarka, <code>requests.Session</code>, <code>curl -b</code>) zapamiętuje tę parę.</li>
+<li>Przy następnym żądaniu do tego serwera klient automatycznie dołącza nagłówek <code>Cookie: klucz=wartość</code>.</li>
+</ol>
+<p>Serwer „rozpoznaje” klienta, bo klient sam odsyła wcześniej otrzymane cookie.</p>
+</section>
+<section id="przepływ-set-cookie-i-cookie" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="przepływ-set-cookie-i-cookie"><span class="header-section-number">3.2</span> Przepływ: Set-Cookie i Cookie</h3>
+<p>Zobaczmy to na konkretnym scenariuszu — serwer ustawia cookie z imieniem użytkownika:</p>
+<pre><code>Żądanie 1:
+  Klient  →  GET /set-name?name=Jan        →  Serwer
+  Klient  ←  200 OK                         ←  Serwer
+              Set-Cookie: user=Jan
+
+Żądanie 2:
+  Klient  →  GET /hello                     →  Serwer
+              Cookie: user=Jan
+  Klient  ←  200 OK                         ←  Serwer
+              "Witaj, Jan!"</code></pre>
+<p>Między żądaniem 1 a 2 serwer nie przechowuje żadnej informacji o kliencie. Cała „pamięć” leży po stronie klienta — w cookie.</p>
+</section>
+<section id="demo-flask-ustawianie-i-odczytywanie-cookies" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="demo-flask-ustawianie-i-odczytywanie-cookies"><span class="header-section-number">3.3</span> Demo Flask: ustawianie i odczytywanie cookies</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, request, make_response</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/set-name"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> set_name():</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> request.args.get(<span class="st">"name"</span>, <span class="st">"Anonim"</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=</span> make_response(<span class="ss">f"Cookie ustawione dla: </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    resp.set_cookie(<span class="st">"user"</span>, name)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> resp</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/hello"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hello():</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> request.cookies.get(<span class="st">"user"</span>, <span class="st">"nieznany"</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Witaj, </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">!"</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/delete-name"</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> delete_name():</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=</span> make_response(<span class="st">"Cookie usunięte."</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    resp.delete_cookie(<span class="st">"user"</span>)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> resp</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Testujemy w <code>curl -v</code>, żeby zobaczyć nagłówki:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Żądanie 1: ustawiamy cookie</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-v</span> http://localhost:5000/set-name<span class="pp">?</span>name=Jan <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span> <span class="kw">|</span> <span class="fu">grep</span> <span class="at">-i</span> <span class="st">"set-cookie"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># &lt; Set-Cookie: user=Jan; Path=/</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Żądanie 2: wysyłamy cookie ręcznie</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-v</span> <span class="at">-H</span> <span class="st">"Cookie: user=Jan"</span> http://localhost:5000/hello</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Witaj, Jan!</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Żądanie 3: bez cookie</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:5000/hello</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Witaj, nieznany!</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Nagłówek <code>Set-Cookie</code> to zwykły nagłówek odpowiedzi — nic magicznego. Nagłówek <code>Cookie</code> to zwykły nagłówek żądania. Przeglądarka obsługuje ten mechanizm automatycznie; w <code>curl</code> musimy podać cookie ręcznie (albo użyć <code>-c</code>/<code>-b</code> do zapisu i odczytu z pliku).</p>
+</section>
+<section id="atrybuty-cookies" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="atrybuty-cookies"><span class="header-section-number">3.4</span> Atrybuty cookies</h3>
+<p>Nagłówek <code>Set-Cookie</code> może zawierać dodatkowe atrybuty, które kontrolują zachowanie cookie:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Atrybut</th>
+<th>Znaczenie</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Path=/</code></td>
+<td>Cookie wysyłane tylko do ścieżek zaczynających się od <code>/</code> (domyślnie: ścieżka, z której przyszła odpowiedź)</td>
+</tr>
+<tr class="even">
+<td><code>Expires=...</code> / <code>Max-Age=...</code></td>
+<td>Czas życia cookie. Bez tego atrybutu cookie jest <strong>sesyjne</strong> — znika po zamknięciu przeglądarki</td>
+</tr>
+<tr class="odd">
+<td><code>HttpOnly</code></td>
+<td>Cookie niedostępne z JavaScript (<code>document.cookie</code>). Chroni przed kradzieżą cookie przez XSS</td>
+</tr>
+<tr class="even">
+<td><code>Secure</code></td>
+<td>Cookie wysyłane tylko przez HTTPS</td>
+</tr>
+</tbody>
+</table>
+<p>Dla scrapingu najważniejsze jest rozróżnienie: <strong>cookie sesyjne</strong> (bez <code>Expires</code>) żyje do zamknięcia sesji klienta, a <strong>cookie trwałe</strong> (z <code>Expires</code>) przeżywa restart.</p>
+<hr>
+</section>
+</section>
+<section id="sesje-stan-po-stronie-serwera" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="sesje-stan-po-stronie-serwera"><span class="header-section-number">4</span> Sesje — stan po stronie serwera</h2>
+<section id="problem-dane-w-cookie" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="problem-dane-w-cookie"><span class="header-section-number">4.1</span> Problem: dane w cookie</h3>
+<p>Cookie przechowuje dane po stronie klienta. To ma dwie konsekwencje:</p>
+<ol type="1">
+<li><strong>Bezpieczeństwo</strong>: klient może dowolnie modyfikować cookie. Jeśli przechowujesz <code>role=admin</code> w cookie, użytkownik może to zmienić na <code>role=superadmin</code>.</li>
+<li><strong>Rozmiar</strong>: przeglądarki ograniczają cookie do ok. 4 KB. Nie zmieścisz tam koszyka zakupowego.</li>
+</ol>
+<p>Rozwiązanie: przechowuj dane <strong>na serwerze</strong>, a w cookie trzymaj tylko <strong>identyfikator sesji</strong> — krótki, losowy ciąg znaków, który serwer kojarzy z danymi konkretnego klienta.</p>
+<pre><code>Cookie: session=a1b2c3d4e5f6
+                 │
+                 ▼
+Serwer: {"a1b2c3d4e5f6": {"user": "Jan", "cart": [...]}}</code></pre>
+<p>Klient nie widzi ani nie może zmienić danych sesji — zna tylko identyfikator.</p>
+</section>
+<section id="flask.session" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="flask.session"><span class="header-section-number">4.2</span> <code>flask.session</code></h3>
+<p>Flask ma wbudowane wsparcie dla sesji. Technicznie Flask przechowuje dane sesji <strong>w samym cookie</strong>, ale podpisuje je kryptograficznie — klient może je odczytać (to tylko base64), ale nie może ich zmodyfikować bez znajomości klucza:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, session, redirect</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>app.secret_key <span class="op">=</span> <span class="st">"klucz-tylko-do-labu"</span>  <span class="co"># wymagany do podpisywania sesji</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/login-quick"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> login_quick():</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    session[<span class="st">"user"</span>] <span class="op">=</span> <span class="st">"Jan"</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"Zalogowano jako Jan!"</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/profile"</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> profile():</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    user <span class="op">=</span> session.get(<span class="st">"user"</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> user:</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"Nie jesteś zalogowany."</span>, <span class="dv">401</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Profil użytkownika: </span><span class="sc">{</span>user<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/logout"</span>)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> logout():</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    session.clear()</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"Wylogowano."</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>secret_key</code> jest wymagany — bez niego Flask nie może podpisać cookie sesyjnego i zgłosi błąd. W labach używamy dowolnego stringa; na produkcji klucz musi być długi i losowy.</p>
+</section>
+<section id="devtools-podgląd-cookies" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="devtools-podgląd-cookies"><span class="header-section-number">4.3</span> DevTools: podgląd cookies</h3>
+<p>Po wejściu na <code>http://localhost:5000/login-quick</code> w przeglądarce:</p>
+<ol type="1">
+<li>Otwórz DevTools (<code>F12</code>).</li>
+<li>Zakładka <strong>Application</strong> (Chrome) lub <strong>Storage</strong> (Firefox).</li>
+<li>W lewym panelu: <strong>Cookies</strong> → <code>http://localhost:5000</code>.</li>
+<li>Zobaczysz cookie o nazwie <code>session</code> z wartością, która wygląda jak długi ciąg znaków (to zakodowane i podpisane dane sesji).</li>
+</ol>
+<p>Możesz spróbować zmienić wartość cookie w DevTools i odświeżyć stronę — Flask odrzuci zmodyfikowane cookie (podpis się nie zgadza) i potraktuje klienta jako niezalogowanego. To jest efekt <code>secret_key</code>.</p>
+<hr>
+</section>
+</section>
+<section id="formularze-html-post-z-przeglądarki" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="formularze-html-post-z-przeglądarki"><span class="header-section-number">5</span> Formularze HTML — POST z przeglądarki</h2>
+<section id="json-api-vs-formularz-html" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="json-api-vs-formularz-html"><span class="header-section-number">5.1</span> JSON API vs formularz HTML</h3>
+<p>Na Labie 3 wysyłaliśmy POST z danymi JSON:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST http://localhost:5000/messages <span class="dt">\</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">"Content-Type: application/json"</span> <span class="dt">\</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">'{"text": "Wiadomość"}'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Serwer odbierał dane przez <code>request.get_json()</code>, a klient Pythonowy używał <code>requests.post(..., json={...})</code>. To jest wzorzec <strong>JSON API</strong> — programy rozmawiają z programami.</p>
+<p>Ale kiedy <strong>człowiek</strong> wpisuje login i hasło w przeglądarce, mechanizm jest inny. Przeglądarka nie wysyła JSON-a — wysyła dane z <strong>formularza HTML</strong>:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>JSON API (Lab 3)</th>
+<th>Formularz HTML</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Content-Type</td>
+<td><code>application/json</code></td>
+<td><code>application/x-www-form-urlencoded</code></td>
+</tr>
+<tr class="even">
+<td>Format body</td>
+<td><code>{"username": "Jan"}</code></td>
+<td><code>username=Jan&amp;password=secret</code></td>
+</tr>
+<tr class="odd">
+<td>Serwer (Flask)</td>
+<td><code>request.get_json()</code></td>
+<td><code>request.form["username"]</code></td>
+</tr>
+<tr class="even">
+<td>Klient (requests)</td>
+<td><code>json={...}</code></td>
+<td><code>data={...}</code></td>
+</tr>
+<tr class="odd">
+<td>Klient (przeglądarka)</td>
+<td>wymaga JavaScript</td>
+<td><code>&lt;form&gt;</code> — natywnie</td>
+</tr>
+</tbody>
+</table>
+<p>Rozróżnienie <code>data={}</code> (formularz) vs <code>json={}</code> (JSON API) w <code>requests.post()</code> to jeden z najczęstszych punktów potknięcia przy scrapingu stron z logowaniem.</p>
+</section>
+<section id="anatomia-formularza" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="anatomia-formularza"><span class="header-section-number">5.2</span> Anatomia formularza</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">form</span><span class="ot"> action</span><span class="op">=</span><span class="st">"/login"</span><span class="ot"> method</span><span class="op">=</span><span class="st">"POST"</span><span class="dt">&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">"text"</span><span class="ot"> name</span><span class="op">=</span><span class="st">"username"</span><span class="dt">&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">"password"</span><span class="ot"> name</span><span class="op">=</span><span class="st">"password"</span><span class="dt">&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">button</span><span class="ot"> type</span><span class="op">=</span><span class="st">"submit"</span><span class="dt">&gt;</span>Zaloguj<span class="dt">&lt;/</span><span class="kw">button</span><span class="dt">&gt;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">form</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Trzy kluczowe atrybuty:</p>
+<ul>
+<li><code>action="/login"</code> — URL, do którego przeglądarka wyśle żądanie,</li>
+<li><code>method="POST"</code> — metoda HTTP (domyślnie <code>GET</code>, ale przy logowaniu zawsze <code>POST</code>),</li>
+<li><code>name="username"</code> — klucze w body żądania. Po kliknięciu „Zaloguj” przeglądarka wyśle: <code>username=Jan&amp;password=secret</code>.</li>
+</ul>
+</section>
+<section id="demo-flask-formularz-logowania" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="demo-flask-formularz-logowania"><span class="header-section-number">5.3</span> Demo Flask: formularz logowania</h3>
+<p>Poniższy serwer łączy formularz, sesję i kontrolę dostępu w jeden spójny przepływ. Szablon HTML definiujemy jako string Pythona poza funkcją — to daje separację treści od logiki bez wprowadzania systemu szablonów:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, request, session, redirect</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>app.secret_key <span class="op">=</span> <span class="st">"klucz-tylko-do-labu"</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Dane użytkowników (w praktyce: baza danych)</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>USERS <span class="op">=</span> {<span class="st">"admin"</span>: <span class="st">"secret"</span>, <span class="st">"jan"</span>: <span class="st">"haslo123"</span>}</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>LOGIN_PAGE <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;html&gt;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;body&gt;</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;h1&gt;Logowanie&lt;/h1&gt;</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="st">    </span><span class="sc">{message}</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;form action="/login" method="POST"&gt;</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;label&gt;Login: &lt;input type="text" name="username"&gt;&lt;/label&gt;&lt;br&gt;</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;label&gt;Hasło: &lt;input type="password" name="password"&gt;&lt;/label&gt;&lt;br&gt;</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;button type="submit"&gt;Zaloguj&lt;/button&gt;</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;/form&gt;</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;/body&gt;</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;/html&gt;</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>DASHBOARD_PAGE <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;html&gt;</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;body&gt;</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;h1&gt;Panel użytkownika&lt;/h1&gt;</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;p&gt;Zalogowany jako: </span><span class="sc">{user}</span><span class="st">&lt;/p&gt;</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;p&gt;To jest chroniona strona — widoczna tylko po zalogowaniu.&lt;/p&gt;</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;a href="/logout"&gt;Wyloguj&lt;/a&gt;</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;/body&gt;</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;/html&gt;</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/login"</span>, methods<span class="op">=</span>[<span class="st">"GET"</span>, <span class="st">"POST"</span>])</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> login():</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> request.method <span class="op">==</span> <span class="st">"GET"</span>:</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> LOGIN_PAGE.<span class="bu">format</span>(message<span class="op">=</span><span class="st">""</span>)</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    username <span class="op">=</span> request.form[<span class="st">"username"</span>]</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    password <span class="op">=</span> request.form[<span class="st">"password"</span>]</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> USERS.get(username) <span class="op">==</span> password:</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>        session[<span class="st">"user"</span>] <span class="op">=</span> username</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> redirect(<span class="st">"/dashboard"</span>)</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> LOGIN_PAGE.<span class="bu">format</span>(</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>        message<span class="op">=</span><span class="st">'&lt;p style="color:red"&gt;Błędny login lub hasło.&lt;/p&gt;'</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    ), <span class="dv">401</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/dashboard"</span>)</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> dashboard():</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>    user <span class="op">=</span> session.get(<span class="st">"user"</span>)</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> user:</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> redirect(<span class="st">"/login"</span>)</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> DASHBOARD_PAGE.<span class="bu">format</span>(user<span class="op">=</span>user)</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/logout"</span>)</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> logout():</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>    session.clear()</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> redirect(<span class="st">"/login"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Przepływ wygląda tak:</p>
+<ol type="1">
+<li><code>GET /login</code> — serwer zwraca stronę z formularzem.</li>
+<li>Użytkownik wypełnia formularz i klika „Zaloguj”.</li>
+<li>Przeglądarka wysyła <code>POST /login</code> z <code>username=admin&amp;password=secret</code> w body.</li>
+<li>Serwer sprawdza dane. Jeśli poprawne → ustawia <code>session["user"]</code> i przekierowuje (<code>302</code>) na <code>/dashboard</code>.</li>
+<li>Przeglądarka podąża za przekierowaniem: <code>GET /dashboard</code> — teraz z cookie sesyjnym.</li>
+<li>Serwer widzi cookie, odczytuje sesję, zwraca chronioną stronę.</li>
+</ol>
+<p>Wzorzec <strong>POST → redirect → GET</strong> (PRG) to standardowa praktyka: po udanym logowaniu serwer przekierowuje, żeby odświeżenie strony nie wysłało formularza ponownie.</p>
+<p>Realne strony z formularzami często dodają <strong>ukryty token CSRF</strong> — dodatkowe pole <code>&lt;input type="hidden" name="csrf_token" value="..."&gt;</code>, które zabezpiecza przed wysłaniem formularza z obcej strony. Przy scrapingu oznacza to, że przed POST-em trzeba najpierw pobrać formularz GET-em i wyciągnąć token z HTML-a.</p>
+<hr>
+</section>
+</section>
+<section id="requests.session-klient-z-pamięcią" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="requests.session-klient-z-pamięcią"><span class="header-section-number">6</span> <code>requests.Session</code> — klient z pamięcią</h2>
+<section id="problem-requests.get-nie-pamięta-cookies" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="problem-requests.get-nie-pamięta-cookies"><span class="header-section-number">6.1</span> Problem: <code>requests.get</code> nie pamięta cookies</h3>
+<p>Zwykłe wywołania <code>requests.get()</code> i <code>requests.post()</code> nie przechowują cookies między żądaniami. Każde żądanie jest „czyste”:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Logujemy się...</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>requests.post(<span class="st">"http://localhost:5000/login"</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>              data<span class="op">=</span>{<span class="st">"username"</span>: <span class="st">"admin"</span>, <span class="st">"password"</span>: <span class="st">"secret"</span>})</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ...ale to żądanie nie ma cookie sesyjnego — serwer nie wie, że się logowaliśmy</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="st">"http://localhost:5000/dashboard"</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Dostajemy redirect na /login, bo brak sesji</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>To jest dokładnie bezstanowość HTTP w akcji — dwa osobne wywołania <code>requests</code> nie współdzielą żadnego stanu.</p>
+</section>
+<section id="requests.session" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="requests.session"><span class="header-section-number">6.2</span> <code>requests.Session()</code></h3>
+<p><code>requests.Session</code> to obiekt, który <strong>automatycznie zarządza cookies</strong> między żądaniami — tak jak przeglądarka:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> requests.Session()</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Logowanie — POST z danymi formularza</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> s.post(<span class="st">"http://localhost:5000/login"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>           data<span class="op">=</span>{<span class="st">"username"</span>: <span class="st">"admin"</span>, <span class="st">"password"</span>: <span class="st">"secret"</span>})</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(r.status_code)  <span class="co"># 200 (po redirect na /dashboard)</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(r.url)          <span class="co"># http://localhost:5000/dashboard</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Pobranie chronionej strony — cookie już jest w sesji</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> s.get(<span class="st">"http://localhost:5000/dashboard"</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(r.text)         <span class="co"># "Zalogowany jako: admin"</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Inspekcja cookies</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(s.cookies.get_dict())  <span class="co"># {'session': '...'}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Kluczowy szczegół: <code>data={"username": "admin", "password": "secret"}</code> — nie <code>json={}</code>. Formularz HTML wysyła <code>application/x-www-form-urlencoded</code>, więc klient musi zrobić to samo. Użycie <code>json={}</code> wyśle <code>Content-Type: application/json</code>, a serwer oczekujący <code>request.form</code> nie znajdzie danych.</p>
+</section>
+<section id="curl-z-cookies" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="curl-z-cookies"><span class="header-section-number">6.3</span> <code>curl</code> z cookies</h3>
+<p><code>curl</code> ma analogiczny mechanizm — pliki cookie:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Logowanie: zapisz cookies do pliku</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-v</span> <span class="at">-c</span> cookies.txt <span class="at">-L</span> <span class="dt">\</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">"username=admin&amp;password=secret"</span> <span class="dt">\</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  http://localhost:5000/login</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Pobranie chronionej strony: użyj zapisanych cookies</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-b</span> cookies.txt http://localhost:5000/dashboard</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Flagi <code>-c</code> (zapisz cookies) i <code>-b</code> (wyślij cookies) działają razem. Flaga <code>-L</code> podąża za przekierowaniami (POST → 302 → GET).</p>
+</section>
+<section id="wzorzec-scraping-strony-z-logowaniem" class="level3" data-number="6.4">
+<h3 data-number="6.4" class="anchored" data-anchor-id="wzorzec-scraping-strony-z-logowaniem"><span class="header-section-number">6.4</span> Wzorzec: scraping strony z logowaniem</h3>
+<p>Podsumowując, pełny wzorzec scrapingu strony wymagającej logowania wygląda tak:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> requests.Session()</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Krok 1: pobierz stronę logowania (GET)</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># — na realnych stronach tu wyciągamy token CSRF z formularza</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> s.get(<span class="st">"http://localhost:5000/login"</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Krok 2: wyślij formularz logowania (POST)</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> s.post(<span class="st">"http://localhost:5000/login"</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>           data<span class="op">=</span>{<span class="st">"username"</span>: <span class="st">"admin"</span>, <span class="st">"password"</span>: <span class="st">"secret"</span>})</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Krok 3: pobierz chronione dane (GET) — cookie jest w sesji</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> s.get(<span class="st">"http://localhost:5000/dashboard"</span>)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Krok 4: parsuj HTML jak zwykle</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>soup <span class="op">=</span> BeautifulSoup(r.text, <span class="st">"html.parser"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>To jest ten sam łańcuch narzędzi, którego używaliśmy na Labach 5–6 (parsowanie HTML), ale z dodatkowym krokiem logowania na początku.</p>
+<hr>
+</section>
+</section>
+<section id="kontrola-dostępu-401-i-403" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="kontrola-dostępu-401-i-403"><span class="header-section-number">7</span> Kontrola dostępu: 401 i 403</h2>
+<p>Dwa kody statusu HTTP sygnalizują problemy z dostępem:</p>
+<ul>
+<li><strong>401 Unauthorized</strong> — klient nie jest uwierzytelniony. Serwer mówi: „nie wiem, kim jesteś — zaloguj się”. W Flask: <code>return ..., 401</code> lub <code>abort(401)</code>.</li>
+<li><strong>403 Forbidden</strong> — klient jest uwierzytelniony, ale <strong>nie ma uprawnień</strong> do tego zasobu. Serwer mówi: „wiem, kim jesteś, ale nie masz dostępu”. W Flask: <code>abort(403)</code>.</li>
+</ul>
+<p>Wzorzec ochrony endpointu we Flask:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> abort</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/admin"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> admin_panel():</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    user <span class="op">=</span> session.get(<span class="st">"user"</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> user:</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        abort(<span class="dv">401</span>)          <span class="co"># niezalogowany</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> user <span class="op">!=</span> <span class="st">"admin"</span>:</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        abort(<span class="dv">403</span>)          <span class="co"># zalogowany, ale nie admin</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"Panel administracyjny"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Z perspektywy scrapingu: odpowiedź <code>401</code> oznacza, że potrzebna jest sesja (logowanie). Odpowiedź <code>403</code> oznacza, że sesja istnieje, ale konto nie ma wystarczających uprawnień — to sygnał, żeby nie próbować dalej z tym kontem.</p>
+<hr>
+</section>
+<section id="podsumowanie" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="podsumowanie"><span class="header-section-number">8</span> Podsumowanie</h2>
+<p>Na tym wykładzie:</p>
+<ul>
+<li>zobaczyliśmy, dlaczego HTTP potrzebuje dodatkowego mechanizmu „pamięci” — cookies,</li>
+<li>poznaliśmy <code>Set-Cookie</code> / <code>Cookie</code> jako zwykłe nagłówki HTTP — żadnej magii, tylko para klucz–wartość przesyłana w obie strony,</li>
+<li>zbudowaliśmy sesję we Flask (<code>flask.session</code>) — dane na serwerze, identyfikator w podpisanym cookie,</li>
+<li>zobaczyliśmy, jak formularz HTML wysyła POST z <code>application/x-www-form-urlencoded</code> — i czym to się różni od JSON API, które znamy z Labu 3,</li>
+<li>nauczyliśmy się <code>requests.Session</code> — klient programowy, który automatycznie utrzymuje cookies, jak przeglądarka,</li>
+<li>poznaliśmy kody 401 i 403 jako sygnały kontroli dostępu.</li>
+</ul>
+<p><strong>Co dalej:</strong></p>
+<ul>
+<li><strong>Lab 7</strong>: budujemy serwer Flask z logowaniem, sesjami i chronionymi podstronami — testujemy ręcznie (przeglądarka, <code>curl</code>) i widzimy cookies w nagłówkach.</li>
+<li><strong>Lab 8</strong>: piszemy klienta w <code>requests.Session</code>, który automatycznie loguje się do serwera z Labu 7 i pobiera chronione dane — to jest scraping strony wymagającej uwierzytelnienia.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/APD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
