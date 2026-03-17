@@ -11,6 +11,7 @@ Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z si
 - [Wykład 1: HTTP i klienci HTTP](wyklady/wyklad_1.md)
 - [Wykład 2: Wykład 2: Serwer HTTP - framework Flask](wyklady/wyklad_2.md)
 - [Wykład 3: HTML jako drzewo — selekcja danych](wyklady/wyklad_3.md)
+- [Wykład 4: Cookies, sesje i formularze](wyklady/wyklad_4.md)
 
 ## Laboratoria
 
