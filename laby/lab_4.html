@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Lab 4: Paginacja HTML i prosty crawler – Automatyczne pozyskiwanie danych</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-176b38be48070efe3d434d0a95bef3fe.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-ef324ad6d051ca23791dd96b7ffd98a1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_0.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_4.html">Lab 4: Paginacja HTML i prosty crawler</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Automatyczne pozyskiwanie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automatyczne pozyskiwanie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: HTTP i klienci HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: Serwer HTTP - framework Flask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 3: HTML jako drzewo — selekcja danych</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 4: Cookies, sesje i formularze</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Python — odświeżenie podstaw</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Klienci HTTP (curl, requests)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: Nawigacja po API — stronicowanie, pipeline, retry</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 3: Tworzenie serwera HTTP w Flask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_4.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Lab 4: Paginacja HTML i prosty crawler</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#cel" id="toc-cel" class="nav-link active" data-scroll-target="#cel"><span class="header-section-number">1</span> Cel</a></li>
+  <li><a href="#przygotowanie" id="toc-przygotowanie" class="nav-link" data-scroll-target="#przygotowanie"><span class="header-section-number">2</span> Przygotowanie</a></li>
+  <li><a href="#demonstracja-1-serwer-z-paginacją-html" id="toc-demonstracja-1-serwer-z-paginacją-html" class="nav-link" data-scroll-target="#demonstracja-1-serwer-z-paginacją-html"><span class="header-section-number">3</span> Demonstracja 1: serwer z paginacją HTML</a>
+  <ul class="collapse">
+  <li><a href="#porównanie-z-paginacją-api" id="toc-porównanie-z-paginacją-api" class="nav-link" data-scroll-target="#porównanie-z-paginacją-api"><span class="header-section-number">3.1</span> Porównanie z paginacją API</a></li>
+  </ul></li>
+  <li><a href="#demonstracja-2-wyciąganie-danych-z-html" id="toc-demonstracja-2-wyciąganie-danych-z-html" class="nav-link" data-scroll-target="#demonstracja-2-wyciąganie-danych-z-html"><span class="header-section-number">4</span> Demonstracja 2: wyciąganie danych z HTML</a>
+  <ul class="collapse">
+  <li><a href="#krok-1-pobranie-strony" id="toc-krok-1-pobranie-strony" class="nav-link" data-scroll-target="#krok-1-pobranie-strony"><span class="header-section-number">4.1</span> Krok 1: pobranie strony</a></li>
+  <li><a href="#krok-2-link-do-następnej-strony" id="toc-krok-2-link-do-następnej-strony" class="nav-link" data-scroll-target="#krok-2-link-do-następnej-strony"><span class="header-section-number">4.2</span> Krok 2: link do następnej strony</a></li>
+  <li><a href="#krok-3-dane-z-tabeli" id="toc-krok-3-dane-z-tabeli" class="nav-link" data-scroll-target="#krok-3-dane-z-tabeli"><span class="header-section-number">4.3</span> Krok 3: dane z tabeli</a></li>
+  </ul></li>
+  <li><a href="#ćwiczenie-1-crawler-katalogu-miast" id="toc-ćwiczenie-1-crawler-katalogu-miast" class="nav-link" data-scroll-target="#ćwiczenie-1-crawler-katalogu-miast"><span class="header-section-number">5</span> Ćwiczenie 1: crawler katalogu miast</a></li>
+  <li><a href="#ćwiczenie-2-własny-serwer-paginowany" id="toc-ćwiczenie-2-własny-serwer-paginowany" class="nav-link" data-scroll-target="#ćwiczenie-2-własny-serwer-paginowany"><span class="header-section-number">6</span> Ćwiczenie 2: własny serwer paginowany</a></li>
+  <li><a href="#ćwiczenia-samodzielne" id="toc-ćwiczenia-samodzielne" class="nav-link" data-scroll-target="#ćwiczenia-samodzielne"><span class="header-section-number">7</span> Ćwiczenia samodzielne</a>
+  <ul class="collapse">
+  <li><a href="#ćwiczenie-a-crawler-na-serwer-collatza" id="toc-ćwiczenie-a-crawler-na-serwer-collatza" class="nav-link" data-scroll-target="#ćwiczenie-a-crawler-na-serwer-collatza"><span class="header-section-number">7.1</span> Ćwiczenie A: crawler na serwer Collatza</a></li>
+  <li><a href="#ćwiczenie-b-konfigurowalny-per_page" id="toc-ćwiczenie-b-konfigurowalny-per_page" class="nav-link" data-scroll-target="#ćwiczenie-b-konfigurowalny-per_page"><span class="header-section-number">7.2</span> Ćwiczenie B: konfigurowalny <code>per_page</code></a></li>
+  <li><a href="#ćwiczenie-c-dodatkowe-serwer-z-losowymi-błędami-retry" id="toc-ćwiczenie-c-dodatkowe-serwer-z-losowymi-błędami-retry" class="nav-link" data-scroll-target="#ćwiczenie-c-dodatkowe-serwer-z-losowymi-błędami-retry"><span class="header-section-number">7.3</span> Ćwiczenie C (dodatkowe): serwer z losowymi błędami + retry</a></li>
+  </ul></li>
+  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">8</span> Podsumowanie</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_0.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_4.html">Lab 4: Paginacja HTML i prosty crawler</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Lab 4: Paginacja HTML i prosty crawler</h1>
+<p class="subtitle lead">Automatyczne pozyskiwanie danych — ćwiczenia</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="cel" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Cel</h1>
+<p>Zakres materiału:</p>
+<ul>
+<li>Budowa serwera Flask z paginacją HTML (strony z linkami „Następna” / „Poprzednia”),</li>
+<li>Wyciąganie linków i danych z HTML za pomocą wyrażeń regularnych (<code>re</code>),</li>
+<li>Pisanie crawlera: pętla pobierająca kolejne strony katalogu i zbierająca dane,</li>
+<li>Zapis zebranych danych do pliku JSON.</li>
+</ul>
+<p>Narzędzia: Python (Flask, <code>requests</code>, <code>re</code>, <code>json</code>), VSCode.</p>
+<hr>
+</section>
+<section id="przygotowanie" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Przygotowanie</h1>
+<p>Środowisko pracy jest takie samo jak na Labie 3: VSCode, dwa terminale (serwer + klient), Flask.</p>
+<p>Sprawdź, czy Flask jest dostępny:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install flask</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Utwórz nowy folder roboczy (np. <code>lab4/</code>) i otwórz go w VSCode.</p>
+<p>Na tym labie używamy dodatkowo modułu <code>re</code> (wyrażenia regularne) — jest częścią biblioteki standardowej Pythona, nie wymaga instalacji.</p>
+<hr>
+</section>
+<section id="demonstracja-1-serwer-z-paginacją-html" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Demonstracja 1: serwer z paginacją HTML</h1>
+<p>Na Labie 2 przechodziliśmy po stronach wyników API dane.gov.pl — każda odpowiedź JSON zawierała pole <code>links.next</code> z adresem następnej strony. Większość stron w internecie nie ma publicznego API — dzielą wyniki na podstrony HTML z linkami nawigacyjnymi („Następna”, „Poprzednia”).</p>
+<p>Utwórz plik <code>app.py</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, request</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>CITIES <span class="op">=</span> [</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Warszawa"</span>, <span class="st">"population"</span>: <span class="dv">1_862_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"mazowieckie"</span>},</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Kraków"</span>, <span class="st">"population"</span>: <span class="dv">804_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"małopolskie"</span>},</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Łódź"</span>, <span class="st">"population"</span>: <span class="dv">672_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"łódzkie"</span>},</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Wrocław"</span>, <span class="st">"population"</span>: <span class="dv">674_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"dolnośląskie"</span>},</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Poznań"</span>, <span class="st">"population"</span>: <span class="dv">546_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"wielkopolskie"</span>},</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Gdańsk"</span>, <span class="st">"population"</span>: <span class="dv">486_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"pomorskie"</span>},</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Szczecin"</span>, <span class="st">"population"</span>: <span class="dv">398_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"zachodniopomorskie"</span>},</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Bydgoszcz"</span>, <span class="st">"population"</span>: <span class="dv">348_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"kujawsko-pomorskie"</span>},</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Lublin"</span>, <span class="st">"population"</span>: <span class="dv">340_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"lubelskie"</span>},</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Białystok"</span>, <span class="st">"population"</span>: <span class="dv">298_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"podlaskie"</span>},</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Katowice"</span>, <span class="st">"population"</span>: <span class="dv">292_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"śląskie"</span>},</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Gdynia"</span>, <span class="st">"population"</span>: <span class="dv">246_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"pomorskie"</span>},</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Częstochowa"</span>, <span class="st">"population"</span>: <span class="dv">224_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"śląskie"</span>},</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Radom"</span>, <span class="st">"population"</span>: <span class="dv">214_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"mazowieckie"</span>},</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Toruń"</span>, <span class="st">"population"</span>: <span class="dv">198_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"kujawsko-pomorskie"</span>},</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Sosnowiec"</span>, <span class="st">"population"</span>: <span class="dv">196_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"śląskie"</span>},</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Rzeszów"</span>, <span class="st">"population"</span>: <span class="dv">196_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"podkarpackie"</span>},</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Kielce"</span>, <span class="st">"population"</span>: <span class="dv">195_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"świętokrzyskie"</span>},</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Gliwice"</span>, <span class="st">"population"</span>: <span class="dv">179_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"śląskie"</span>},</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Olsztyn"</span>, <span class="st">"population"</span>: <span class="dv">172_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"warmińsko-mazurskie"</span>},</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Zabrze"</span>, <span class="st">"population"</span>: <span class="dv">172_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"śląskie"</span>},</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Bielsko-Biała"</span>, <span class="st">"population"</span>: <span class="dv">171_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"śląskie"</span>},</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Bytom"</span>, <span class="st">"population"</span>: <span class="dv">163_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"śląskie"</span>},</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Zielona Góra"</span>, <span class="st">"population"</span>: <span class="dv">142_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"lubuskie"</span>},</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Rybnik"</span>, <span class="st">"population"</span>: <span class="dv">139_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"śląskie"</span>},</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Ruda Śląska"</span>, <span class="st">"population"</span>: <span class="dv">138_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"śląskie"</span>},</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Opole"</span>, <span class="st">"population"</span>: <span class="dv">128_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"opolskie"</span>},</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Tychy"</span>, <span class="st">"population"</span>: <span class="dv">128_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"śląskie"</span>},</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Gorzów Wielkopolski"</span>, <span class="st">"population"</span>: <span class="dv">124_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"lubuskie"</span>},</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Elbląg"</span>, <span class="st">"population"</span>: <span class="dv">120_000</span>, <span class="st">"voivodeship"</span>: <span class="st">"warmińsko-mazurskie"</span>},</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>PER_PAGE <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/"</span>)</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> index():</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"""</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;html&gt;&lt;body&gt;</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;h1&gt;Miasta Polski&lt;/h1&gt;</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;p&gt;Serwer z paginacją HTML — Lab 4&lt;/p&gt;</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;a href="/catalog?page=1"&gt;Przejdź do katalogu&lt;/a&gt;</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;/body&gt;&lt;/html&gt;</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/catalog"</span>)</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> catalog():</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    page <span class="op">=</span> request.args.get(<span class="st">"page"</span>, <span class="dv">1</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    total_pages <span class="op">=</span> (<span class="bu">len</span>(CITIES) <span class="op">+</span> PER_PAGE <span class="op">-</span> <span class="dv">1</span>) <span class="op">//</span> PER_PAGE</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> page <span class="op">&lt;</span> <span class="dv">1</span> <span class="kw">or</span> page <span class="op">&gt;</span> total_pages:</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"&lt;html&gt;&lt;body&gt;&lt;h1&gt;404&lt;/h1&gt;&lt;p&gt;Nie ma takiej strony.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;"</span>, <span class="dv">404</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> (page <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> PER_PAGE</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    end <span class="op">=</span> start <span class="op">+</span> PER_PAGE</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    page_cities <span class="op">=</span> CITIES[start:end]</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Nagłówek</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    html <span class="op">=</span> <span class="ss">f"""</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="ss">    &lt;html&gt;&lt;body&gt;</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="ss">    &lt;h1&gt;Katalog miast — strona </span><span class="sc">{</span>page<span class="sc">}</span><span class="ss"> z </span><span class="sc">{</span>total_pages<span class="sc">}</span><span class="ss">&lt;/h1&gt;</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a><span class="ss">    &lt;table border="1"&gt;</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;tr&gt;&lt;th&gt;Nazwa&lt;/th&gt;&lt;th&gt;Populacja&lt;/th&gt;&lt;th&gt;Województwo&lt;/th&gt;&lt;/tr&gt;</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a><span class="ss">    """</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Wiersze tabeli</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> city <span class="kw">in</span> page_cities:</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>        html <span class="op">+=</span> <span class="ss">f"""</span></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;tr&gt;</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a><span class="ss">            &lt;td&gt;</span><span class="sc">{</span>city[<span class="st">'name'</span>]<span class="sc">}</span><span class="ss">&lt;/td&gt;</span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a><span class="ss">            &lt;td&gt;</span><span class="sc">{</span>city[<span class="st">'population'</span>]<span class="sc">}</span><span class="ss">&lt;/td&gt;</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a><span class="ss">            &lt;td&gt;</span><span class="sc">{</span>city[<span class="st">'voivodeship'</span>]<span class="sc">}</span><span class="ss">&lt;/td&gt;</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;/tr&gt;"""</span></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>    html <span class="op">+=</span> <span class="st">"</span><span class="ch">\n</span><span class="st">    &lt;/table&gt;</span><span class="ch">\n</span><span class="st">    &lt;p&gt;"</span></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Linki nawigacyjne</span></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> page <span class="op">&gt;</span> <span class="dv">1</span>:</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>        html <span class="op">+=</span> <span class="ss">f'&lt;a href="/catalog?page=</span><span class="sc">{</span>page <span class="op">-</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">"&gt;← Poprzednia&lt;/a&gt; '</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> page <span class="op">&lt;</span> total_pages:</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>        html <span class="op">+=</span> <span class="ss">f'&lt;a href="/catalog?page=</span><span class="sc">{</span>page <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">"&gt;Następna →&lt;/a&gt;'</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>    html <span class="op">+=</span> <span class="st">"&lt;/p&gt;</span><span class="ch">\n</span><span class="st">    &lt;/body&gt;&lt;/html&gt;"</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> html</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Uruchom serwer w <strong>Terminalu 1</strong>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">flask</span> run <span class="at">--debug</span> <span class="at">-p</span> 5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Otwórz <code>http://localhost:5000/catalog?page=1</code> w przeglądarce. Przejdź po stronach klikając „Następna →“.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Otwórz <code>/catalog?page=3</code>. Czy widzisz 10 miast? Czy link „Następna →” zniknął (bo to ostatnia strona)? Czy „← Poprzednia” prowadzi do strony 2?</p>
+</div>
+</div>
+<section id="porównanie-z-paginacją-api" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="porównanie-z-paginacją-api"><span class="header-section-number">3.1</span> Porównanie z paginacją API</h2>
+<p>Na Labie 2 paginacja wyglądała tak:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> r.json()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>next_url <span class="op">=</span> data[<span class="st">"links"</span>][<span class="st">"next"</span>]   <span class="co"># czyste, strukturalne</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Tutaj dane i nawigacja są zakopane w HTML. Żeby wyciągnąć link do następnej strony, trzeba <strong>przeszukać tekst HTML</strong>. Wykorzystamy do tego wyrażenia regularne.</p>
+<hr>
+</section>
+</section>
+<section id="demonstracja-2-wyciąganie-danych-z-html" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Demonstracja 2: wyciąganie danych z HTML</h1>
+<p>Serwer z Demonstracji 1 działa. W <strong>Terminalu 2</strong> otwórz interaktywny Python (<code>python</code>) lub utwórz skrypt <code>crawler.py</code>.</p>
+<section id="krok-1-pobranie-strony" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="krok-1-pobranie-strony"><span class="header-section-number">4.1</span> Krok 1: pobranie strony</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="st">"http://localhost:5000/catalog?page=1"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>html <span class="op">=</span> r.text</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(html)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Widzisz surowy HTML — tabela z miastami i linki nawigacyjne.</p>
+</section>
+<section id="krok-2-link-do-następnej-strony" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="krok-2-link-do-następnej-strony"><span class="header-section-number">4.2</span> Krok 2: link do następnej strony</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>match <span class="op">=</span> re.search(<span class="vs">r'&lt;a href="</span><span class="kw">(</span><span class="pp">[^"]</span><span class="op">+</span><span class="kw">)</span><span class="vs">"&gt;Następna'</span>, html)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> match:</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    next_path <span class="op">=</span> match.group(<span class="dv">1</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Następna strona:"</span>, next_path)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Brak następnej strony"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Wyrażenie regularne — co robi ten wzorzec?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>&lt;a href="([^"]+)"&gt;Następna</code> — szuka tekstu <code>&lt;a href="</code>, potem <strong>przechwytuje</strong> (nawiasy) ciąg znaków niebędących cudzysłowem <code>[^"]+</code>, potem zamykający <code>"</code> i tekst <code>Następna</code>. Wynik w <code>match.group(1)</code> to wartość atrybutu <code>href</code>.</p>
+</div>
+</div>
+<p>Zwróć uwagę: <code>next_path</code> to ścieżka względna (np. <code>/catalog?page=2</code>), nie pełny URL. Aby użyć jej w <code>requests.get</code>, trzeba dodać adres serwera:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="st">"http://localhost:5000"</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>next_url <span class="op">=</span> base <span class="op">+</span> next_path</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(next_url)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="krok-3-dane-z-tabeli" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="krok-3-dane-z-tabeli"><span class="header-section-number">4.3</span> Krok 3: dane z tabeli</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> re.findall(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="vs">r"&lt;tr&gt;</span><span class="dv">\s</span><span class="op">*</span><span class="vs">&lt;td&gt;</span><span class="kw">(</span><span class="dv">.</span><span class="op">*?</span><span class="kw">)</span><span class="vs">&lt;/td&gt;</span><span class="dv">\s</span><span class="op">*</span><span class="vs">&lt;td&gt;</span><span class="kw">(</span><span class="dv">.</span><span class="op">*?</span><span class="kw">)</span><span class="vs">&lt;/td&gt;</span><span class="dv">\s</span><span class="op">*</span><span class="vs">&lt;td&gt;</span><span class="kw">(</span><span class="dv">.</span><span class="op">*?</span><span class="kw">)</span><span class="vs">&lt;/td&gt;</span><span class="dv">\s</span><span class="op">*</span><span class="vs">&lt;/tr&gt;"</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    html,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> name, population, voivodeship <span class="kw">in</span> rows:</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>name<span class="sc">:20s}</span><span class="ss"> </span><span class="sc">{</span>population<span class="sc">:&gt;10s}</span><span class="ss">  </span><span class="sc">{</span>voivodeship<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Wyrażenie regularne — co robi ten wzorzec?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>&lt;tr&gt;\s*&lt;td&gt;(.*?)&lt;/td&gt;\s*&lt;td&gt;(.*?)&lt;/td&gt;\s*&lt;td&gt;(.*?)&lt;/td&gt;\s*&lt;/tr&gt;</code> — szuka wiersza tabeli (<code>&lt;tr&gt;...&lt;/tr&gt;</code>) z trzema komórkami (<code>&lt;td&gt;...&lt;/td&gt;</code>). Każde <code>(.*?)</code> przechwytuje zawartość jednej komórki. <code>\s*</code> ignoruje białe znaki (spacje, nowe linie) między tagami. <code>re.findall</code> zwraca listę krotek — po jednej na każdy wiersz.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Regex na HTML jest zawodny
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Ten wzorzec zadziała, bo HTML naszego serwera ma przewidywalny format. Gdyby tabela miała dodatkowe atrybuty (<code>&lt;td class="..."&gt;</code>), zagnieżdżone tagi albo inny układ spacji — regex by się załamał. Lepszego rozwiązania dostarczają biblioteki do parsowania HTML, np. BeautifulSoup.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Czy <code>rows</code> ma 10 elementów (tyle miast na stronie)? Czy <code>population</code> to string (np. <code>"1862000"</code>)? Pamiętaj, że regex zawsze zwraca tekst — konwersja na <code>int</code> to osobny krok.</p>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="ćwiczenie-1-crawler-katalogu-miast" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Ćwiczenie 1: crawler katalogu miast</h1>
+<p>Serwer z Demonstracji 1 nadal działa. Na Demonstracji 2 zobaczyłeś, jak pobrać jedną stronę i wyciągnąć z niej dane oraz link do następnej. Teraz zamknij ten mechanizm w pętli.</p>
+<p>Utwórz plik <code>crawler.py</code> i uzupełnij szkielet:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>BASE <span class="op">=</span> <span class="st">"http://localhost:5000"</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Wzorce regex — użyj ich w kodzie poniżej.</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>NEXT_LINK_PATTERN <span class="op">=</span> <span class="vs">r'&lt;a href="</span><span class="kw">(</span><span class="pp">[^"]</span><span class="op">+</span><span class="kw">)</span><span class="vs">"&gt;Następna'</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>ROW_PATTERN <span class="op">=</span> <span class="vs">r"&lt;tr&gt;</span><span class="dv">\s</span><span class="op">*</span><span class="vs">&lt;td&gt;</span><span class="kw">(</span><span class="dv">.</span><span class="op">*?</span><span class="kw">)</span><span class="vs">&lt;/td&gt;</span><span class="dv">\s</span><span class="op">*</span><span class="vs">&lt;td&gt;</span><span class="kw">(</span><span class="dv">.</span><span class="op">*?</span><span class="kw">)</span><span class="vs">&lt;/td&gt;</span><span class="dv">\s</span><span class="op">*</span><span class="vs">&lt;td&gt;</span><span class="kw">(</span><span class="dv">.</span><span class="op">*?</span><span class="kw">)</span><span class="vs">&lt;/td&gt;</span><span class="dv">\s</span><span class="op">*</span><span class="vs">&lt;/tr&gt;"</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> crawl_catalog(start_url):</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Przechodzi po stronach katalogu, zbiera dane o miastach.</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="co">    start_url : str</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">        URL pierwszej strony, np. "http://localhost:5000/catalog?page=1".</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="co">    list[dict]</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="co">        Lista słowników z kluczami: name, population, voivodeship.</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    all_cities <span class="op">=</span> []</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> start_url</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    page_num <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> url <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>        page_num <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 1. Pobierz stronę. Użyj requests.get() i raise_for_status().</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 2. Wyciągnij wiersze z tabeli (re.findall + ROW_PATTERN).</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    Dla każdego wiersza utwórz słownik</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    {"name": ..., "population": int(...), "voivodeship": ...}</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    i dodaj do all_cities.</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 3. Znajdź link do następnej strony (re.search + NEXT_LINK_PATTERN).</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    Jeśli jest — zbuduj pełny URL (BASE + ścieżka).</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    Jeśli brak — ustaw url = None.</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 4. Wypisz postęp, np.: "Strona 1: pobrano 10 miast (łącznie 10)"</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> all_cities</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>cities <span class="op">=</span> crawl_catalog(<span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/catalog?page=1"</span>)</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Zebrano </span><span class="sc">{</span><span class="bu">len</span>(cities)<span class="sc">}</span><span class="ss"> miast."</span>)</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a><span class="co"># Zapis do pliku</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"cities.json"</span>, <span class="st">"w"</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>) <span class="im">as</span> f:</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>    json.dump(cities, f, ensure_ascii<span class="op">=</span><span class="va">False</span>, indent<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Zapisano do cities.json"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Przetestuj:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="st">"http://localhost:5000/catalog?page=1"</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(r.text[:<span class="dv">500</span>])   <span class="co"># podgląd HTML — czy wygląda jak oczekiwany?</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Czy crawler wypisał 3 strony i zebrał 30 miast?</li>
+<li>Czy plik <code>cities.json</code> zawiera poprawne dane? Otwórz go i sprawdź.</li>
+<li>Czy crawler zatrzymał się sam na ostatniej stronie (nie zapętlił się)?</li>
+<li>Czy wartości <code>population</code> to liczby (<code>int</code>), nie stringi?</li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
+<section id="ćwiczenie-2-własny-serwer-paginowany" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Ćwiczenie 2: własny serwer paginowany</h1>
+<p>Teraz zbuduj serwer z paginacją od podstaw — z innym zestawem danych. Poniżej szkielet serwera z listą polskich gór. Uzupełnij trasę <code>/peaks</code>.</p>
+<p>Utwórz nowy plik <code>app.py</code> (zatrzymaj poprzedni serwer przez <code>Ctrl+C</code>):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, request</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>PEAKS <span class="op">=</span> [</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Rysy"</span>, <span class="st">"height"</span>: <span class="dv">2499</span>, <span class="st">"range"</span>: <span class="st">"Tatry"</span>},</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Świnica"</span>, <span class="st">"height"</span>: <span class="dv">2301</span>, <span class="st">"range"</span>: <span class="st">"Tatry"</span>},</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Kasprowy Wierch"</span>, <span class="st">"height"</span>: <span class="dv">1987</span>, <span class="st">"range"</span>: <span class="st">"Tatry"</span>},</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Giewont"</span>, <span class="st">"height"</span>: <span class="dv">1895</span>, <span class="st">"range"</span>: <span class="st">"Tatry"</span>},</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Turbacz"</span>, <span class="st">"height"</span>: <span class="dv">1310</span>, <span class="st">"range"</span>: <span class="st">"Gorce"</span>},</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Babia Góra"</span>, <span class="st">"height"</span>: <span class="dv">1725</span>, <span class="st">"range"</span>: <span class="st">"Beskid Żywiecki"</span>},</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Pilsko"</span>, <span class="st">"height"</span>: <span class="dv">1557</span>, <span class="st">"range"</span>: <span class="st">"Beskid Żywiecki"</span>},</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Tarnica"</span>, <span class="st">"height"</span>: <span class="dv">1346</span>, <span class="st">"range"</span>: <span class="st">"Bieszczady"</span>},</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Halicz"</span>, <span class="st">"height"</span>: <span class="dv">1333</span>, <span class="st">"range"</span>: <span class="st">"Bieszczady"</span>},</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Śnieżka"</span>, <span class="st">"height"</span>: <span class="dv">1603</span>, <span class="st">"range"</span>: <span class="st">"Karkonosze"</span>},</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Wielki Szyszak"</span>, <span class="st">"height"</span>: <span class="dv">1509</span>, <span class="st">"range"</span>: <span class="st">"Karkonosze"</span>},</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Śnieżnik"</span>, <span class="st">"height"</span>: <span class="dv">1425</span>, <span class="st">"range"</span>: <span class="st">"Masyw Śnieżnika"</span>},</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Lackowa"</span>, <span class="st">"height"</span>: <span class="dv">997</span>, <span class="st">"range"</span>: <span class="st">"Beskid Niski"</span>},</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Mogielica"</span>, <span class="st">"height"</span>: <span class="dv">1170</span>, <span class="st">"range"</span>: <span class="st">"Beskid Wyspowy"</span>},</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Luboń Wielki"</span>, <span class="st">"height"</span>: <span class="dv">1022</span>, <span class="st">"range"</span>: <span class="st">"Beskid Wyspowy"</span>},</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Skrzyczne"</span>, <span class="st">"height"</span>: <span class="dv">1257</span>, <span class="st">"range"</span>: <span class="st">"Beskid Śląski"</span>},</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Barania Góra"</span>, <span class="st">"height"</span>: <span class="dv">1220</span>, <span class="st">"range"</span>: <span class="st">"Beskid Śląski"</span>},</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Wielka Rawka"</span>, <span class="st">"height"</span>: <span class="dv">1307</span>, <span class="st">"range"</span>: <span class="st">"Bieszczady"</span>},</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Połonina Caryńska"</span>, <span class="st">"height"</span>: <span class="dv">1297</span>, <span class="st">"range"</span>: <span class="st">"Bieszczady"</span>},</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"Szczeliniec Wielki"</span>, <span class="st">"height"</span>: <span class="dv">919</span>, <span class="st">"range"</span>: <span class="st">"Góry Stołowe"</span>},</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>PER_PAGE <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/"</span>)</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> index():</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"""</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;html&gt;&lt;body&gt;</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;h1&gt;Szczyty Polski&lt;/h1&gt;</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;a href="/peaks?page=1"&gt;Katalog szczytów&lt;/a&gt;</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="st">    &lt;/body&gt;&lt;/html&gt;</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/peaks"</span>)</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> peaks():</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>    page <span class="op">=</span> request.args.get(<span class="st">"page"</span>, <span class="dv">1</span>, <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>)</span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Oblicz total_pages — ile stron potrzeba, żeby wyświetlić</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    wszystkie szczyty po PER_PAGE na stronę.</span></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    Wskazówka: (len(PEAKS) + PER_PAGE - 1) // PER_PAGE</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Walidacja: jeśli page &lt; 1 lub page &gt; total_pages,</span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    zwróć HTML z komunikatem "Nie ma takiej strony." i kod 404.</span></span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Oblicz start i end — indeksy wycinka listy PEAKS</span></span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    dla bieżącej strony. Wyciągnij page_peaks = PEAKS[start:end].</span></span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 4. Zbuduj string HTML:</span></span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    - nagłówek &lt;h1&gt; z numerem strony i liczbą stron,</span></span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    - tabela &lt;table border="1"&gt; z nagłówkami: Nazwa, Wysokość, Pasmo,</span></span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    - wiersz &lt;tr&gt;&lt;td&gt;...&lt;/td&gt;... dla każdego szczytu,</span></span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    - linki nawigacyjne:</span></span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        * "← Poprzednia" (jeśli page &gt; 1),</span></span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        * "Następna →" (jeśli page &lt; total_pages).</span></span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a>    <span class="co">#</span></span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    WAŻNE: format linków musi być dokładnie taki:</span></span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        &lt;a href="/peaks?page=N"&gt;Następna →&lt;/a&gt;</span></span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        &lt;a href="/peaks?page=N"&gt;← Poprzednia&lt;/a&gt;</span></span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    Dzięki temu crawler z Ćwiczenia 1 będzie działał</span></span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    na tym serwerze po minimalnych zmianach.</span></span>
+<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> html</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Uruchom serwer i przetestuj w przeglądarce.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Czy <code>/peaks?page=1</code> wyświetla 5 szczytów? Czy strona 4 wyświetla ostatnie 5?</li>
+<li>Czy na stronie 1 nie ma linku „← Poprzednia”? Czy na ostatniej stronie nie ma „Następna →“?</li>
+<li><strong>Test crawlerem</strong>: zmodyfikuj <code>crawl_catalog</code> z Ćwiczenia 1 — zmień <code>start_url</code> na <code>http://localhost:5000/peaks?page=1</code> i dostosuj klucze słownika (<code>name</code>, <code>height</code>, <code>range</code>). Czy crawler przechodzi po wszystkich stronach i zbiera 20 szczytów?</li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
+<section id="ćwiczenia-samodzielne" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Ćwiczenia samodzielne</h1>
+<section id="ćwiczenie-a-crawler-na-serwer-collatza" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="ćwiczenie-a-crawler-na-serwer-collatza"><span class="header-section-number">7.1</span> Ćwiczenie A: crawler na serwer Collatza</h2>
+<p>Na Wykładzie 2 widzieliśmy serwer generujący strony HTML dla ciągu Collatza — każda strona to liczba, a link prowadzi do następnej w ciągu. Uruchom ten serwer (kod z Wykładu 2) i napisz crawlera, który:</p>
+<ol type="1">
+<li>Startuje od <code>/collatz/27</code>.</li>
+<li>Pobiera stronę, wyciąga link do następnej liczby.</li>
+<li>Zbiera odwiedzone liczby do listy.</li>
+<li>Zatrzymuje się, gdy dotrze do <code>n = 1</code>.</li>
+<li>Wypisuje cały ciąg i zapisuje go do pliku <code>collatz_27.json</code>.</li>
+</ol>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Wskazówka: wyciąganie linku
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Link na stronie Collatza ma postać <code>&lt;a href="/collatz/N"&gt;Przejdź do N&lt;/a&gt;</code>. Użyj wzorca <code>r'&lt;a href="(/collatz/\d+)"&gt;Przejdź'</code> — <code>\d+</code> oznacza jedną lub więcej cyfr.</p>
+</div>
+</div>
+<p>Porównaj z Ćwiczeniem 1: tam crawler przechodził po stronach katalogu (wiele danych na stronie, link „Następna”). Tu przechodzi po ciągu liczbowym (jedna dana na stronie, link do konkretnej następnej). Wzorzec jest ten sam: pobierz stronę → wyciągnij link → podążaj.</p>
+</section>
+<section id="ćwiczenie-b-konfigurowalny-per_page" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="ćwiczenie-b-konfigurowalny-per_page"><span class="header-section-number">7.2</span> Ćwiczenie B: konfigurowalny <code>per_page</code></h2>
+<p>Rozbuduj serwer z Ćwiczenia 2 tak, aby <code>per_page</code> było parametrem query string:</p>
+<ul>
+<li><code>/peaks?page=1&amp;per_page=3</code> — 3 szczyty na stronę (7 stron),</li>
+<li><code>/peaks?page=1&amp;per_page=10</code> — 10 szczytów na stronę (2 strony),</li>
+<li><code>/peaks?page=1</code> — domyślnie 5 na stronę (jak dotychczas).</li>
+</ul>
+<p>Przetestuj crawlerem: zbierz dane raz z <code>per_page=3</code>, raz z <code>per_page=10</code>. Czy w obu przypadkach wynik to te same 20 szczytów?</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Wskazówka
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Użyj <code>request.args.get("per_page", PER_PAGE, type=int)</code>. Pamiętaj, żeby linki nawigacyjne zawierały parametr <code>per_page</code>, np. <code>/peaks?page=2&amp;per_page=3</code> — inaczej po kliknięciu „Następna” serwer wróci do domyślnej wartości.</p>
+</div>
+</div>
+</section>
+<section id="ćwiczenie-c-dodatkowe-serwer-z-losowymi-błędami-retry" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="ćwiczenie-c-dodatkowe-serwer-z-losowymi-błędami-retry"><span class="header-section-number">7.3</span> Ćwiczenie C (dodatkowe): serwer z losowymi błędami + retry</h2>
+<p>Rozbuduj serwer z Ćwiczenia 2: z prawdopodobieństwem 30% zwracaj kod 503 zamiast normalnej odpowiedzi.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/peaks"</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> peaks():</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> random.random() <span class="op">&lt;</span> <span class="fl">0.3</span>:</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"&lt;html&gt;&lt;body&gt;&lt;h1&gt;503&lt;/h1&gt;&lt;p&gt;Serwer przeciążony&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;"</span>, <span class="dv">503</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ... reszta kodu ...</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Rozbuduj crawlera o prostą logikę retry: jeśli dostaniesz 503, poczekaj sekundę i spróbuj ponownie (maks. 3 próby).</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Wskazówka
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Na Labie 2 napisałeś funkcję <code>fetch_with_retry</code>. Możesz ją tu wykorzystać bez zmian — wystarczy zaimportować lub skopiować.</p>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="podsumowanie" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Podsumowanie</h1>
+<p>W tym labie:</p>
+<ul>
+<li>uruchomiłeś serwer z paginacją HTML — odpowiednik stron, które dzielą wyniki na podstrony z linkami „Następna / Poprzednia”,</li>
+<li>napisałeś crawlera, który automatycznie przechodzi po stronach i zbiera dane — pętla: pobierz → wyciągnij link → podążaj,</li>
+<li>użyłeś wyrażeń regularnych do wyciągania linków i danych z HTML — i zobaczyłeś, jak kruche i niewygodne jest parsowanie HTML w ten sposób,</li>
+<li>zbudowałeś własny serwer paginowany i przetestowałeś na nim crawlera z innym zestawem danych.</li>
+</ul>
+<p><strong>Co dalej:</strong></p>
+<ul>
+<li><strong>Wykład 3</strong>: HTML jako drzewo — BeautifulSoup, selektory CSS, XPath. Koniec z wyrażeniami regularnymi na HTML.</li>
+<li><strong>Laby 5–6</strong>: ekstrakcja danych z HTML za pomocą dedykowanych narzędzi.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/APD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
