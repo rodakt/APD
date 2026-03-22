@@ -69,6 +69,7 @@ Thumbs.db
 # folder metadanych i robocze
 meta/
 sandbox/
+app/
 
 # --- Pliki tymczasowe i robocze (rozszerzone) ---
 *_tmp.*
