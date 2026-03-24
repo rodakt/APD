@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Wykład 5: Asynchroniczność w Pythonie — od intuicji do httpx – Automatyczne pozyskiwanie danych</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-176b38be48070efe3d434d0a95bef3fe.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-ef324ad6d051ca23791dd96b7ffd98a1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_5.html">Wykład 5: Asynchroniczność w Pythonie — od intuicji do httpx</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Automatyczne pozyskiwanie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automatyczne pozyskiwanie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: HTTP i klienci HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: Serwer HTTP - framework Flask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 3: HTML jako drzewo — selekcja danych</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 4: Cookies, sesje i formularze</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_5.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Wykład 5: Asynchroniczność w Pythonie — od intuicji do httpx</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Python — odświeżenie podstaw</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Klienci HTTP (curl, requests)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: Nawigacja po API — stronicowanie, pipeline, retry</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 3: Tworzenie serwera HTTP w Flask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: Paginacja HTML i prosty crawler</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#cele-i-zakres" id="toc-cele-i-zakres" class="nav-link active" data-scroll-target="#cele-i-zakres"><span class="header-section-number">1</span> Cele i zakres</a></li>
+  <li><a href="#problem-synchroniczna-pętla" id="toc-problem-synchroniczna-pętla" class="nav-link" data-scroll-target="#problem-synchroniczna-pętla"><span class="header-section-number">2</span> Problem: synchroniczna pętla</a>
+  <ul class="collapse">
+  <li><a href="#scenariusz" id="toc-scenariusz" class="nav-link" data-scroll-target="#scenariusz"><span class="header-section-number">2.1</span> Scenariusz</a></li>
+  <li><a href="#diagnoza" id="toc-diagnoza" class="nav-link" data-scroll-target="#diagnoza"><span class="header-section-number">2.2</span> Diagnoza</a></li>
+  <li><a href="#io-bound-vs-cpu-bound" id="toc-io-bound-vs-cpu-bound" class="nav-link" data-scroll-target="#io-bound-vs-cpu-bound"><span class="header-section-number">2.3</span> I/O-bound vs CPU-bound</a></li>
+  </ul></li>
+  <li><a href="#analogia-kelner-w-restauracji" id="toc-analogia-kelner-w-restauracji" class="nav-link" data-scroll-target="#analogia-kelner-w-restauracji"><span class="header-section-number">3</span> Analogia: kelner w restauracji</a>
+  <ul class="collapse">
+  <li><a href="#kelner-synchroniczny" id="toc-kelner-synchroniczny" class="nav-link" data-scroll-target="#kelner-synchroniczny"><span class="header-section-number">3.1</span> Kelner synchroniczny</a></li>
+  <li><a href="#kelner-asynchroniczny" id="toc-kelner-asynchroniczny" class="nav-link" data-scroll-target="#kelner-asynchroniczny"><span class="header-section-number">3.2</span> Kelner asynchroniczny</a></li>
+  <li><a href="#mapowanie-na-programowanie" id="toc-mapowanie-na-programowanie" class="nav-link" data-scroll-target="#mapowanie-na-programowanie"><span class="header-section-number">3.3</span> Mapowanie na programowanie</a></li>
+  </ul></li>
+  <li><a href="#asyncio-od-podstaw" id="toc-asyncio-od-podstaw" class="nav-link" data-scroll-target="#asyncio-od-podstaw"><span class="header-section-number">4</span> <code>asyncio</code> od podstaw</a>
+  <ul class="collapse">
+  <li><a href="#korutyna-funkcja-którą-można-zawieszać" id="toc-korutyna-funkcja-którą-można-zawieszać" class="nav-link" data-scroll-target="#korutyna-funkcja-którą-można-zawieszać"><span class="header-section-number">4.1</span> Korutyna: funkcja, którą można zawieszać</a></li>
+  <li><a href="#asyncio.run-uruchomienie-event-loopu" id="toc-asyncio.run-uruchomienie-event-loopu" class="nav-link" data-scroll-target="#asyncio.run-uruchomienie-event-loopu"><span class="header-section-number">4.2</span> <code>asyncio.run()</code> — uruchomienie event loopu</a></li>
+  </ul></li>
+  <li><a href="#współbieżność-create_task-i-gather" id="toc-współbieżność-create_task-i-gather" class="nav-link" data-scroll-target="#współbieżność-create_task-i-gather"><span class="header-section-number">5</span> Współbieżność: <code>create_task</code> i <code>gather</code></a>
+  <ul class="collapse">
+  <li><a href="#asyncio.create_task-rejestracja-bez-czekania" id="toc-asyncio.create_task-rejestracja-bez-czekania" class="nav-link" data-scroll-target="#asyncio.create_task-rejestracja-bez-czekania"><span class="header-section-number">5.1</span> <code>asyncio.create_task()</code> — rejestracja bez czekania</a></li>
+  <li><a href="#asyncio.gather-czekaj-na-wszystkie" id="toc-asyncio.gather-czekaj-na-wszystkie" class="nav-link" data-scroll-target="#asyncio.gather-czekaj-na-wszystkie"><span class="header-section-number">5.2</span> <code>asyncio.gather()</code> — czekaj na wszystkie</a></li>
+  <li><a href="#asyncio.as_completed-wyniki-w-kolejności-kończenia" id="toc-asyncio.as_completed-wyniki-w-kolejności-kończenia" class="nav-link" data-scroll-target="#asyncio.as_completed-wyniki-w-kolejności-kończenia"><span class="header-section-number">5.3</span> <code>asyncio.as_completed()</code> — wyniki w kolejności kończenia</a></li>
+  <li><a href="#gather-vs-as_completed-kiedy-co" id="toc-gather-vs-as_completed-kiedy-co" class="nav-link" data-scroll-target="#gather-vs-as_completed-kiedy-co"><span class="header-section-number">5.4</span> <code>gather</code> vs <code>as_completed</code> — kiedy co</a></li>
+  </ul></li>
+  <li><a href="#od-asyncio.sleep-do-prawdziwego-http-httpx" id="toc-od-asyncio.sleep-do-prawdziwego-http-httpx" class="nav-link" data-scroll-target="#od-asyncio.sleep-do-prawdziwego-http-httpx"><span class="header-section-number">6</span> Od <code>asyncio.sleep</code> do prawdziwego HTTP: <code>httpx</code></a>
+  <ul class="collapse">
+  <li><a href="#dlaczego-nie-requests" id="toc-dlaczego-nie-requests" class="nav-link" data-scroll-target="#dlaczego-nie-requests"><span class="header-section-number">6.1</span> Dlaczego nie <code>requests</code></a></li>
+  <li><a href="#httpx-asynchroniczny-klient-http" id="toc-httpx-asynchroniczny-klient-http" class="nav-link" data-scroll-target="#httpx-asynchroniczny-klient-http"><span class="header-section-number">6.2</span> <code>httpx</code> — asynchroniczny klient HTTP</a></li>
+  <li><a href="#dlaczego-async-with" id="toc-dlaczego-async-with" class="nav-link" data-scroll-target="#dlaczego-async-with"><span class="header-section-number">6.3</span> Dlaczego <code>async with</code></a></li>
+  <li><a href="#pełny-przykład-sync-vs-async" id="toc-pełny-przykład-sync-vs-async" class="nav-link" data-scroll-target="#pełny-przykład-sync-vs-async"><span class="header-section-number">6.4</span> Pełny przykład: sync vs async</a></li>
+  </ul></li>
+  <li><a href="#kontrola-współbieżności" id="toc-kontrola-współbieżności" class="nav-link" data-scroll-target="#kontrola-współbieżności"><span class="header-section-number">7</span> Kontrola współbieżności</a>
+  <ul class="collapse">
+  <li><a href="#problem-za-dużo-żądań-naraz" id="toc-problem-za-dużo-żądań-naraz" class="nav-link" data-scroll-target="#problem-za-dużo-żądań-naraz"><span class="header-section-number">7.1</span> Problem: za dużo żądań naraz</a></li>
+  <li><a href="#asyncio.semaphore-ogranicznik-współbieżności" id="toc-asyncio.semaphore-ogranicznik-współbieżności" class="nav-link" data-scroll-target="#asyncio.semaphore-ogranicznik-współbieżności"><span class="header-section-number">7.2</span> <code>asyncio.Semaphore</code> — ogranicznik współbieżności</a></li>
+  <li><a href="#timeouty" id="toc-timeouty" class="nav-link" data-scroll-target="#timeouty"><span class="header-section-number">7.3</span> Timeouty</a></li>
+  </ul></li>
+  <li><a href="#obsługa-błędów-w-gather" id="toc-obsługa-błędów-w-gather" class="nav-link" data-scroll-target="#obsługa-błędów-w-gather"><span class="header-section-number">8</span> Obsługa błędów w <code>gather</code></a>
+  <ul class="collapse">
+  <li><a href="#domyślne-zachowanie-przerwanie-na-pierwszym-błędzie" id="toc-domyślne-zachowanie-przerwanie-na-pierwszym-błędzie" class="nav-link" data-scroll-target="#domyślne-zachowanie-przerwanie-na-pierwszym-błędzie"><span class="header-section-number">8.1</span> Domyślne zachowanie: przerwanie na pierwszym błędzie</a></li>
+  <li><a href="#return_exceptionstrue-zbierz-wszystko" id="toc-return_exceptionstrue-zbierz-wszystko" class="nav-link" data-scroll-target="#return_exceptionstrue-zbierz-wszystko"><span class="header-section-number">8.2</span> <code>return_exceptions=True</code> — zbierz wszystko</a></li>
+  <li><a href="#alternatywa-tryexcept-wewnątrz-korutyny" id="toc-alternatywa-tryexcept-wewnątrz-korutyny" class="nav-link" data-scroll-target="#alternatywa-tryexcept-wewnątrz-korutyny"><span class="header-section-number">8.3</span> Alternatywa: <code>try/except</code> wewnątrz korutyny</a></li>
+  </ul></li>
+  <li><a href="#time.sleep-vs-asyncio.sleep-pułapka-blokowania" id="toc-time.sleep-vs-asyncio.sleep-pułapka-blokowania" class="nav-link" data-scroll-target="#time.sleep-vs-asyncio.sleep-pułapka-blokowania"><span class="header-section-number">9</span> <code>time.sleep</code> vs <code>asyncio.sleep</code> — pułapka blokowania</a></li>
+  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">10</span> Podsumowanie</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_5.html">Wykład 5: Asynchroniczność w Pythonie — od intuicji do httpx</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Wykład 5: Asynchroniczność w Pythonie — od intuicji do httpx</h1>
+<p class="subtitle lead">Automatyczne pozyskiwanie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="cele-i-zakres" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="cele-i-zakres"><span class="header-section-number">1</span> Cele i zakres</h2>
+<p>Na poprzednich wykładach i labach pobieraliśmy dane z sieci synchronicznie: jedno żądanie za drugim, w pętli <code>for</code>. To podejście jest proste i wystarczające, gdy żądań jest kilka. Przy dziesiątkach lub setkach żądań staje się jednak nieakceptowalnie wolne — nie dlatego, że procesor jest przeciążony, lecz dlatego, że klient przez większość czasu <strong>bezczynnie czeka</strong> na odpowiedzi serwera.</p>
+<p>Zakres obejmuje:</p>
+<ul>
+<li>problem synchronicznego pobierania — diagnoza i pomiar,</li>
+<li>I/O-bound vs CPU-bound — dlaczego standardowe techniki przyspieszania (szybszy procesor, lepszy algorytm) tu nie pomagają,</li>
+<li>model asynchroniczny — event loop, korutyny, <code>await</code>,</li>
+<li><code>asyncio</code> od podstaw — <code>async def</code>, <code>asyncio.sleep()</code>, <code>asyncio.run()</code>,</li>
+<li>współbieżność — <code>create_task</code>, <code>gather</code>, <code>as_completed</code>,</li>
+<li><code>httpx.AsyncClient</code> — asynchroniczny HTTP z API w stylu <code>requests</code>,</li>
+<li>kontrola i odporność — <code>Semaphore</code>, timeouty, obsługa błędów w <code>gather</code>.</li>
+</ul>
+<hr>
+</section>
+<section id="problem-synchroniczna-pętla" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="problem-synchroniczna-pętla"><span class="header-section-number">2</span> Problem: synchroniczna pętla</h2>
+<section id="scenariusz" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="scenariusz"><span class="header-section-number">2.1</span> Scenariusz</h3>
+<p>Wyobraźmy sobie serwer Flask z endpointem, który odpowiada z jednosekundowym opóźnieniem — symuluje np. bazę danych, obliczenia lub wolne łącze:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, jsonify</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/data/&lt;int:page&gt;"</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data(page):</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">1</span>)  <span class="co"># symulacja wolnego serwera</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jsonify({<span class="st">"page"</span>: page, <span class="st">"items"</span>: [<span class="ss">f"item-</span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>)]})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Klient w <code>requests</code>, który pobiera 10 stron:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> time.perf_counter()</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> []</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> page <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> requests.get(<span class="ss">f"http://127.0.0.1:5000/data/</span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    results.append(r.json())</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>elapsed <span class="op">=</span> time.perf_counter() <span class="op">-</span> start</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Pobrano </span><span class="sc">{</span><span class="bu">len</span>(results)<span class="sc">}</span><span class="ss"> stron w </span><span class="sc">{</span>elapsed<span class="sc">:.1f}</span><span class="ss">s"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Pobrano 10 stron w 10.2s</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Dziesięć stron, po sekundzie każda — łącznie ponad 10 sekund.</p>
+</section>
+<section id="diagnoza" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="diagnoza"><span class="header-section-number">2.2</span> Diagnoza</h3>
+<p>Problem nie leży w procesorze. Procesor praktycznie nic nie robi — parsowanie JSON z jednej strony trwa ułamki milisekundy. Problem leży w <strong>oczekiwaniu na I/O</strong>: klient wysyła żądanie, potem stoi bezczynnie, aż serwer odpowie. Dopiero wtedy wysyła kolejne żądanie.</p>
+<pre><code>Żądanie 0:  [====wysyłka====][.........czekanie.........][odbiór]
+Żądanie 1:                                                       [====wysyłka====][.........czekanie.........][odbiór]
+Żądanie 2:                                                                                                           [====wysyłka====]...</code></pre>
+<p>Każde żądanie zaczyna się <strong>dopiero po zakończeniu poprzedniego</strong>. Okresy bezczynnego czekania sumują się.</p>
+</section>
+<section id="io-bound-vs-cpu-bound" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="io-bound-vs-cpu-bound"><span class="header-section-number">2.3</span> I/O-bound vs CPU-bound</h3>
+<p>To rozróżnienie jest fundamentalne:</p>
+<ul>
+<li><strong>CPU-bound</strong> — program jest wolny, bo procesor ma dużo do obliczenia (np. trenowanie modelu ML, kompresja wideo). Rozwiązanie: szybszy procesor, lepszy algorytm, wielowątkowość.</li>
+<li><strong>I/O-bound</strong> — program jest wolny, bo czeka na operacje wejścia/wyjścia (sieć, dysk, baza danych). Procesor jest bezczynny przez większość czasu.</li>
+</ul>
+<p>Pobieranie danych z sieci to klasyczny problem I/O-bound. Szybszy procesor nic tu nie zmieni — i tak 99% czasu to oczekiwanie na odpowiedź serwera.</p>
+<p>Rozwiązanie: zamiast czekać bezczynnie na jedno żądanie, <strong>wyślij kolejne żądania w międzyczasie</strong>. To jest idea asynchroniczności.</p>
+<hr>
+</section>
+</section>
+<section id="analogia-kelner-w-restauracji" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="analogia-kelner-w-restauracji"><span class="header-section-number">3</span> Analogia: kelner w restauracji</h2>
+<section id="kelner-synchroniczny" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="kelner-synchroniczny"><span class="header-section-number">3.1</span> Kelner synchroniczny</h3>
+<p>Wyobraź sobie kelnera, który obsługuje restaurację w ten sposób:</p>
+<ol type="1">
+<li>Podchodzi do stolika 1, przyjmuje zamówienie.</li>
+<li>Idzie do kuchni, przekazuje zamówienie.</li>
+<li><strong>Stoi przy okienku i czeka</strong>, aż danie będzie gotowe.</li>
+<li>Odbiera danie, niesie do stolika 1.</li>
+<li>Dopiero teraz podchodzi do stolika 2.</li>
+</ol>
+<p>Jeśli kuchnia potrzebuje 10 minut na danie, a w restauracji jest 5 stolików — ostatni klient czeka 50 minut. Kelner przez większość czasu <strong>stoi bezczynnie</strong> przy okienku.</p>
+</section>
+<section id="kelner-asynchroniczny" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="kelner-asynchroniczny"><span class="header-section-number">3.2</span> Kelner asynchroniczny</h3>
+<p>Ten sam kelner, ale zmienia strategię:</p>
+<ol type="1">
+<li>Podchodzi do stolika 1, przyjmuje zamówienie, przekazuje do kuchni.</li>
+<li><strong>Nie czeka</strong> — wraca na salę.</li>
+<li>Podchodzi do stolika 2, przyjmuje zamówienie, przekazuje do kuchni.</li>
+<li>Podchodzi do stolika 3…</li>
+<li>Kuchnia sygnalizuje: „danie dla stolika 1 gotowe” — kelner odbiera i podaje.</li>
+</ol>
+<p>Jeden kelner, te same dania, ten sam czas przygotowania — ale wszystkie stoliki złożyły zamówienia niemal jednocześnie. Łączny czas obsługi to czas najdłuższego dania, nie suma wszystkich.</p>
+</section>
+<section id="mapowanie-na-programowanie" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="mapowanie-na-programowanie"><span class="header-section-number">3.3</span> Mapowanie na programowanie</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Restauracja</th>
+<th>Programowanie</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>kelner</td>
+<td>event loop</td>
+</tr>
+<tr class="even">
+<td>zamówienie</td>
+<td>żądanie HTTP</td>
+</tr>
+<tr class="odd">
+<td>kuchnia</td>
+<td>serwer</td>
+</tr>
+<tr class="even">
+<td>gotowe danie</td>
+<td>odpowiedź</td>
+</tr>
+<tr class="odd">
+<td>„stoi i czeka”</td>
+<td><code>requests.get()</code> — blokuje</td>
+</tr>
+<tr class="even">
+<td>„wraca na salę”</td>
+<td><code>await</code> — oddaje sterowanie</td>
+</tr>
+</tbody>
+</table>
+<p>Kluczowy wniosek: nie potrzebujemy wielu kelnerów (wątków, procesów). Potrzebujemy <strong>jednego kelnera</strong>, który nie blokuje się na oczekiwaniu.</p>
+<hr>
+</section>
+</section>
+<section id="asyncio-od-podstaw" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="asyncio-od-podstaw"><span class="header-section-number">4</span> <code>asyncio</code> od podstaw</h2>
+<section id="korutyna-funkcja-którą-można-zawieszać" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="korutyna-funkcja-którą-można-zawieszać"><span class="header-section-number">4.1</span> Korutyna: funkcja, którą można zawieszać</h3>
+<p>W zwykłym Pythonie wywołanie funkcji blokuje — program czeka na jej zakończenie:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fetch_page(page_id):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">1</span>)       <span class="co"># tu program stoi</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"dane-</span><span class="sc">{</span>page_id<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> fetch_page(<span class="dv">1</span>)  <span class="co"># wraca po 1 sekundzie</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Korutyna</strong> (coroutine) to funkcja, której wykonanie można <strong>zawiesić</strong> w punkcie oczekiwania i wznowić później. Definiujemy ją słowem <code>async def</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> asyncio</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> fetch_page(page_id):</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Start: strona </span><span class="sc">{</span>page_id<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> asyncio.sleep(<span class="dv">1</span>)   <span class="co"># zawieszenie — oddajemy sterowanie</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Gotowe: strona </span><span class="sc">{</span>page_id<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"dane-</span><span class="sc">{</span>page_id<span class="sc">}</span><span class="ss">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Trzy nowe elementy:</p>
+<ul>
+<li><code>async def</code> — deklaruje korutynę (zamiast zwykłej funkcji).</li>
+<li><code>await</code> — punkt zawieszenia. Mówi: „tu czekam na wynik, ale w międzyczasie event loop może robić coś innego”.</li>
+<li><code>asyncio.sleep(1)</code> — asynchroniczny odpowiednik <code>time.sleep(1)</code>. Nie blokuje event loopu — tylko rejestruje „obudź mnie za sekundę”.</li>
+</ul>
+</section>
+<section id="asyncio.run-uruchomienie-event-loopu" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="asyncio.run-uruchomienie-event-loopu"><span class="header-section-number">4.2</span> <code>asyncio.run()</code> — uruchomienie event loopu</h3>
+<p>Korutyny nie można wywołać jak zwykłej funkcji. Potrzebny jest <strong>event loop</strong> — pętla sterująca, która zarządza zawieszaniem i wznawianiem korutyn:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> main():</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> <span class="cf">await</span> fetch_page(<span class="dv">1</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(result)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>asyncio.run(main())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre><code>Start: strona 1
+Gotowe: strona 1
+dane-1</code></pre>
+<p><code>asyncio.run()</code> tworzy event loop, uruchamia w nim korutynę <code>main()</code> i czeka na jej zakończenie. To jedyny punkt wejścia — cały kod asynchroniczny żyje wewnątrz <code>asyncio.run()</code>.</p>
+<p>Na razie nie ma żadnego zysku — jedna korutyna działa tak samo jak zwykła funkcja. Zysk pojawia się, gdy uruchomimy <strong>wiele korutyn jednocześnie</strong>.</p>
+<hr>
+</section>
+</section>
+<section id="współbieżność-create_task-i-gather" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="współbieżność-create_task-i-gather"><span class="header-section-number">5</span> Współbieżność: <code>create_task</code> i <code>gather</code></h2>
+<section id="asyncio.create_task-rejestracja-bez-czekania" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="asyncio.create_task-rejestracja-bez-czekania"><span class="header-section-number">5.1</span> <code>asyncio.create_task()</code> — rejestracja bez czekania</h3>
+<p><code>create_task</code> rejestruje korutynę w event loopie i <strong>natychmiast wraca</strong> — nie czeka na jej zakończenie:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> main():</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    task1 <span class="op">=</span> asyncio.create_task(fetch_page(<span class="dv">1</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    task2 <span class="op">=</span> asyncio.create_task(fetch_page(<span class="dv">2</span>))</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Obie korutyny już działają w tle.</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Teraz czekamy na wyniki:</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    result1 <span class="op">=</span> <span class="cf">await</span> task1</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    result2 <span class="op">=</span> <span class="cf">await</span> task2</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(result1, result2)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>asyncio.run(main())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre><code>Start: strona 1
+Start: strona 2
+Gotowe: strona 1
+Gotowe: strona 2
+dane-1 dane-2</code></pre>
+<p>Obie korutyny wystartowały niemal jednocześnie. Każda czeka sekundę, ale czekają <strong>równolegle</strong> — łączny czas to ~1 sekunda, nie 2.</p>
+</section>
+<section id="asyncio.gather-czekaj-na-wszystkie" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="asyncio.gather-czekaj-na-wszystkie"><span class="header-section-number">5.2</span> <code>asyncio.gather()</code> — czekaj na wszystkie</h3>
+<p>Gdy mamy wiele zadań, <code>gather</code> jest wygodniejszy niż ręczne <code>create_task</code> + <code>await</code> dla każdego:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> main():</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    tasks <span class="op">=</span> [fetch_page(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>)]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> <span class="cf">await</span> asyncio.gather(<span class="op">*</span>tasks)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(results)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>asyncio.run(main())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre><code>Start: strona 0
+Start: strona 1
+Start: strona 2
+Start: strona 3
+Start: strona 4
+Gotowe: strona 0
+Gotowe: strona 1
+Gotowe: strona 2
+Gotowe: strona 3
+Gotowe: strona 4
+['dane-0', 'dane-1', 'dane-2', 'dane-3', 'dane-4']</code></pre>
+<p>Pięć korutyn, każda czeka sekundę — łączny czas to ~1 sekunda. <code>gather</code> zwraca listę wyników <strong>w tej samej kolejności</strong>, w jakiej przekazaliśmy korutyny.</p>
+</section>
+<section id="asyncio.as_completed-wyniki-w-kolejności-kończenia" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="asyncio.as_completed-wyniki-w-kolejności-kończenia"><span class="header-section-number">5.3</span> <code>asyncio.as_completed()</code> — wyniki w kolejności kończenia</h3>
+<p><code>gather</code> czeka, aż <strong>wszystkie</strong> korutyny się zakończą, i dopiero wtedy zwraca wyniki. Czasem chcemy przetwarzać wyniki <strong>w miarę jak się pojawiają</strong> — np. wyświetlać postęp lub zapisywać dane na bieżąco.</p>
+<p><code>as_completed</code> zwraca iterator korutyn do oczekiwania — w kolejności, w jakiej się kończą:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> fetch_page_variable(page_id, delay):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Strony z różnymi czasami odpowiedzi."""</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Start: strona </span><span class="sc">{</span>page_id<span class="sc">}</span><span class="ss"> (delay=</span><span class="sc">{</span>delay<span class="sc">}</span><span class="ss">s)"</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> asyncio.sleep(delay)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"dane-</span><span class="sc">{</span>page_id<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> main():</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    tasks <span class="op">=</span> [</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>        fetch_page_variable(<span class="dv">0</span>, <span class="fl">3.0</span>),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>        fetch_page_variable(<span class="dv">1</span>, <span class="fl">1.0</span>),</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        fetch_page_variable(<span class="dv">2</span>, <span class="fl">2.0</span>),</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> coro <span class="kw">in</span> asyncio.as_completed(tasks):</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> <span class="cf">await</span> coro</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Otrzymano: </span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>asyncio.run(main())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre><code>Start: strona 0 (delay=3.0s)
+Start: strona 1 (delay=1.0s)
+Start: strona 2 (delay=2.0s)
+Otrzymano: dane-1
+Otrzymano: dane-2
+Otrzymano: dane-0</code></pre>
+<p>Strona 1 skończyła się pierwsza (najkrótsze opóźnienie), mimo że została przekazana jako druga. <code>as_completed</code> pozwala reagować natychmiast, bez czekania na najwolniejsze zadanie.</p>
+</section>
+<section id="gather-vs-as_completed-kiedy-co" class="level3" data-number="5.4">
+<h3 data-number="5.4" class="anchored" data-anchor-id="gather-vs-as_completed-kiedy-co"><span class="header-section-number">5.4</span> <code>gather</code> vs <code>as_completed</code> — kiedy co</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Cecha</th>
+<th><code>gather</code></th>
+<th><code>as_completed</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Zwraca wyniki</td>
+<td>po zakończeniu wszystkich</td>
+<td>w kolejności kończenia</td>
+</tr>
+<tr class="even">
+<td>Kolejność wyników</td>
+<td>taka sama jak wejściowa</td>
+<td>kolejność zakończenia</td>
+</tr>
+<tr class="odd">
+<td>Zastosowanie</td>
+<td>pobranie stałego zestawu danych</td>
+<td>przetwarzanie na bieżąco, postęp</td>
+</tr>
+</tbody>
+</table>
+<p>W praktyce <code>gather</code> jest częstszy — prostszy kod, przewidywalna kolejność. <code>as_completed</code> przydaje się, gdy chcemy np. wyświetlać pasek postępu lub zapisywać wyniki do pliku na bieżąco.</p>
+<hr>
+</section>
+</section>
+<section id="od-asyncio.sleep-do-prawdziwego-http-httpx" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="od-asyncio.sleep-do-prawdziwego-http-httpx"><span class="header-section-number">6</span> Od <code>asyncio.sleep</code> do prawdziwego HTTP: <code>httpx</code></h2>
+<section id="dlaczego-nie-requests" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="dlaczego-nie-requests"><span class="header-section-number">6.1</span> Dlaczego nie <code>requests</code></h3>
+<p>Do tej pory używaliśmy <code>asyncio.sleep</code> jako symulacji operacji I/O. W prawdziwym kodzie chcemy wysyłać żądania HTTP. Czy można użyć <code>requests</code>?</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> fetch(url):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> requests.get(url)      <span class="co"># TO NIE DZIAŁA jak chcemy</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> r.text</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Ten kod jest poprawny składniowo, ale <strong>nie daje żadnego zysku z asynchroniczności</strong>. <code>requests.get()</code> jest funkcją synchroniczną — blokuje event loop na czas oczekiwania na odpowiedź. Inne korutyny nie mogą działać w międzyczasie. Efekt: taki sam jak zwykła pętla <code>for</code>.</p>
+<p>Problem: <code>requests.get()</code> nie jest korutyną — nie można na niej zrobić <code>await</code>, bo nie ma punktu zawieszenia. Event loop nie wie, kiedy <code>requests.get()</code> czeka na sieć, a kiedy przetwarza dane — z jego perspektywy to jedna nieprzerwana operacja.</p>
+</section>
+<section id="httpx-asynchroniczny-klient-http" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="httpx-asynchroniczny-klient-http"><span class="header-section-number">6.2</span> <code>httpx</code> — asynchroniczny klient HTTP</h3>
+<p><code>httpx</code> to biblioteka HTTP, która ma API niemal identyczne z <code>requests</code>, ale wspiera natywny tryb asynchroniczny. To, co student zna z <code>requests</code> — <code>r.status_code</code>, <code>r.text</code>, <code>r.json()</code>, <code>r.headers</code> — działa tak samo w <code>httpx</code>.</p>
+<p>Instalacja:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install httpx</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Porównanie:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># requests (synchroniczne)</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="st">"http://127.0.0.1:5000/data/1"</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(r.json())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># httpx (asynchroniczne)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> httpx</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> fetch():</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="cf">with</span> httpx.AsyncClient() <span class="im">as</span> client:</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        r <span class="op">=</span> <span class="cf">await</span> client.get(<span class="st">"http://127.0.0.1:5000/data/1"</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(r.json())</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>asyncio.run(fetch())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Dwie różnice:</p>
+<ol type="1">
+<li><code>httpx.AsyncClient()</code> zamiast <code>requests</code> — i używamy go w bloku <code>async with</code>.</li>
+<li><code>await client.get(...)</code> zamiast <code>requests.get(...)</code> — tu jest punkt zawieszenia.</li>
+</ol>
+</section>
+<section id="dlaczego-async-with" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="dlaczego-async-with"><span class="header-section-number">6.3</span> Dlaczego <code>async with</code></h3>
+<p><code>httpx.AsyncClient</code> zarządza <strong>pulą połączeń</strong> TCP. Blok <code>async with</code> gwarantuje, że połączenia zostaną zamknięte po zakończeniu pracy — analogicznie do <code>with open(...)</code> przy plikach. Bez <code>async with</code> połączenia mogą wyciekać, a program wypisywać ostrzeżenia.</p>
+</section>
+<section id="pełny-przykład-sync-vs-async" class="level3" data-number="6.4">
+<h3 data-number="6.4" class="anchored" data-anchor-id="pełny-przykład-sync-vs-async"><span class="header-section-number">6.4</span> Pełny przykład: sync vs async</h3>
+<p>Serwer Flask z opóźnieniem (ten sam co wcześniej):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># serwer.py</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask, jsonify</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/data/&lt;int:page&gt;"</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> data(page):</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">1</span>)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> jsonify({<span class="st">"page"</span>: page, <span class="st">"items"</span>: [<span class="ss">f"item-</span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>)]})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Klient synchroniczny:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>start <span class="op">=</span> time.perf_counter()</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> []</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> page <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>):</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> requests.get(<span class="ss">f"http://127.0.0.1:5000/data/</span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    results.append(r.json())</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>elapsed <span class="op">=</span> time.perf_counter() <span class="op">-</span> start</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Sync: </span><span class="sc">{</span><span class="bu">len</span>(results)<span class="sc">}</span><span class="ss"> stron w </span><span class="sc">{</span>elapsed<span class="sc">:.1f}</span><span class="ss">s"</span>)</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Sync: 10 stron w 10.2s</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Klient asynchroniczny:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> asyncio</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> httpx</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> main():</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    start <span class="op">=</span> time.perf_counter()</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="cf">with</span> httpx.AsyncClient() <span class="im">as</span> client:</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        tasks <span class="op">=</span> [client.get(<span class="ss">f"http://127.0.0.1:5000/data/</span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">"</span>) <span class="cf">for</span> page <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>)]</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>        responses <span class="op">=</span> <span class="cf">await</span> asyncio.gather(<span class="op">*</span>tasks)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> [r.json() <span class="cf">for</span> r <span class="kw">in</span> responses]</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    elapsed <span class="op">=</span> time.perf_counter() <span class="op">-</span> start</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Async: </span><span class="sc">{</span><span class="bu">len</span>(results)<span class="sc">}</span><span class="ss"> stron w </span><span class="sc">{</span>elapsed<span class="sc">:.1f}</span><span class="ss">s"</span>)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>asyncio.run(main())</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Async: 10 stron w 1.3s</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wynik: ~10x szybciej. Wszystkie żądania wysłane niemal jednocześnie, klient czekał na odpowiedzi równolegle.</p>
+<hr>
+</section>
+</section>
+<section id="kontrola-współbieżności" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="kontrola-współbieżności"><span class="header-section-number">7</span> Kontrola współbieżności</h2>
+<section id="problem-za-dużo-żądań-naraz" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="problem-za-dużo-żądań-naraz"><span class="header-section-number">7.1</span> Problem: za dużo żądań naraz</h3>
+<p>W przykładzie wyżej wysłaliśmy 10 żądań jednocześnie. Co, jeśli mamy 1000 URL-ów?</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>tasks <span class="op">=</span> [client.get(url) <span class="cf">for</span> url <span class="kw">in</span> urls]  <span class="co"># 1000 żądań naraz</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>responses <span class="op">=</span> <span class="cf">await</span> asyncio.gather(<span class="op">*</span>tasks)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>To może spowodować:</p>
+<ul>
+<li><strong>przeciążenie serwera</strong> — 1000 jednoczesnych połączeń to de facto atak DDoS,</li>
+<li><strong>wyczerpanie pamięci</strong> — 1000 otwartych połączeń i buforów,</li>
+<li><strong>błędy sieciowe</strong> — system operacyjny ma limit otwartych gniazd.</li>
+</ul>
+<p>Potrzebujemy mechanizmu, który ograniczy liczbę <strong>równoczesnych</strong> żądań — np. do 5 lub 10.</p>
+</section>
+<section id="asyncio.semaphore-ogranicznik-współbieżności" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="asyncio.semaphore-ogranicznik-współbieżności"><span class="header-section-number">7.2</span> <code>asyncio.Semaphore</code> — ogranicznik współbieżności</h3>
+<p>Semafor to licznik, który pozwala najwyżej N korutynom wejść do chronionej sekcji jednocześnie. Pozostałe czekają, aż któraś wyjdzie:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>sem <span class="op">=</span> asyncio.Semaphore(<span class="dv">5</span>)  <span class="co"># maks. 5 jednocześnie</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> fetch_limited(client, url):</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="cf">with</span> sem:                         <span class="co"># czekaj na wolne miejsce</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>        r <span class="op">=</span> <span class="cf">await</span> client.get(url)           <span class="co"># wykonaj żądanie</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> r.json()                     <span class="co"># po return — miejsce się zwalnia</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> main():</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    urls <span class="op">=</span> [<span class="ss">f"http://127.0.0.1:5000/data/</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">50</span>)]</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="cf">with</span> httpx.AsyncClient() <span class="im">as</span> client:</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>        tasks <span class="op">=</span> [fetch_limited(client, url) <span class="cf">for</span> url <span class="kw">in</span> urls]</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>        results <span class="op">=</span> <span class="cf">await</span> asyncio.gather(<span class="op">*</span>tasks)</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Pobrano </span><span class="sc">{</span><span class="bu">len</span>(results)<span class="sc">}</span><span class="ss"> stron"</span>)</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>asyncio.run(main())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Bez semafora: 50 żądań jednocześnie. Z semaforem (5): w dowolnym momencie działa najwyżej 5 żądań, pozostałe czekają na zwolnienie miejsca.</p>
+<p>Analogia: 5 okienek w urzędzie. W poczekalni może być 100 osób, ale obsługiwanych jest jednocześnie najwyżej 5. Gdy ktoś odchodzi od okienka, następna osoba podchodzi.</p>
+</section>
+<section id="timeouty" class="level3" data-number="7.3">
+<h3 data-number="7.3" class="anchored" data-anchor-id="timeouty"><span class="header-section-number">7.3</span> Timeouty</h3>
+<p><code>httpx</code> wspiera timeouty na dwóch poziomach:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Timeout domyślny dla wszystkich żądań w kliencie</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="cf">with</span> httpx.AsyncClient(timeout<span class="op">=</span><span class="fl">10.0</span>) <span class="im">as</span> client:</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> <span class="cf">await</span> client.get(url)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Timeout per żądanie (nadpisuje domyślny)</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> <span class="cf">await</span> client.get(url, timeout<span class="op">=</span><span class="fl">5.0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Timeout dotyczy <strong>całego żądania</strong> — od wysłania do otrzymania pełnej odpowiedzi. Jeśli serwer nie odpowie w zadanym czasie, <code>httpx</code> rzuca <code>httpx.TimeoutException</code>.</p>
+<p>W kontekście asynchronicznym timeout jest szczególnie ważny: jedno wiszące żądanie może blokować miejsce w semaforze, opóźniając wszystkie pozostałe.</p>
+<hr>
+</section>
+</section>
+<section id="obsługa-błędów-w-gather" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="obsługa-błędów-w-gather"><span class="header-section-number">8</span> Obsługa błędów w <code>gather</code></h2>
+<section id="domyślne-zachowanie-przerwanie-na-pierwszym-błędzie" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="domyślne-zachowanie-przerwanie-na-pierwszym-błędzie"><span class="header-section-number">8.1</span> Domyślne zachowanie: przerwanie na pierwszym błędzie</h3>
+<p>Domyślnie <code>gather</code> przerywa działanie, gdy którakolwiek korutyna rzuci wyjątek — i propaguje ten wyjątek do kodu wywołującego:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> fetch_page(client, url):</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> <span class="cf">await</span> client.get(url)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    r.raise_for_status()</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> r.json()</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> main():</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    urls <span class="op">=</span> [</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"http://127.0.0.1:5000/data/1"</span>,</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"http://127.0.0.1:5000/nie-istnieje"</span>,   <span class="co"># 404</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"http://127.0.0.1:5000/data/3"</span>,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="cf">with</span> httpx.AsyncClient() <span class="im">as</span> client:</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>        tasks <span class="op">=</span> [fetch_page(client, url) <span class="cf">for</span> url <span class="kw">in</span> urls]</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>            results <span class="op">=</span> <span class="cf">await</span> asyncio.gather(<span class="op">*</span>tasks)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> httpx.HTTPStatusError <span class="im">as</span> e:</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"Błąd: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Nie wiemy, które żądania się udały, a które nie</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Problem: dostajemy jeden wyjątek, ale nie wiemy, ile żądań się udało i jakie są ich wyniki.</p>
+</section>
+<section id="return_exceptionstrue-zbierz-wszystko" class="level3" data-number="8.2">
+<h3 data-number="8.2" class="anchored" data-anchor-id="return_exceptionstrue-zbierz-wszystko"><span class="header-section-number">8.2</span> <code>return_exceptions=True</code> — zbierz wszystko</h3>
+<p>Parametr <code>return_exceptions=True</code> zmienia zachowanie: <code>gather</code> nie przerywa na wyjątkach, ale wstawia je do listy wyników na odpowiadające pozycje:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> main():</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    urls <span class="op">=</span> [</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"http://127.0.0.1:5000/data/1"</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"http://127.0.0.1:5000/nie-istnieje"</span>,   <span class="co"># 404</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"http://127.0.0.1:5000/data/3"</span>,</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="cf">with</span> httpx.AsyncClient() <span class="im">as</span> client:</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>        tasks <span class="op">=</span> [fetch_page(client, url) <span class="cf">for</span> url <span class="kw">in</span> urls]</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>        results <span class="op">=</span> <span class="cf">await</span> asyncio.gather(<span class="op">*</span>tasks, return_exceptions<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> url, result <span class="kw">in</span> <span class="bu">zip</span>(urls, results):</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(result, <span class="pp">Exception</span>):</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"BŁĄD  </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss"> → </span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"OK    </span><span class="sc">{</span>url<span class="sc">}</span><span class="ss"> → </span><span class="sc">{</span><span class="bu">len</span>(result[<span class="st">'items'</span>])<span class="sc">}</span><span class="ss"> elementów"</span>)</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>asyncio.run(main())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<pre><code>OK    http://127.0.0.1:5000/data/1 → 5 elementów
+BŁĄD  http://127.0.0.1:5000/nie-istnieje → ...
+OK    http://127.0.0.1:5000/data/3 → 5 elementów</code></pre>
+<p>Wyniki: 2 sukcesy, 1 błąd — ale żaden wynik nie jest utracony.</p>
+</section>
+<section id="alternatywa-tryexcept-wewnątrz-korutyny" class="level3" data-number="8.3">
+<h3 data-number="8.3" class="anchored" data-anchor-id="alternatywa-tryexcept-wewnątrz-korutyny"><span class="header-section-number">8.3</span> Alternatywa: <code>try/except</code> wewnątrz korutyny</h3>
+<p>Zamiast filtrować wyniki po <code>gather</code>, można obsłużyć błędy <strong>wewnątrz</strong> każdej korutyny:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> fetch_page_safe(client, url):</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>        r <span class="op">=</span> <span class="cf">await</span> client.get(url, timeout<span class="op">=</span><span class="fl">5.0</span>)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>        r.raise_for_status()</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">"url"</span>: url, <span class="st">"status"</span>: <span class="st">"ok"</span>, <span class="st">"data"</span>: r.json()}</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> (httpx.HTTPStatusError, httpx.TimeoutException) <span class="im">as</span> e:</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">"url"</span>: url, <span class="st">"status"</span>: <span class="st">"error"</span>, <span class="st">"error"</span>: <span class="bu">str</span>(e)}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Teraz <code>gather</code> nigdy nie otrzyma wyjątku — każda korutyna zwraca słownik z wynikiem lub opisem błędu. Nie trzeba <code>return_exceptions=True</code>.</p>
+<p>Oba podejścia są poprawne. <code>return_exceptions=True</code> jest prostsze przy jednorazowym przetwarzaniu wyników. <code>try/except</code> w korutynie daje więcej kontroli — np. pozwala na logowanie błędów w miejscu ich wystąpienia lub na retry wewnątrz korutyny.</p>
+<hr>
+</section>
+</section>
+<section id="time.sleep-vs-asyncio.sleep-pułapka-blokowania" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="time.sleep-vs-asyncio.sleep-pułapka-blokowania"><span class="header-section-number">9</span> <code>time.sleep</code> vs <code>asyncio.sleep</code> — pułapka blokowania</h2>
+<p>Jedna z najczęstszych pomyłek przy nauce asynchroniczności: użycie <code>time.sleep</code> zamiast <code>asyncio.sleep</code> wewnątrz korutyny.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> bad_fetch(page_id):</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">1</span>)         <span class="co"># BLOKUJE event loop!</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"dane-</span><span class="sc">{</span>page_id<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> main():</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    tasks <span class="op">=</span> [bad_fetch(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>)]</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    results <span class="op">=</span> <span class="cf">await</span> asyncio.gather(<span class="op">*</span>tasks)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>asyncio.run(main())</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Czas: ~5 sekund — brak współbieżności!</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>time.sleep(1)</code> jest operacją synchroniczną — blokuje <strong>cały event loop</strong> na sekundę. Inne korutyny nie mogą działać w tym czasie. Efekt: 5 korutyn wykonuje się sekwencyjnie, jakby nie było żadnego <code>async</code>.</p>
+<p>Reguła: wewnątrz korutyny <strong>nigdy nie używaj funkcji blokujących</strong> (<code>time.sleep</code>, <code>requests.get</code>, <code>open().read()</code> na dużym pliku). Używaj ich asynchronicznych odpowiedników (<code>asyncio.sleep</code>, <code>httpx.AsyncClient</code>, <code>aiofiles</code>).</p>
+<p>To samo dotyczy serwera Flask użytego w naszych przykładach: <code>time.sleep(1)</code> w endpoincie Flask <strong>celowo</strong> symuluje wolny serwer. To nie jest kod asynchroniczny — Flask jest synchroniczny i obsługuje po jednym żądaniu na wątek. Asynchroniczny jest <strong>klient</strong> (<code>httpx</code>), który nie czeka na odpowiedź jednego żądania, zanim wyśle następne.</p>
+<hr>
+</section>
+<section id="podsumowanie" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="podsumowanie"><span class="header-section-number">10</span> Podsumowanie</h2>
+<p>Na tym wykładzie:</p>
+<ul>
+<li>zdiagnozowaliśmy problem synchronicznego pobierania — klient bezczynnie czeka na każdą odpowiedź, a czasy oczekiwania się sumują,</li>
+<li>rozróżniliśmy I/O-bound od CPU-bound — pobieranie danych z sieci to klasyczny I/O-bound, gdzie procesor jest bezczynny,</li>
+<li>poznaliśmy model event loop na analogii kelnera — jeden kelner (event loop) obsługuje wiele stolików (żądań), nie blokując się na oczekiwaniu,</li>
+<li>nauczyliśmy się składni <code>async def</code> / <code>await</code> / <code>asyncio.run()</code> — korutyna to funkcja, którą można zawieszać w punktach <code>await</code>,</li>
+<li>zobaczyliśmy <code>gather</code> (czekaj na wszystkie, wyniki w kolejności wejściowej) i <code>as_completed</code> (wyniki w kolejności kończenia),</li>
+<li>przeszliśmy od symulacji (<code>asyncio.sleep</code>) do prawdziwego HTTP z <code>httpx.AsyncClient</code> — API identyczne z <code>requests</code>, z dodanym <code>await</code>,</li>
+<li>poznaliśmy <code>Semaphore</code> jako ogranicznik współbieżności i <code>return_exceptions=True</code> jako mechanizm zbierania błędów bez przerywania.</li>
+</ul>
+<p><strong>Co dalej:</strong></p>
+<ul>
+<li><strong>Lab 9</strong>: ćwiczenia prowadzone — od <code>asyncio.sleep</code> (suche symulacje, wizualizacja kolejności wykonania) przez <code>create_task</code> / <code>gather</code> do pierwszych żądań async HTTP do lokalnego serwera Flask z opóźnieniami. Porównanie sync vs async na tym samym zadaniu.</li>
+<li><strong>Lab 10</strong>: async HTTP w praktyce — serwer z wieloma endpointami i sztucznymi opóźnieniami, <code>httpx.AsyncClient</code> + <code>gather</code>, <code>Semaphore</code>, <code>as_completed</code>, obsługa błędów. Pełny pipeline: pobranie, przetworzenie, zapis.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/APD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
