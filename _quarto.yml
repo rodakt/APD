@@ -20,6 +20,7 @@ website:
           - wyklady/wyklad_2.md
           - wyklady/wyklad_3.md
           - wyklady/wyklad_4.md
+          - wyklady/wyklad_5.md
       - section: "Laboratoria"
         contents:
           - laby/lab_0.md
