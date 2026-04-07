@@ -22,6 +22,30 @@ Zakres obejmuje:
 * konfiguracja — `settings.py`, kontrola tempa i współbieżności,
 * `robots.txt` i etyka scrapingu.
 
+## Serwer ćwiczeniowy
+
+Przykłady w tym wykładzie zakładają lokalny serwer Flask udający prostą księgarnię. Kod serwera dostępny jest w repozytorium kursu:
+
+<https://github.com/rodakt/APD/tree/v_2526/bookshop>
+
+Aby pobrać tylko katalog `bookshop` bez klonowania całego repozytorium:
+
+```bash
+git clone --filter=blob:none --sparse https://github.com/rodakt/APD
+cd APD
+git sparse-checkout set bookshop
+git checkout v_2526
+```
+
+Uruchomienie serwera:
+
+```bash
+cd bookshop
+flask --app app run --debug
+```
+
+Serwer działa na `http://localhost:5000`. Strony do scrapowania: `/books` (listing z paginacją) i `/book/<id>` (strona szczegółowa).
+
 ---
 
 ## Od ręcznego scrapera do frameworka
