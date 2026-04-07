@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Księgarnia — strona {{ page }} z {{ total_pages }}{% endblock %}
+
+{% block content %}
+<h1>Księgarnia</h1>
+<div class="book-list">
+  {% for book in books %}
+  <div class="book">
+    <h2 class="title">{{ book.title }}</h2>
+    <span class="author">{{ book.author }}</span>
+    <span class="price">{{ book.price }}</span>
+    <a class="book-link" href="/book/{{ book.id }}">{{ book.title }}</a>
+  </div>
+  {% endfor %}
+</div>
+<div class="pagination">
+  {% if page > 1 %}
+  <a class="prev-page" href="/books?page={{ page - 1 }}">← Poprzednia strona</a>
+  {% endif %}
+  {% if page < total_pages %}
+  <a class="next-page" href="/books?page={{ page + 1 }}">Następna strona →</a>
+  {% endif %}
+</div>
+{% endblock %}

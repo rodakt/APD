@@ -81,3 +81,7 @@ app/
 /.quarto/
 /_site/
 **/*.quarto_ipynb
+
+# bookshop — wyjątki od reguł *.html i *.json
+!bookshop/**/*.html
+!bookshop/**/*.json
