@@ -78,7 +78,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-176b38be48070efe3d434d0a95bef3fe.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-48c95295d902c81ffd89ff58ae6d84a1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-a5c836abc625d5e557b9cc4d6dc6c017.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -249,52 +249,53 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#cele-i-zakres" id="toc-cele-i-zakres" class="nav-link active" data-scroll-target="#cele-i-zakres"><span class="header-section-number">1</span> Cele i zakres</a></li>
-  <li><a href="#od-ręcznego-scrapera-do-frameworka" id="toc-od-ręcznego-scrapera-do-frameworka" class="nav-link" data-scroll-target="#od-ręcznego-scrapera-do-frameworka"><span class="header-section-number">2</span> Od ręcznego scrapera do frameworka</a>
+  <li><a href="#serwer-ćwiczeniowy" id="toc-serwer-ćwiczeniowy" class="nav-link" data-scroll-target="#serwer-ćwiczeniowy"><span class="header-section-number">2</span> Serwer ćwiczeniowy</a></li>
+  <li><a href="#od-ręcznego-scrapera-do-frameworka" id="toc-od-ręcznego-scrapera-do-frameworka" class="nav-link" data-scroll-target="#od-ręcznego-scrapera-do-frameworka"><span class="header-section-number">3</span> Od ręcznego scrapera do frameworka</a>
   <ul class="collapse">
-  <li><a href="#ręczny-crawler-przypomnienie" id="toc-ręczny-crawler-przypomnienie" class="nav-link" data-scroll-target="#ręczny-crawler-przypomnienie"><span class="header-section-number">2.1</span> Ręczny crawler — przypomnienie</a></li>
-  <li><a href="#co-daje-scrapy" id="toc-co-daje-scrapy" class="nav-link" data-scroll-target="#co-daje-scrapy"><span class="header-section-number">2.2</span> Co daje Scrapy</a></li>
+  <li><a href="#ręczny-crawler-przypomnienie" id="toc-ręczny-crawler-przypomnienie" class="nav-link" data-scroll-target="#ręczny-crawler-przypomnienie"><span class="header-section-number">3.1</span> Ręczny crawler — przypomnienie</a></li>
+  <li><a href="#co-daje-scrapy" id="toc-co-daje-scrapy" class="nav-link" data-scroll-target="#co-daje-scrapy"><span class="header-section-number">3.2</span> Co daje Scrapy</a></li>
   </ul></li>
-  <li><a href="#architektura" id="toc-architektura" class="nav-link" data-scroll-target="#architektura"><span class="header-section-number">3</span> Architektura</a></li>
-  <li><a href="#struktura-projektu" id="toc-struktura-projektu" class="nav-link" data-scroll-target="#struktura-projektu"><span class="header-section-number">4</span> Struktura projektu</a>
+  <li><a href="#architektura" id="toc-architektura" class="nav-link" data-scroll-target="#architektura"><span class="header-section-number">4</span> Architektura</a></li>
+  <li><a href="#struktura-projektu" id="toc-struktura-projektu" class="nav-link" data-scroll-target="#struktura-projektu"><span class="header-section-number">5</span> Struktura projektu</a>
   <ul class="collapse">
-  <li><a href="#tworzenie-projektu" id="toc-tworzenie-projektu" class="nav-link" data-scroll-target="#tworzenie-projektu"><span class="header-section-number">4.1</span> Tworzenie projektu</a></li>
-  <li><a href="#pliki-z-których-korzystamy" id="toc-pliki-z-których-korzystamy" class="nav-link" data-scroll-target="#pliki-z-których-korzystamy"><span class="header-section-number">4.2</span> Pliki, z których korzystamy</a></li>
+  <li><a href="#tworzenie-projektu" id="toc-tworzenie-projektu" class="nav-link" data-scroll-target="#tworzenie-projektu"><span class="header-section-number">5.1</span> Tworzenie projektu</a></li>
+  <li><a href="#pliki-z-których-korzystamy" id="toc-pliki-z-których-korzystamy" class="nav-link" data-scroll-target="#pliki-z-których-korzystamy"><span class="header-section-number">5.2</span> Pliki, z których korzystamy</a></li>
   </ul></li>
-  <li><a href="#spider-mechanika" id="toc-spider-mechanika" class="nav-link" data-scroll-target="#spider-mechanika"><span class="header-section-number">5</span> Spider — mechanika</a>
+  <li><a href="#spider-mechanika" id="toc-spider-mechanika" class="nav-link" data-scroll-target="#spider-mechanika"><span class="header-section-number">6</span> Spider — mechanika</a>
   <ul class="collapse">
-  <li><a href="#minimalny-spider" id="toc-minimalny-spider" class="nav-link" data-scroll-target="#minimalny-spider"><span class="header-section-number">5.1</span> Minimalny spider</a></li>
-  <li><a href="#uruchomienie-i-eksport" id="toc-uruchomienie-i-eksport" class="nav-link" data-scroll-target="#uruchomienie-i-eksport"><span class="header-section-number">5.2</span> Uruchomienie i eksport</a></li>
-  <li><a href="#podążanie-za-linkami-response.follow" id="toc-podążanie-za-linkami-response.follow" class="nav-link" data-scroll-target="#podążanie-za-linkami-response.follow"><span class="header-section-number">5.3</span> Podążanie za linkami — <code>response.follow</code></a></li>
-  <li><a href="#scrapy.request-pełna-forma" id="toc-scrapy.request-pełna-forma" class="nav-link" data-scroll-target="#scrapy.request-pełna-forma"><span class="header-section-number">5.4</span> <code>scrapy.Request</code> — pełna forma</a></li>
-  <li><a href="#wzorzec-lista-detal" id="toc-wzorzec-lista-detal" class="nav-link" data-scroll-target="#wzorzec-lista-detal"><span class="header-section-number">5.5</span> Wzorzec lista → detal</a></li>
+  <li><a href="#minimalny-spider" id="toc-minimalny-spider" class="nav-link" data-scroll-target="#minimalny-spider"><span class="header-section-number">6.1</span> Minimalny spider</a></li>
+  <li><a href="#uruchomienie-i-eksport" id="toc-uruchomienie-i-eksport" class="nav-link" data-scroll-target="#uruchomienie-i-eksport"><span class="header-section-number">6.2</span> Uruchomienie i eksport</a></li>
+  <li><a href="#podążanie-za-linkami-response.follow" id="toc-podążanie-za-linkami-response.follow" class="nav-link" data-scroll-target="#podążanie-za-linkami-response.follow"><span class="header-section-number">6.3</span> Podążanie za linkami — <code>response.follow</code></a></li>
+  <li><a href="#scrapy.request-pełna-forma" id="toc-scrapy.request-pełna-forma" class="nav-link" data-scroll-target="#scrapy.request-pełna-forma"><span class="header-section-number">6.4</span> <code>scrapy.Request</code> — pełna forma</a></li>
+  <li><a href="#wzorzec-lista-detal" id="toc-wzorzec-lista-detal" class="nav-link" data-scroll-target="#wzorzec-lista-detal"><span class="header-section-number">6.5</span> Wzorzec lista → detal</a></li>
   </ul></li>
-  <li><a href="#selektory-w-scrapy" id="toc-selektory-w-scrapy" class="nav-link" data-scroll-target="#selektory-w-scrapy"><span class="header-section-number">6</span> Selektory w Scrapy</a>
+  <li><a href="#selektory-w-scrapy" id="toc-selektory-w-scrapy" class="nav-link" data-scroll-target="#selektory-w-scrapy"><span class="header-section-number">7</span> Selektory w Scrapy</a>
   <ul class="collapse">
-  <li><a href="#response.css-i-response.xpath" id="toc-response.css-i-response.xpath" class="nav-link" data-scroll-target="#response.css-i-response.xpath"><span class="header-section-number">6.1</span> <code>response.css()</code> i <code>response.xpath()</code></a></li>
-  <li><a href="#pseudoelementy-text-i-attr" id="toc-pseudoelementy-text-i-attr" class="nav-link" data-scroll-target="#pseudoelementy-text-i-attr"><span class="header-section-number">6.2</span> Pseudoelementy <code>::text</code> i <code>::attr()</code></a></li>
-  <li><a href="#selektory-na-podelementach" id="toc-selektory-na-podelementach" class="nav-link" data-scroll-target="#selektory-na-podelementach"><span class="header-section-number">6.3</span> Selektory na podelementach</a></li>
-  <li><a href="#scrapy-shell-interaktywna-eksploracja" id="toc-scrapy-shell-interaktywna-eksploracja" class="nav-link" data-scroll-target="#scrapy-shell-interaktywna-eksploracja"><span class="header-section-number">6.4</span> <code>scrapy shell</code> — interaktywna eksploracja</a></li>
+  <li><a href="#response.css-i-response.xpath" id="toc-response.css-i-response.xpath" class="nav-link" data-scroll-target="#response.css-i-response.xpath"><span class="header-section-number">7.1</span> <code>response.css()</code> i <code>response.xpath()</code></a></li>
+  <li><a href="#pseudoelementy-text-i-attr" id="toc-pseudoelementy-text-i-attr" class="nav-link" data-scroll-target="#pseudoelementy-text-i-attr"><span class="header-section-number">7.2</span> Pseudoelementy <code>::text</code> i <code>::attr()</code></a></li>
+  <li><a href="#selektory-na-podelementach" id="toc-selektory-na-podelementach" class="nav-link" data-scroll-target="#selektory-na-podelementach"><span class="header-section-number">7.3</span> Selektory na podelementach</a></li>
+  <li><a href="#scrapy-shell-interaktywna-eksploracja" id="toc-scrapy-shell-interaktywna-eksploracja" class="nav-link" data-scroll-target="#scrapy-shell-interaktywna-eksploracja"><span class="header-section-number">7.4</span> <code>scrapy shell</code> — interaktywna eksploracja</a></li>
   </ul></li>
-  <li><a href="#item-i-item-pipeline" id="toc-item-i-item-pipeline" class="nav-link" data-scroll-target="#item-i-item-pipeline"><span class="header-section-number">7</span> Item i Item Pipeline</a>
+  <li><a href="#item-i-item-pipeline" id="toc-item-i-item-pipeline" class="nav-link" data-scroll-target="#item-i-item-pipeline"><span class="header-section-number">8</span> Item i Item Pipeline</a>
   <ul class="collapse">
-  <li><a href="#dlaczego-yield-dict-nie-wystarczy" id="toc-dlaczego-yield-dict-nie-wystarczy" class="nav-link" data-scroll-target="#dlaczego-yield-dict-nie-wystarczy"><span class="header-section-number">7.1</span> Dlaczego <code>yield dict</code> nie wystarczy</a></li>
-  <li><a href="#scrapy.item-deklaratywna-struktura" id="toc-scrapy.item-deklaratywna-struktura" class="nav-link" data-scroll-target="#scrapy.item-deklaratywna-struktura"><span class="header-section-number">7.2</span> <code>scrapy.Item</code> — deklaratywna struktura</a></li>
-  <li><a href="#item-pipeline-łańcuch-przetwarzania" id="toc-item-pipeline-łańcuch-przetwarzania" class="nav-link" data-scroll-target="#item-pipeline-łańcuch-przetwarzania"><span class="header-section-number">7.3</span> Item Pipeline — łańcuch przetwarzania</a></li>
-  <li><a href="#aktywacja-pipeline-w-settings" id="toc-aktywacja-pipeline-w-settings" class="nav-link" data-scroll-target="#aktywacja-pipeline-w-settings"><span class="header-section-number">7.4</span> Aktywacja pipeline w settings</a></li>
+  <li><a href="#dlaczego-yield-dict-nie-wystarczy" id="toc-dlaczego-yield-dict-nie-wystarczy" class="nav-link" data-scroll-target="#dlaczego-yield-dict-nie-wystarczy"><span class="header-section-number">8.1</span> Dlaczego <code>yield dict</code> nie wystarczy</a></li>
+  <li><a href="#scrapy.item-deklaratywna-struktura" id="toc-scrapy.item-deklaratywna-struktura" class="nav-link" data-scroll-target="#scrapy.item-deklaratywna-struktura"><span class="header-section-number">8.2</span> <code>scrapy.Item</code> — deklaratywna struktura</a></li>
+  <li><a href="#item-pipeline-łańcuch-przetwarzania" id="toc-item-pipeline-łańcuch-przetwarzania" class="nav-link" data-scroll-target="#item-pipeline-łańcuch-przetwarzania"><span class="header-section-number">8.3</span> Item Pipeline — łańcuch przetwarzania</a></li>
+  <li><a href="#aktywacja-pipeline-w-settings" id="toc-aktywacja-pipeline-w-settings" class="nav-link" data-scroll-target="#aktywacja-pipeline-w-settings"><span class="header-section-number">8.4</span> Aktywacja pipeline w settings</a></li>
   </ul></li>
-  <li><a href="#konfiguracja" id="toc-konfiguracja" class="nav-link" data-scroll-target="#konfiguracja"><span class="header-section-number">8</span> Konfiguracja</a>
+  <li><a href="#konfiguracja" id="toc-konfiguracja" class="nav-link" data-scroll-target="#konfiguracja"><span class="header-section-number">9</span> Konfiguracja</a>
   <ul class="collapse">
-  <li><a href="#kontrola-tempa" id="toc-kontrola-tempa" class="nav-link" data-scroll-target="#kontrola-tempa"><span class="header-section-number">8.1</span> Kontrola tempa</a></li>
-  <li><a href="#identyfikacja" id="toc-identyfikacja" class="nav-link" data-scroll-target="#identyfikacja"><span class="header-section-number">8.2</span> Identyfikacja</a></li>
-  <li><a href="#robots.txt" id="toc-robots.txt" class="nav-link" data-scroll-target="#robots.txt"><span class="header-section-number">8.3</span> <code>robots.txt</code></a></li>
+  <li><a href="#kontrola-tempa" id="toc-kontrola-tempa" class="nav-link" data-scroll-target="#kontrola-tempa"><span class="header-section-number">9.1</span> Kontrola tempa</a></li>
+  <li><a href="#identyfikacja" id="toc-identyfikacja" class="nav-link" data-scroll-target="#identyfikacja"><span class="header-section-number">9.2</span> Identyfikacja</a></li>
+  <li><a href="#robots.txt" id="toc-robots.txt" class="nav-link" data-scroll-target="#robots.txt"><span class="header-section-number">9.3</span> <code>robots.txt</code></a></li>
   </ul></li>
-  <li><a href="#robots.txt-i-etyka" id="toc-robots.txt-i-etyka" class="nav-link" data-scroll-target="#robots.txt-i-etyka"><span class="header-section-number">9</span> <code>robots.txt</code> i etyka</a>
+  <li><a href="#robots.txt-i-etyka" id="toc-robots.txt-i-etyka" class="nav-link" data-scroll-target="#robots.txt-i-etyka"><span class="header-section-number">10</span> <code>robots.txt</code> i etyka</a>
   <ul class="collapse">
-  <li><a href="#czym-jest-robots.txt" id="toc-czym-jest-robots.txt" class="nav-link" data-scroll-target="#czym-jest-robots.txt"><span class="header-section-number">9.1</span> Czym jest <code>robots.txt</code></a></li>
-  <li><a href="#dobre-praktyki" id="toc-dobre-praktyki" class="nav-link" data-scroll-target="#dobre-praktyki"><span class="header-section-number">9.2</span> Dobre praktyki</a></li>
-  <li><a href="#kontekst-prawny" id="toc-kontekst-prawny" class="nav-link" data-scroll-target="#kontekst-prawny"><span class="header-section-number">9.3</span> Kontekst prawny</a></li>
+  <li><a href="#czym-jest-robots.txt" id="toc-czym-jest-robots.txt" class="nav-link" data-scroll-target="#czym-jest-robots.txt"><span class="header-section-number">10.1</span> Czym jest <code>robots.txt</code></a></li>
+  <li><a href="#dobre-praktyki" id="toc-dobre-praktyki" class="nav-link" data-scroll-target="#dobre-praktyki"><span class="header-section-number">10.2</span> Dobre praktyki</a></li>
+  <li><a href="#kontekst-prawny" id="toc-kontekst-prawny" class="nav-link" data-scroll-target="#kontekst-prawny"><span class="header-section-number">10.3</span> Kontekst prawny</a></li>
   </ul></li>
-  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">10</span> Podsumowanie</a></li>
+  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">11</span> Podsumowanie</a></li>
   </ul>
 </nav>
     </div>
@@ -342,39 +343,53 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>konfiguracja — <code>settings.py</code>, kontrola tempa i współbieżności,</li>
 <li><code>robots.txt</code> i etyka scrapingu.</li>
 </ul>
+</section>
+<section id="serwer-ćwiczeniowy" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="serwer-ćwiczeniowy"><span class="header-section-number">2</span> Serwer ćwiczeniowy</h2>
+<p>Przykłady w tym wykładzie zakładają lokalny serwer Flask udający prostą księgarnię. Kod serwera dostępny jest w repozytorium kursu:</p>
+<p><a href="https://github.com/rodakt/APD/tree/v_2526/bookshop" class="uri">https://github.com/rodakt/APD/tree/v_2526/bookshop</a></p>
+<p>Aby pobrać tylko katalog <code>bookshop</code> bez klonowania całego repozytorium:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone <span class="at">--filter</span><span class="op">=</span>blob:none <span class="at">--sparse</span> https://github.com/rodakt/APD</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> APD</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> sparse-checkout set bookshop</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> checkout v_2526</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Uruchomienie serwera:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> bookshop</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">flask</span> <span class="at">--app</span> app run <span class="at">--debug</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Serwer działa na <code>http://localhost:5000</code>. Strony do scrapowania: <code>/books</code> (listing z paginacją) i <code>/book/&lt;id&gt;</code> (strona szczegółowa).</p>
 <hr>
 </section>
-<section id="od-ręcznego-scrapera-do-frameworka" class="level2" data-number="2">
-<h2 data-number="2" class="anchored" data-anchor-id="od-ręcznego-scrapera-do-frameworka"><span class="header-section-number">2</span> Od ręcznego scrapera do frameworka</h2>
-<section id="ręczny-crawler-przypomnienie" class="level3" data-number="2.1">
-<h3 data-number="2.1" class="anchored" data-anchor-id="ręczny-crawler-przypomnienie"><span class="header-section-number">2.1</span> Ręczny crawler — przypomnienie</h3>
+<section id="od-ręcznego-scrapera-do-frameworka" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="od-ręcznego-scrapera-do-frameworka"><span class="header-section-number">3</span> Od ręcznego scrapera do frameworka</h2>
+<section id="ręczny-crawler-przypomnienie" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="ręczny-crawler-przypomnienie"><span class="header-section-number">3.1</span> Ręczny crawler — przypomnienie</h3>
 <p>Na wcześniejszych labach pisaliśmy crawlery w <code>requests</code> + BeautifulSoup. Schemat wyglądał mniej więcej tak:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>visited <span class="op">=</span> <span class="bu">set</span>()</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>to_visit <span class="op">=</span> [<span class="st">"http://localhost:5000/books"</span>]</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> []</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> to_visit:</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> to_visit.pop(<span class="dv">0</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> url <span class="kw">in</span> visited:</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    visited.add(url)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> requests.get(url)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    soup <span class="op">=</span> BeautifulSoup(r.text, <span class="st">"html.parser"</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> book <span class="kw">in</span> soup.select(<span class="st">"div.book"</span>):</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>        results.append({</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"title"</span>: book.select_one(<span class="st">"h2"</span>).text.strip(),</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"price"</span>: book.select_one(<span class="st">"span.price"</span>).text.strip(),</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        })</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> a <span class="kw">in</span> soup.select(<span class="st">"a.next-page"</span>):</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        next_url <span class="op">=</span> <span class="st">"http://localhost:5000"</span> <span class="op">+</span> a[<span class="st">"href"</span>]</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> next_url <span class="kw">not</span> <span class="kw">in</span> visited:</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>            to_visit.append(next_url)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>visited <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>to_visit <span class="op">=</span> [<span class="st">"http://localhost:5000/books"</span>]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> []</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> to_visit:</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> to_visit.pop(<span class="dv">0</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> url <span class="kw">in</span> visited:</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    visited.add(url)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> requests.get(url)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    soup <span class="op">=</span> BeautifulSoup(r.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> book <span class="kw">in</span> soup.select(<span class="st">"div.book"</span>):</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>        results.append({</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"title"</span>: book.select_one(<span class="st">"h2"</span>).text.strip(),</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>            <span class="st">"price"</span>: book.select_one(<span class="st">"span.price"</span>).text.strip(),</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> a <span class="kw">in</span> soup.select(<span class="st">"a.next-page"</span>):</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        next_url <span class="op">=</span> <span class="st">"http://localhost:5000"</span> <span class="op">+</span> a[<span class="st">"href"</span>]</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> next_url <span class="kw">not</span> <span class="kw">in</span> visited:</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>            to_visit.append(next_url)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>To działa, ale przy skalowaniu pojawiają się problemy:</p>
 <ul>
 <li><strong>Śledzenie URL-ów</strong> — ręczny zbiór <code>visited</code>, ręczne budowanie pełnych URL-ów.</li>
@@ -385,8 +400,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>Każdy z tych elementów można dopisać, ale to kod infrastrukturalny, który powtarza się w każdym projekcie. Framework rozwiązuje te problemy raz, a programista skupia się na tym, co jest unikalne: <strong>logice ekstrakcji danych z konkretnej strony</strong>.</p>
 </section>
-<section id="co-daje-scrapy" class="level3" data-number="2.2">
-<h3 data-number="2.2" class="anchored" data-anchor-id="co-daje-scrapy"><span class="header-section-number">2.2</span> Co daje Scrapy</h3>
+<section id="co-daje-scrapy" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="co-daje-scrapy"><span class="header-section-number">3.2</span> Co daje Scrapy</h3>
 <p>Scrapy to framework open-source, który implementuje pełny cykl crawlingu:</p>
 <ul>
 <li>kolejkowanie i deduplikacja URL-ów,</li>
@@ -400,8 +415,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <hr>
 </section>
 </section>
-<section id="architektura" class="level2" data-number="3">
-<h2 data-number="3" class="anchored" data-anchor-id="architektura"><span class="header-section-number">3</span> Architektura</h2>
+<section id="architektura" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="architektura"><span class="header-section-number">4</span> Architektura</h2>
 <p>Scrapy składa się z kilku komponentów, z których każdy odpowiada za jeden etap cyklu:</p>
 <pre><code>                    ┌───────────┐
          URL-e      │ Scheduler │     kolejka URL-ów
@@ -463,12 +478,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <hr>
 </section>
-<section id="struktura-projektu" class="level2" data-number="4">
-<h2 data-number="4" class="anchored" data-anchor-id="struktura-projektu"><span class="header-section-number">4</span> Struktura projektu</h2>
-<section id="tworzenie-projektu" class="level3" data-number="4.1">
-<h3 data-number="4.1" class="anchored" data-anchor-id="tworzenie-projektu"><span class="header-section-number">4.1</span> Tworzenie projektu</h3>
+<section id="struktura-projektu" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="struktura-projektu"><span class="header-section-number">5</span> Struktura projektu</h2>
+<section id="tworzenie-projektu" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="tworzenie-projektu"><span class="header-section-number">5.1</span> Tworzenie projektu</h3>
 <p>Scrapy organizuje kod w projekt z ustaloną strukturą katalogów. Projekt tworzymy poleceniem:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> startproject bookshop</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> startproject bookshop</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Powstaje następująca struktura:</p>
 <pre><code>bookshop/
 ├── scrapy.cfg              # konfiguracja deploymentu (nie ruszamy)
@@ -482,12 +497,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         ├── __init__.py
         └── (tu będą nasze spidery)</code></pre>
 <p>Wewnątrz projektu tworzymy spidera:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> bookshop</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> genspider books localhost:5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> bookshop</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> genspider books localhost:5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>To generuje plik <code>bookshop/spiders/books.py</code> z szablonem spidera.</p>
 </section>
-<section id="pliki-z-których-korzystamy" class="level3" data-number="4.2">
-<h3 data-number="4.2" class="anchored" data-anchor-id="pliki-z-których-korzystamy"><span class="header-section-number">4.2</span> Pliki, z których korzystamy</h3>
+<section id="pliki-z-których-korzystamy" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="pliki-z-których-korzystamy"><span class="header-section-number">5.2</span> Pliki, z których korzystamy</h3>
 <p>Na tym wykładzie korzystamy z czterech plików:</p>
 <ul>
 <li><strong><code>spiders/*.py</code></strong> — logika ekstrakcji (klasa Spider),</li>
@@ -499,202 +514,202 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <hr>
 </section>
 </section>
-<section id="spider-mechanika" class="level2" data-number="5">
-<h2 data-number="5" class="anchored" data-anchor-id="spider-mechanika"><span class="header-section-number">5</span> Spider — mechanika</h2>
+<section id="spider-mechanika" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="spider-mechanika"><span class="header-section-number">6</span> Spider — mechanika</h2>
 <p>Spider to klasa dziedzicząca po <code>scrapy.Spider</code>. Definiuje punkt startowy (jakie URL-e pobrać na początku) i logikę ekstrakcji (co zrobić z pobraną stroną).</p>
-<section id="minimalny-spider" class="level3" data-number="5.1">
-<h3 data-number="5.1" class="anchored" data-anchor-id="minimalny-spider"><span class="header-section-number">5.1</span> Minimalny spider</h3>
+<section id="minimalny-spider" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="minimalny-spider"><span class="header-section-number">6.1</span> Minimalny spider</h3>
 <p>Rozważmy stronę z listą książek:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="dt">&gt;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Księgarnia<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book-list"</span><span class="dt">&gt;</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book"</span><span class="dt">&gt;</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">h2</span><span class="ot"> class</span><span class="op">=</span><span class="st">"title"</span><span class="dt">&gt;</span>Solaris<span class="dt">&lt;/</span><span class="kw">h2</span><span class="dt">&gt;</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"author"</span><span class="dt">&gt;</span>Stanisław Lem<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"price"</span><span class="dt">&gt;</span>34,90 zł<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book"</span><span class="dt">&gt;</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">h2</span><span class="ot"> class</span><span class="op">=</span><span class="st">"title"</span><span class="dt">&gt;</span>Ferdydurke<span class="dt">&lt;/</span><span class="kw">h2</span><span class="dt">&gt;</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"author"</span><span class="dt">&gt;</span>Witold Gombrowicz<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"price"</span><span class="dt">&gt;</span>28,50 zł<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> class</span><span class="op">=</span><span class="st">"next-page"</span><span class="ot"> href</span><span class="op">=</span><span class="st">"/books?page=2"</span><span class="dt">&gt;</span>Następna strona<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">html</span><span class="dt">&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">h1</span><span class="dt">&gt;</span>Księgarnia<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book-list"</span><span class="dt">&gt;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book"</span><span class="dt">&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">h2</span><span class="ot"> class</span><span class="op">=</span><span class="st">"title"</span><span class="dt">&gt;</span>Solaris<span class="dt">&lt;/</span><span class="kw">h2</span><span class="dt">&gt;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"author"</span><span class="dt">&gt;</span>Stanisław Lem<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"price"</span><span class="dt">&gt;</span>34,90 zł<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book"</span><span class="dt">&gt;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">h2</span><span class="ot"> class</span><span class="op">=</span><span class="st">"title"</span><span class="dt">&gt;</span>Ferdydurke<span class="dt">&lt;/</span><span class="kw">h2</span><span class="dt">&gt;</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"author"</span><span class="dt">&gt;</span>Witold Gombrowicz<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"price"</span><span class="dt">&gt;</span>28,50 zł<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> class</span><span class="op">=</span><span class="st">"next-page"</span><span class="ot"> href</span><span class="op">=</span><span class="st">"/books?page=2"</span><span class="dt">&gt;</span>Następna strona<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">body</span><span class="dt">&gt;</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">html</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Spider, który wyciąga dane z tej strony:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scrapy</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BooksSpider(scrapy.Spider):</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> <span class="st">"books"</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    start_urls <span class="op">=</span> [<span class="st">"http://localhost:5000/books"</span>]</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse(<span class="va">self</span>, response):</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> book <span class="kw">in</span> response.css(<span class="st">"div.book"</span>):</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">yield</span> {</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                <span class="st">"title"</span>: book.css(<span class="st">"h2.title::text"</span>).get(),</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                <span class="st">"author"</span>: book.css(<span class="st">"span.author::text"</span>).get(),</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                <span class="st">"price"</span>: book.css(<span class="st">"span.price::text"</span>).get(),</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>            }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scrapy</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BooksSpider(scrapy.Spider):</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> <span class="st">"books"</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    start_urls <span class="op">=</span> [<span class="st">"http://localhost:5000/books"</span>]</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse(<span class="va">self</span>, response):</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> book <span class="kw">in</span> response.css(<span class="st">"div.book"</span>):</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">yield</span> {</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                <span class="st">"title"</span>: book.css(<span class="st">"h2.title::text"</span>).get(),</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                <span class="st">"author"</span>: book.css(<span class="st">"span.author::text"</span>).get(),</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                <span class="st">"price"</span>: book.css(<span class="st">"span.price::text"</span>).get(),</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>            }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Rozbijmy to element po elemencie:</p>
 <p><strong><code>name = "books"</code></strong> — unikalna nazwa spidera. Używamy jej do uruchomienia: <code>scrapy crawl books</code>.</p>
 <p><strong><code>start_urls</code></strong> — lista URL-ów, od których Scrapy zaczyna. Scheduler umieszcza je w kolejce, Downloader pobiera i przekazuje do metody <code>parse</code>.</p>
 <p><strong><code>def parse(self, response)</code></strong> — metoda wywoływana dla każdej pobranej strony. <code>response</code> to obiekt Scrapy (nie <code>requests.Response</code>) — ma wbudowane selektory CSS i XPath.</p>
 <p><strong><code>yield dict</code></strong> — spider nie zwraca listy wyników, tylko <strong>generuje</strong> (<code>yield</code>) kolejne elementy. Każdy wygenerowany słownik trafia do Item Pipeline, a stamtąd do eksportu.</p>
 </section>
-<section id="uruchomienie-i-eksport" class="level3" data-number="5.2">
-<h3 data-number="5.2" class="anchored" data-anchor-id="uruchomienie-i-eksport"><span class="header-section-number">5.2</span> Uruchomienie i eksport</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl books <span class="at">-o</span> books.json</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="uruchomienie-i-eksport" class="level3" data-number="6.2">
+<h3 data-number="6.2" class="anchored" data-anchor-id="uruchomienie-i-eksport"><span class="header-section-number">6.2</span> Uruchomienie i eksport</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl books <span class="at">-o</span> books.json</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Scrapy uruchamia spidera, pobiera strony, przetwarza wyniki i zapisuje je do <code>books.json</code>. Format rozpoznawany jest po rozszerzeniu pliku:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl books <span class="at">-o</span> books.csv</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl books <span class="at">-o</span> books.jsonl   <span class="co"># JSON Lines — jeden obiekt na linię</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl books <span class="at">-o</span> books.csv</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl books <span class="at">-o</span> books.jsonl   <span class="co"># JSON Lines — jeden obiekt na linię</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Bez <code>-o</code> spider działa, ale wyniki nie są zapisywane do pliku (widać je tylko w logach, jeśli ustawimy odpowiedni poziom logowania).</p>
 </section>
-<section id="podążanie-za-linkami-response.follow" class="level3" data-number="5.3">
-<h3 data-number="5.3" class="anchored" data-anchor-id="podążanie-za-linkami-response.follow"><span class="header-section-number">5.3</span> Podążanie za linkami — <code>response.follow</code></h3>
+<section id="podążanie-za-linkami-response.follow" class="level3" data-number="6.3">
+<h3 data-number="6.3" class="anchored" data-anchor-id="podążanie-za-linkami-response.follow"><span class="header-section-number">6.3</span> Podążanie za linkami — <code>response.follow</code></h3>
 <p>Na stronie jest link do następnej strony. Spider może za nim podążyć:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> parse(<span class="va">self</span>, response):</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> book <span class="kw">in</span> response.css(<span class="st">"div.book"</span>):</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> {</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">"title"</span>: book.css(<span class="st">"h2.title::text"</span>).get(),</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">"author"</span>: book.css(<span class="st">"span.author::text"</span>).get(),</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"price"</span>: book.css(<span class="st">"span.price::text"</span>).get(),</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    next_page <span class="op">=</span> response.css(<span class="st">"a.next-page::attr(href)"</span>).get()</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> next_page:</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> response.follow(next_page, callback<span class="op">=</span><span class="va">self</span>.parse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> parse(<span class="va">self</span>, response):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> book <span class="kw">in</span> response.css(<span class="st">"div.book"</span>):</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> {</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">"title"</span>: book.css(<span class="st">"h2.title::text"</span>).get(),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">"author"</span>: book.css(<span class="st">"span.author::text"</span>).get(),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"price"</span>: book.css(<span class="st">"span.price::text"</span>).get(),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    next_page <span class="op">=</span> response.css(<span class="st">"a.next-page::attr(href)"</span>).get()</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> next_page:</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> response.follow(next_page, callback<span class="op">=</span><span class="va">self</span>.parse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>response.follow(url, callback)</code> tworzy nowe żądanie i przekazuje je do Schedulera. Gdy Downloader pobierze stronę, wywoła podaną metodę <code>callback</code> z nowym <code>response</code>.</p>
 <p><code>response.follow</code> automatycznie rozwiązuje relatywne URL-e — <code>"/books?page=2"</code> zamienia na <code>"http://localhost:5000/books?page=2"</code> na podstawie URL bieżącej strony. Nie trzeba ręcznie budować pełnego URL-a.</p>
 <p>Scheduler automatycznie deduplikuje URL-e — jeśli strona 2 linkuje z powrotem do strony 1, Scrapy nie pobierze jej ponownie.</p>
 <p>Jedno wywołanie <code>parse</code> może generować zarówno dane (<code>yield dict</code>), jak i nowe żądania (<code>yield response.follow</code>). Scrapy rozróżnia je automatycznie: słownik trafia do pipeline, Request trafia do Schedulera.</p>
 </section>
-<section id="scrapy.request-pełna-forma" class="level3" data-number="5.4">
-<h3 data-number="5.4" class="anchored" data-anchor-id="scrapy.request-pełna-forma"><span class="header-section-number">5.4</span> <code>scrapy.Request</code> — pełna forma</h3>
+<section id="scrapy.request-pełna-forma" class="level3" data-number="6.4">
+<h3 data-number="6.4" class="anchored" data-anchor-id="scrapy.request-pełna-forma"><span class="header-section-number">6.4</span> <code>scrapy.Request</code> — pełna forma</h3>
 <p><code>response.follow</code> to skrót. Pełna forma to jawne tworzenie obiektu <code>scrapy.Request</code>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">yield</span> scrapy.Request(</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    url<span class="op">=</span><span class="st">"http://localhost:5000/books?page=2"</span>,</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    callback<span class="op">=</span><span class="va">self</span>.parse,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">yield</span> scrapy.Request(</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    url<span class="op">=</span><span class="st">"http://localhost:5000/books?page=2"</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    callback<span class="op">=</span><span class="va">self</span>.parse,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Różnica: <code>scrapy.Request</code> wymaga pełnego URL-a (nie rozwiązuje relatywnych). <code>response.follow</code> jest wygodniejszy w większości przypadków. <code>scrapy.Request</code> przydaje się, gdy URL budujemy programowo, a nie wyciągamy z HTML-a.</p>
 </section>
-<section id="wzorzec-lista-detal" class="level3" data-number="5.5">
-<h3 data-number="5.5" class="anchored" data-anchor-id="wzorzec-lista-detal"><span class="header-section-number">5.5</span> Wzorzec lista → detal</h3>
+<section id="wzorzec-lista-detal" class="level3" data-number="6.5">
+<h3 data-number="6.5" class="anchored" data-anchor-id="wzorzec-lista-detal"><span class="header-section-number">6.5</span> Wzorzec lista → detal</h3>
 <p>Częsty scenariusz: strona z listą elementów (np. lista książek) zawiera linki do stron szczegółowych, gdzie jest więcej danych.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Listing: /books --&gt;</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book"</span><span class="dt">&gt;</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book-link"</span><span class="ot"> href</span><span class="op">=</span><span class="st">"/book/1"</span><span class="dt">&gt;</span>Solaris<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"price"</span><span class="dt">&gt;</span>34,90 zł<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book"</span><span class="dt">&gt;</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book-link"</span><span class="ot"> href</span><span class="op">=</span><span class="st">"/book/2"</span><span class="dt">&gt;</span>Ferdydurke<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"price"</span><span class="dt">&gt;</span>28,50 zł<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Strona szczegółowa: /book/1 --&gt;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">h1</span><span class="ot"> class</span><span class="op">=</span><span class="st">"title"</span><span class="dt">&gt;</span>Solaris<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="ot"> class</span><span class="op">=</span><span class="st">"author"</span><span class="dt">&gt;</span>Stanisław Lem<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="ot"> class</span><span class="op">=</span><span class="st">"description"</span><span class="dt">&gt;</span>Klasyka polskiej science fiction. Naukowcy na stacji</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>orbitalnej badają tajemniczy ocean planety Solaris.<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"price"</span><span class="dt">&gt;</span>34,90 zł<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"stock"</span><span class="dt">&gt;</span>W magazynie: 7 szt.<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Listing: /books --&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book"</span><span class="dt">&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book-link"</span><span class="ot"> href</span><span class="op">=</span><span class="st">"/book/1"</span><span class="dt">&gt;</span>Solaris<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"price"</span><span class="dt">&gt;</span>34,90 zł<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book"</span><span class="dt">&gt;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">a</span><span class="ot"> class</span><span class="op">=</span><span class="st">"book-link"</span><span class="ot"> href</span><span class="op">=</span><span class="st">"/book/2"</span><span class="dt">&gt;</span>Ferdydurke<span class="dt">&lt;/</span><span class="kw">a</span><span class="dt">&gt;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"price"</span><span class="dt">&gt;</span>28,50 zł<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- Strona szczegółowa: /book/1 --&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">h1</span><span class="ot"> class</span><span class="op">=</span><span class="st">"title"</span><span class="dt">&gt;</span>Solaris<span class="dt">&lt;/</span><span class="kw">h1</span><span class="dt">&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="ot"> class</span><span class="op">=</span><span class="st">"author"</span><span class="dt">&gt;</span>Stanisław Lem<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">p</span><span class="ot"> class</span><span class="op">=</span><span class="st">"description"</span><span class="dt">&gt;</span>Klasyka polskiej science fiction. Naukowcy na stacji</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>orbitalnej badają tajemniczy ocean planety Solaris.<span class="dt">&lt;/</span><span class="kw">p</span><span class="dt">&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"price"</span><span class="dt">&gt;</span>34,90 zł<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> class</span><span class="op">=</span><span class="st">"stock"</span><span class="dt">&gt;</span>W magazynie: 7 szt.<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Spider z dwoma callbackami:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BooksSpider(scrapy.Spider):</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> <span class="st">"books"</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    start_urls <span class="op">=</span> [<span class="st">"http://localhost:5000/books"</span>]</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse(<span class="va">self</span>, response):</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> link <span class="kw">in</span> response.css(<span class="st">"a.book-link"</span>):</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">yield</span> response.follow(link, callback<span class="op">=</span><span class="va">self</span>.parse_book)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>        next_page <span class="op">=</span> response.css(<span class="st">"a.next-page::attr(href)"</span>).get()</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> next_page:</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">yield</span> response.follow(next_page, callback<span class="op">=</span><span class="va">self</span>.parse)</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse_book(<span class="va">self</span>, response):</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> {</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"title"</span>: response.css(<span class="st">"h1.title::text"</span>).get(),</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">"author"</span>: response.css(<span class="st">"p.author::text"</span>).get(),</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">"description"</span>: response.css(<span class="st">"p.description::text"</span>).get(),</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>            <span class="st">"price"</span>: response.css(<span class="st">"span.price::text"</span>).get(),</span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"stock"</span>: response.css(<span class="st">"span.stock::text"</span>).get(),</span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>        }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BooksSpider(scrapy.Spider):</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> <span class="st">"books"</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    start_urls <span class="op">=</span> [<span class="st">"http://localhost:5000/books"</span>]</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse(<span class="va">self</span>, response):</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> link <span class="kw">in</span> response.css(<span class="st">"a.book-link"</span>):</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">yield</span> response.follow(link, callback<span class="op">=</span><span class="va">self</span>.parse_book)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>        next_page <span class="op">=</span> response.css(<span class="st">"a.next-page::attr(href)"</span>).get()</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> next_page:</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">yield</span> response.follow(next_page, callback<span class="op">=</span><span class="va">self</span>.parse)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse_book(<span class="va">self</span>, response):</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> {</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>            <span class="st">"title"</span>: response.css(<span class="st">"h1.title::text"</span>).get(),</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>            <span class="st">"author"</span>: response.css(<span class="st">"p.author::text"</span>).get(),</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>            <span class="st">"description"</span>: response.css(<span class="st">"p.description::text"</span>).get(),</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>            <span class="st">"price"</span>: response.css(<span class="st">"span.price::text"</span>).get(),</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>            <span class="st">"stock"</span>: response.css(<span class="st">"span.stock::text"</span>).get(),</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>        }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Metoda <code>parse</code> przetwarza listing — nie wyciąga danych o książkach, tylko podąża za linkami do stron szczegółowych. Dla każdego linka generuje <code>response.follow</code> z callbackiem <code>parse_book</code>. Dodatkowo podąża za linkiem paginacji (z callbackiem <code>self.parse</code> — ta sama metoda, kolejna strona listingu).</p>
 <p>Metoda <code>parse_book</code> przetwarza stronę szczegółową — wyciąga pełne dane i generuje słownik.</p>
 <p><code>response.follow(link, ...)</code> przyjmuje nie tylko string z URL-em, ale też obiekt selektora (tu: element <code>&lt;a&gt;</code>). Scrapy automatycznie wyciąga z niego atrybut <code>href</code>.</p>
 <hr>
 </section>
 </section>
-<section id="selektory-w-scrapy" class="level2" data-number="6">
-<h2 data-number="6" class="anchored" data-anchor-id="selektory-w-scrapy"><span class="header-section-number">6</span> Selektory w Scrapy</h2>
+<section id="selektory-w-scrapy" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="selektory-w-scrapy"><span class="header-section-number">7</span> Selektory w Scrapy</h2>
 <p>Na Wykładzie 3 poznaliśmy trzy metody selekcji danych z HTML: API BeautifulSoup, selektory CSS i XPath. Scrapy ma wbudowany własny mechanizm selektorów, który łączy CSS i XPath w jednym interfejsie. Nie trzeba importować BeautifulSoup ani lxml — selektory są częścią obiektu <code>response</code>.</p>
-<section id="response.css-i-response.xpath" class="level3" data-number="6.1">
-<h3 data-number="6.1" class="anchored" data-anchor-id="response.css-i-response.xpath"><span class="header-section-number">6.1</span> <code>response.css()</code> i <code>response.xpath()</code></h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CSS — składnia znana z Wykładu 3</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>response.css(<span class="st">"div.book h2.title::text"</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># XPath — również znany z Wykładu 3</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>response.xpath(<span class="st">'//div[@class="book"]/h2[@class="title"]/text()'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="response.css-i-response.xpath" class="level3" data-number="7.1">
+<h3 data-number="7.1" class="anchored" data-anchor-id="response.css-i-response.xpath"><span class="header-section-number">7.1</span> <code>response.css()</code> i <code>response.xpath()</code></h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CSS — składnia znana z Wykładu 3</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>response.css(<span class="st">"div.book h2.title::text"</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># XPath — również znany z Wykładu 3</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>response.xpath(<span class="st">'//div[@class="book"]/h2[@class="title"]/text()'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Oba zwracają obiekt <code>SelectorList</code> — listę wyników, z której wyciągamy dane:</p>
 <ul>
 <li><strong><code>.get()</code></strong> — pierwszy wynik jako string (lub <code>None</code>, jeśli brak). Odpowiednik <code>select_one</code> w BeautifulSoup.</li>
 <li><strong><code>.getall()</code></strong> — lista wszystkich wyników jako stringi. Odpowiednik <code>select</code> w BeautifulSoup.</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Jeden wynik:</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>title <span class="op">=</span> response.css(<span class="st">"h1.title::text"</span>).get()          <span class="co"># "Solaris"</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Wszystkie wyniki:</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>prices <span class="op">=</span> response.css(<span class="st">"span.price::text"</span>).getall()     <span class="co"># ["34,90 zł", "28,50 zł"]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Jeden wynik:</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>title <span class="op">=</span> response.css(<span class="st">"h1.title::text"</span>).get()          <span class="co"># "Solaris"</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Wszystkie wyniki:</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>prices <span class="op">=</span> response.css(<span class="st">"span.price::text"</span>).getall()     <span class="co"># ["34,90 zł", "28,50 zł"]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="pseudoelementy-text-i-attr" class="level3" data-number="6.2">
-<h3 data-number="6.2" class="anchored" data-anchor-id="pseudoelementy-text-i-attr"><span class="header-section-number">6.2</span> Pseudoelementy <code>::text</code> i <code>::attr()</code></h3>
+<section id="pseudoelementy-text-i-attr" class="level3" data-number="7.2">
+<h3 data-number="7.2" class="anchored" data-anchor-id="pseudoelementy-text-i-attr"><span class="header-section-number">7.2</span> Pseudoelementy <code>::text</code> i <code>::attr()</code></h3>
 <p>Selektory CSS w Scrapy mają dwa rozszerzenia, których nie ma w standardowych selektorach CSS:</p>
 <ul>
 <li><strong><code>::text</code></strong> — wyciąga tekst z elementu (zamiast samego elementu):</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>response.css(<span class="st">"h2.title::text"</span>).get()         <span class="co"># "Solaris"</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>response.css(<span class="st">"h2.title"</span>).get()               <span class="co"># "&lt;h2 class=\"title\"&gt;Solaris&lt;/h2&gt;"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>response.css(<span class="st">"h2.title::text"</span>).get()         <span class="co"># "Solaris"</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>response.css(<span class="st">"h2.title"</span>).get()               <span class="co"># "&lt;h2 class=\"title\"&gt;Solaris&lt;/h2&gt;"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li><strong><code>::attr(name)</code></strong> — wyciąga wartość atrybutu:</li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>response.css(<span class="st">"a.next-page::attr(href)"</span>).get()   <span class="co"># "/books?page=2"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>response.css(<span class="st">"a.next-page::attr(href)"</span>).get()   <span class="co"># "/books?page=2"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>W XPath te same operacje wyglądają tak:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>response.xpath(<span class="st">'//h2[@class="title"]/text()'</span>).get()       <span class="co"># "Solaris"</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>response.xpath(<span class="st">'//a[@class="next-page"]/@href'</span>).get()      <span class="co"># "/books?page=2"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>response.xpath(<span class="st">'//h2[@class="title"]/text()'</span>).get()       <span class="co"># "Solaris"</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>response.xpath(<span class="st">'//a[@class="next-page"]/@href'</span>).get()      <span class="co"># "/books?page=2"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="selektory-na-podelementach" class="level3" data-number="6.3">
-<h3 data-number="6.3" class="anchored" data-anchor-id="selektory-na-podelementach"><span class="header-section-number">6.3</span> Selektory na podelementach</h3>
+<section id="selektory-na-podelementach" class="level3" data-number="7.3">
+<h3 data-number="7.3" class="anchored" data-anchor-id="selektory-na-podelementach"><span class="header-section-number">7.3</span> Selektory na podelementach</h3>
 <p>Selektory można łączyć w łańcuchy — najpierw wybrać kontener, potem szukać wewnątrz niego:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> book <span class="kw">in</span> response.css(<span class="st">"div.book"</span>):</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># book to Selector — ma te same metody css() i xpath()</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> book.css(<span class="st">"h2.title::text"</span>).get()</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    price <span class="op">=</span> book.css(<span class="st">"span.price::text"</span>).get()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> book <span class="kw">in</span> response.css(<span class="st">"div.book"</span>):</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># book to Selector — ma te same metody css() i xpath()</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> book.css(<span class="st">"h2.title::text"</span>).get()</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    price <span class="op">=</span> book.css(<span class="st">"span.price::text"</span>).get()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>To ten sam pattern co <code>find</code> + <code>find_all</code> w BeautifulSoup, ale w jednolinijkowej składni selektorowej.</p>
 </section>
-<section id="scrapy-shell-interaktywna-eksploracja" class="level3" data-number="6.4">
-<h3 data-number="6.4" class="anchored" data-anchor-id="scrapy-shell-interaktywna-eksploracja"><span class="header-section-number">6.4</span> <code>scrapy shell</code> — interaktywna eksploracja</h3>
+<section id="scrapy-shell-interaktywna-eksploracja" class="level3" data-number="7.4">
+<h3 data-number="7.4" class="anchored" data-anchor-id="scrapy-shell-interaktywna-eksploracja"><span class="header-section-number">7.4</span> <code>scrapy shell</code> — interaktywna eksploracja</h3>
 <p>Scrapy oferuje interaktywną konsolę do testowania selektorów:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> shell <span class="st">"http://localhost:5000/books"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> shell <span class="st">"http://localhost:5000/books"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>W konsoli dostajemy obiekt <code>response</code>, na którym możemy wywoływać selektory:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> response.css(<span class="st">"div.book"</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>[<span class="op">&lt;</span>Selector query<span class="op">=</span><span class="st">'descendant-or-self::div[...]'</span> data<span class="op">=</span><span class="st">'&lt;div class="book"&gt;...'</span><span class="op">&gt;</span>]</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> response.css(<span class="st">"h2.title::text"</span>).getall()</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>[<span class="st">'Solaris'</span>, <span class="st">'Ferdydurke'</span>, ...]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> response.css(<span class="st">"div.book"</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>[<span class="op">&lt;</span>Selector query<span class="op">=</span><span class="st">'descendant-or-self::div[...]'</span> data<span class="op">=</span><span class="st">'&lt;div class="book"&gt;...'</span><span class="op">&gt;</span>]</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> response.css(<span class="st">"h2.title::text"</span>).getall()</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>[<span class="st">'Solaris'</span>, <span class="st">'Ferdydurke'</span>, ...]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Shell pozwala szybko sprawdzić, czy selektor trafia w odpowiednie elementy — zanim napiszemy spidera. Na labach będziemy z niego korzystać jako z narzędzia eksploracyjnego.</p>
 <hr>
 </section>
 </section>
-<section id="item-i-item-pipeline" class="level2" data-number="7">
-<h2 data-number="7" class="anchored" data-anchor-id="item-i-item-pipeline"><span class="header-section-number">7</span> Item i Item Pipeline</h2>
-<section id="dlaczego-yield-dict-nie-wystarczy" class="level3" data-number="7.1">
-<h3 data-number="7.1" class="anchored" data-anchor-id="dlaczego-yield-dict-nie-wystarczy"><span class="header-section-number">7.1</span> Dlaczego <code>yield dict</code> nie wystarczy</h3>
+<section id="item-i-item-pipeline" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="item-i-item-pipeline"><span class="header-section-number">8</span> Item i Item Pipeline</h2>
+<section id="dlaczego-yield-dict-nie-wystarczy" class="level3" data-number="8.1">
+<h3 data-number="8.1" class="anchored" data-anchor-id="dlaczego-yield-dict-nie-wystarczy"><span class="header-section-number">8.1</span> Dlaczego <code>yield dict</code> nie wystarczy</h3>
 <p>W minimalnym spiderze generowaliśmy zwykłe słowniki:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="cf">yield</span> {</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"title"</span>: book.css(<span class="st">"h2.title::text"</span>).get(),</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"price"</span>: book.css(<span class="st">"span.price::text"</span>).get(),</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="cf">yield</span> {</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"title"</span>: book.css(<span class="st">"h2.title::text"</span>).get(),</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"price"</span>: book.css(<span class="st">"span.price::text"</span>).get(),</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>To działa, ale ma ograniczenia:</p>
 <ul>
 <li><strong>Brak struktury</strong> — nic nie wymusza, jakie klucze powinien mieć słownik. Literówka w nazwie klucza (<code>"titel"</code> zamiast <code>"title"</code>) nie zgłosi błędu.</li>
@@ -703,125 +718,125 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p>Item i Pipeline rozdzielają te odpowiedzialności: spider wyciąga surowe dane, pipeline je czyści i waliduje.</p>
 </section>
-<section id="scrapy.item-deklaratywna-struktura" class="level3" data-number="7.2">
-<h3 data-number="7.2" class="anchored" data-anchor-id="scrapy.item-deklaratywna-struktura"><span class="header-section-number">7.2</span> <code>scrapy.Item</code> — deklaratywna struktura</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># items.py</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scrapy</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BookItem(scrapy.Item):</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> scrapy.Field()</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    author <span class="op">=</span> scrapy.Field()</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    price <span class="op">=</span> scrapy.Field()</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    description <span class="op">=</span> scrapy.Field()</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    stock <span class="op">=</span> scrapy.Field()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><code>BookItem</code> zachowuje się jak słownik (dostęp przez <code>item["title"]</code>, iteracja po kluczach), ale dopuszcza tylko zadeklarowane pola. Próba przypisania do niezadeklarowanego klucza zgłosi <code>KeyError</code>.</p>
-<p>Spider zamiast <code>yield dict</code> generuje <code>yield BookItem(...)</code>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># spiders/books.py</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bookshop.items <span class="im">import</span> BookItem</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BooksSpider(scrapy.Spider):</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> <span class="st">"books"</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    start_urls <span class="op">=</span> [<span class="st">"http://localhost:5000/books"</span>]</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse(<span class="va">self</span>, response):</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> link <span class="kw">in</span> response.css(<span class="st">"a.book-link"</span>):</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">yield</span> response.follow(link, callback<span class="op">=</span><span class="va">self</span>.parse_book)</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>        next_page <span class="op">=</span> response.css(<span class="st">"a.next-page::attr(href)"</span>).get()</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> next_page:</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">yield</span> response.follow(next_page, callback<span class="op">=</span><span class="va">self</span>.parse)</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse_book(<span class="va">self</span>, response):</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> BookItem(</span>
-<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>            title<span class="op">=</span>response.css(<span class="st">"h1.title::text"</span>).get(),</span>
-<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>            author<span class="op">=</span>response.css(<span class="st">"p.author::text"</span>).get(),</span>
-<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>            description<span class="op">=</span>response.css(<span class="st">"p.description::text"</span>).get(),</span>
-<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>            price<span class="op">=</span>response.css(<span class="st">"span.price::text"</span>).get(),</span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>            stock<span class="op">=</span>response.css(<span class="st">"span.stock::text"</span>).get(),</span>
-<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>        )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Zmiana jest minimalna — w <code>parse_book</code> zamiast <code>{}</code> piszemy <code>BookItem(...)</code>. Metoda <code>parse</code> pozostaje taka sama jak w poprzednim przykładzie. Zysk pojawia się po stronie pipeline.</p>
-</section>
-<section id="item-pipeline-łańcuch-przetwarzania" class="level3" data-number="7.3">
-<h3 data-number="7.3" class="anchored" data-anchor-id="item-pipeline-łańcuch-przetwarzania"><span class="header-section-number">7.3</span> Item Pipeline — łańcuch przetwarzania</h3>
-<p>Pipeline to klasa z metodą <code>process_item</code>, która otrzymuje każdy wygenerowany item, przetwarza go i zwraca (lub odrzuca):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pipelines.py</span></span>
+<section id="scrapy.item-deklaratywna-struktura" class="level3" data-number="8.2">
+<h3 data-number="8.2" class="anchored" data-anchor-id="scrapy.item-deklaratywna-struktura"><span class="header-section-number">8.2</span> <code>scrapy.Item</code> — deklaratywna struktura</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># items.py</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scrapy</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> StripWhitespacePipeline:</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> process_item(<span class="va">self</span>, item, spider):</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> field <span class="kw">in</span> item:</span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">isinstance</span>(item[field], <span class="bu">str</span>):</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>                item[field] <span class="op">=</span> item[field].strip()</span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> item</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BookItem(scrapy.Item):</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> scrapy.Field()</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    author <span class="op">=</span> scrapy.Field()</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    price <span class="op">=</span> scrapy.Field()</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    description <span class="op">=</span> scrapy.Field()</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    stock <span class="op">=</span> scrapy.Field()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>BookItem</code> zachowuje się jak słownik (dostęp przez <code>item["title"]</code>, iteracja po kluczach), ale dopuszcza tylko zadeklarowane pola. Próba przypisania do niezadeklarowanego klucza zgłosi <code>KeyError</code>.</p>
+<p>Spider zamiast <code>yield dict</code> generuje <code>yield BookItem(...)</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># spiders/books.py</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bookshop.items <span class="im">import</span> BookItem</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BooksSpider(scrapy.Spider):</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> <span class="st">"books"</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    start_urls <span class="op">=</span> [<span class="st">"http://localhost:5000/books"</span>]</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse(<span class="va">self</span>, response):</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> link <span class="kw">in</span> response.css(<span class="st">"a.book-link"</span>):</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">yield</span> response.follow(link, callback<span class="op">=</span><span class="va">self</span>.parse_book)</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>        next_page <span class="op">=</span> response.css(<span class="st">"a.next-page::attr(href)"</span>).get()</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> next_page:</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">yield</span> response.follow(next_page, callback<span class="op">=</span><span class="va">self</span>.parse)</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse_book(<span class="va">self</span>, response):</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> BookItem(</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>            title<span class="op">=</span>response.css(<span class="st">"h1.title::text"</span>).get(),</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>            author<span class="op">=</span>response.css(<span class="st">"p.author::text"</span>).get(),</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>            description<span class="op">=</span>response.css(<span class="st">"p.description::text"</span>).get(),</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>            price<span class="op">=</span>response.css(<span class="st">"span.price::text"</span>).get(),</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>            stock<span class="op">=</span>response.css(<span class="st">"span.stock::text"</span>).get(),</span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>        )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Zmiana jest minimalna — w <code>parse_book</code> zamiast <code>{}</code> piszemy <code>BookItem(...)</code>. Metoda <code>parse</code> pozostaje taka sama jak w poprzednim przykładzie. Zysk pojawia się po stronie pipeline.</p>
+</section>
+<section id="item-pipeline-łańcuch-przetwarzania" class="level3" data-number="8.3">
+<h3 data-number="8.3" class="anchored" data-anchor-id="item-pipeline-łańcuch-przetwarzania"><span class="header-section-number">8.3</span> Item Pipeline — łańcuch przetwarzania</h3>
+<p>Pipeline to klasa z metodą <code>process_item</code>, która otrzymuje każdy wygenerowany item, przetwarza go i zwraca (lub odrzuca):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pipelines.py</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scrapy</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> StripWhitespacePipeline:</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> process_item(<span class="va">self</span>, item, spider):</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> field <span class="kw">in</span> item:</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="bu">isinstance</span>(item[field], <span class="bu">str</span>):</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>                item[field] <span class="op">=</span> item[field].strip()</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> item</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Ten pipeline przechodzi po wszystkich polach itemu i usuwa białe znaki z początku i końca. Dostaje item z <code>"  Solaris  "</code>, zwraca item z <code>"Solaris"</code>.</p>
 <p>Pipeline czyszczący ceny:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> CleanPricePipeline:</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> process_item(<span class="va">self</span>, item, spider):</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>        raw <span class="op">=</span> item.get(<span class="st">"price"</span>, <span class="st">""</span>)</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> raw:</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>            cleaned <span class="op">=</span> raw.replace(<span class="st">"zł"</span>, <span class="st">""</span>).replace(<span class="st">","</span>, <span class="st">"."</span>).strip()</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>            item[<span class="st">"price"</span>] <span class="op">=</span> <span class="bu">float</span>(cleaned)</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> item</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> CleanPricePipeline:</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> process_item(<span class="va">self</span>, item, spider):</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>        raw <span class="op">=</span> item.get(<span class="st">"price"</span>, <span class="st">""</span>)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> raw:</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>            cleaned <span class="op">=</span> raw.replace(<span class="st">"zł"</span>, <span class="st">""</span>).replace(<span class="st">","</span>, <span class="st">"."</span>).strip()</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>            item[<span class="st">"price"</span>] <span class="op">=</span> <span class="bu">float</span>(cleaned)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> item</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Cena <code>"34,90 zł"</code> staje się liczbą <code>34.9</code>.</p>
 <p>Pipeline walidujący:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DropIncompletePipeline:</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> process_item(<span class="va">self</span>, item, spider):</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> item.get(<span class="st">"title"</span>):</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> scrapy.exceptions.DropItem(<span class="ss">f"Brak tytułu: </span><span class="sc">{</span>item<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> item</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> DropIncompletePipeline:</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> process_item(<span class="va">self</span>, item, spider):</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> item.get(<span class="st">"title"</span>):</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> scrapy.exceptions.DropItem(<span class="ss">f"Brak tytułu: </span><span class="sc">{</span>item<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> item</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><code>DropItem</code> — wyjątek sygnalizujący, że item jest niekompletny i powinien zostać odrzucony. Scrapy loguje dropnięte itemy, ale nie przerywa działania spidera.</p>
 </section>
-<section id="aktywacja-pipeline-w-settings" class="level3" data-number="7.4">
-<h3 data-number="7.4" class="anchored" data-anchor-id="aktywacja-pipeline-w-settings"><span class="header-section-number">7.4</span> Aktywacja pipeline w settings</h3>
+<section id="aktywacja-pipeline-w-settings" class="level3" data-number="8.4">
+<h3 data-number="8.4" class="anchored" data-anchor-id="aktywacja-pipeline-w-settings"><span class="header-section-number">8.4</span> Aktywacja pipeline w settings</h3>
 <p>Pipeline nie działa, dopóki nie aktywujemy go w <code>settings.py</code>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># settings.py</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>ITEM_PIPELINES <span class="op">=</span> {</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"bookshop.pipelines.StripWhitespacePipeline"</span>: <span class="dv">100</span>,</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"bookshop.pipelines.CleanPricePipeline"</span>: <span class="dv">200</span>,</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"bookshop.pipelines.DropIncompletePipeline"</span>: <span class="dv">300</span>,</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># settings.py</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>ITEM_PIPELINES <span class="op">=</span> {</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"bookshop.pipelines.StripWhitespacePipeline"</span>: <span class="dv">100</span>,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"bookshop.pipelines.CleanPricePipeline"</span>: <span class="dv">200</span>,</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"bookshop.pipelines.DropIncompletePipeline"</span>: <span class="dv">300</span>,</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Liczba oznacza priorytet — niższy numer wykonuje się wcześniej. Tu: najpierw strip białych znaków (100), potem czyszczenie ceny (200), na końcu walidacja (300).</p>
 <p>Kolejność ma znaczenie. <code>CleanPricePipeline</code> zakłada, że <code>price</code> to string (bo wywołuje <code>.replace()</code>). Gdyby działał po sobie samym (na już skonwertowanej liczbie), rzuciłby wyjątek. Dlatego walidacja (<code>DropIncompletePipeline</code>) jest ostatnia — działa na już oczyszczonych danych.</p>
 <p>Pipeline to łańcuch: wynik jednego <code>process_item</code> trafia jako wejście do następnego. Jeśli którykolwiek rzuci <code>DropItem</code>, reszta łańcucha jest pomijana dla tego itemu.</p>
 <hr>
 </section>
 </section>
-<section id="konfiguracja" class="level2" data-number="8">
-<h2 data-number="8" class="anchored" data-anchor-id="konfiguracja"><span class="header-section-number">8</span> Konfiguracja</h2>
+<section id="konfiguracja" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="konfiguracja"><span class="header-section-number">9</span> Konfiguracja</h2>
 <p>Scrapy konfigurujemy przez <code>settings.py</code>. Poniżej kluczowe ustawienia — reszta ma sensowne wartości domyślne.</p>
-<section id="kontrola-tempa" class="level3" data-number="8.1">
-<h3 data-number="8.1" class="anchored" data-anchor-id="kontrola-tempa"><span class="header-section-number">8.1</span> Kontrola tempa</h3>
+<section id="kontrola-tempa" class="level3" data-number="9.1">
+<h3 data-number="9.1" class="anchored" data-anchor-id="kontrola-tempa"><span class="header-section-number">9.1</span> Kontrola tempa</h3>
 <p><strong><code>DOWNLOAD_DELAY</code></strong> — minimalne opóźnienie (w sekundach) między kolejnymi żądaniami do tego samego serwera:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>DOWNLOAD_DELAY <span class="op">=</span> <span class="dv">1</span>   <span class="co"># co najmniej 1 sekunda między żądaniami</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>DOWNLOAD_DELAY <span class="op">=</span> <span class="dv">1</span>   <span class="co"># co najmniej 1 sekunda między żądaniami</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>To odpowiednik ręcznego <code>time.sleep(1)</code> w pętli crawlera, ale zintegrowany z mechanizmem pobierania. Domyślnie: <code>0</code> (brak opóźnienia).</p>
 <p><strong><code>CONCURRENT_REQUESTS</code></strong> — maksymalna liczba jednoczesnych żądań:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>CONCURRENT_REQUESTS <span class="op">=</span> <span class="dv">8</span>   <span class="co"># domyślnie 16</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>CONCURRENT_REQUESTS <span class="op">=</span> <span class="dv">8</span>   <span class="co"># domyślnie 16</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Analogia do <code>asyncio.Semaphore</code> z Wykładu 5. Scrapy nie wyśle więcej niż tyle żądań jednocześnie — reszta czeka w Schedulerze.</p>
 <p><strong><code>CONCURRENT_REQUESTS_PER_DOMAIN</code></strong> — limit per domena:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>CONCURRENT_REQUESTS_PER_DOMAIN <span class="op">=</span> <span class="dv">4</span>   <span class="co"># domyślnie 8</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>CONCURRENT_REQUESTS_PER_DOMAIN <span class="op">=</span> <span class="dv">4</span>   <span class="co"># domyślnie 8</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Oba limity działają jednocześnie — obowiązuje bardziej restrykcyjny.</p>
 </section>
-<section id="identyfikacja" class="level3" data-number="8.2">
-<h3 data-number="8.2" class="anchored" data-anchor-id="identyfikacja"><span class="header-section-number">8.2</span> Identyfikacja</h3>
+<section id="identyfikacja" class="level3" data-number="9.2">
+<h3 data-number="9.2" class="anchored" data-anchor-id="identyfikacja"><span class="header-section-number">9.2</span> Identyfikacja</h3>
 <p><strong><code>USER_AGENT</code></strong> — nagłówek identyfikujący crawlera:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>USER_AGENT <span class="op">=</span> <span class="st">"bookshop-spider (+http://example.com/bot)"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>USER_AGENT <span class="op">=</span> <span class="st">"bookshop-spider (+http://example.com/bot)"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Domyślnie Scrapy wysyła <code>"Scrapy/X.Y (+https://scrapy.org)"</code>. Ustawiamy własny, żeby administrator serwera wiedział, kto crawluje.</p>
 </section>
-<section id="robots.txt" class="level3" data-number="8.3">
-<h3 data-number="8.3" class="anchored" data-anchor-id="robots.txt"><span class="header-section-number">8.3</span> <code>robots.txt</code></h3>
+<section id="robots.txt" class="level3" data-number="9.3">
+<h3 data-number="9.3" class="anchored" data-anchor-id="robots.txt"><span class="header-section-number">9.3</span> <code>robots.txt</code></h3>
 <p><strong><code>ROBOTSTXT_OBEY</code></strong> — czy respektować plik <code>robots.txt</code>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>ROBOTSTXT_OBEY <span class="op">=</span> <span class="va">True</span>   <span class="co"># domyślnie True</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>ROBOTSTXT_OBEY <span class="op">=</span> <span class="va">True</span>   <span class="co"># domyślnie True</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Scrapy przed pierwszym żądaniem do domeny pobiera jej <code>robots.txt</code> i sprawdza, czy nasz <code>USER_AGENT</code> ma dostęp do żądanego URL-a. Jeśli nie — pomija żądanie.</p>
 <hr>
 </section>
 </section>
-<section id="robots.txt-i-etyka" class="level2" data-number="9">
-<h2 data-number="9" class="anchored" data-anchor-id="robots.txt-i-etyka"><span class="header-section-number">9</span> <code>robots.txt</code> i etyka</h2>
-<section id="czym-jest-robots.txt" class="level3" data-number="9.1">
-<h3 data-number="9.1" class="anchored" data-anchor-id="czym-jest-robots.txt"><span class="header-section-number">9.1</span> Czym jest <code>robots.txt</code></h3>
+<section id="robots.txt-i-etyka" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="robots.txt-i-etyka"><span class="header-section-number">10</span> <code>robots.txt</code> i etyka</h2>
+<section id="czym-jest-robots.txt" class="level3" data-number="10.1">
+<h3 data-number="10.1" class="anchored" data-anchor-id="czym-jest-robots.txt"><span class="header-section-number">10.1</span> Czym jest <code>robots.txt</code></h3>
 <p><code>robots.txt</code> to plik tekstowy w katalogu głównym serwera, który informuje crawlery, jakie ścieżki mogą, a jakich nie powinny odwiedzać:</p>
 <pre><code># https://example.com/robots.txt
 User-agent: *
@@ -840,8 +855,8 @@ Disallow: /</code></pre>
 </ul>
 <p><code>robots.txt</code> to <strong>konwencja</strong>, nie zabezpieczenie techniczne — nic nie powstrzymuje crawlera przed zignorowaniem tych reguł. Scrapy domyślnie je respektuje (<code>ROBOTSTXT_OBEY = True</code>).</p>
 </section>
-<section id="dobre-praktyki" class="level3" data-number="9.2">
-<h3 data-number="9.2" class="anchored" data-anchor-id="dobre-praktyki"><span class="header-section-number">9.2</span> Dobre praktyki</h3>
+<section id="dobre-praktyki" class="level3" data-number="10.2">
+<h3 data-number="10.2" class="anchored" data-anchor-id="dobre-praktyki"><span class="header-section-number">10.2</span> Dobre praktyki</h3>
 <ul>
 <li><strong>Identyfikuj się</strong> — ustaw <code>USER_AGENT</code> z nazwą bota i kontaktem.</li>
 <li><strong>Kontroluj tempo</strong> — <code>DOWNLOAD_DELAY</code> chroni serwer przed przeciążeniem. Nawet jeśli <code>robots.txt</code> nie wymaga opóźnień, kilkadziesiąt żądań na sekundę do jednego serwera to zachowanie agresywne.</li>
@@ -849,14 +864,14 @@ Disallow: /</code></pre>
 <li><strong>Respektuj <code>robots.txt</code></strong> — to minimum etyki. Wyłączenie <code>ROBOTSTXT_OBEY</code> powinno mieć uzasadnienie (np. crawlowanie własnego serwera).</li>
 </ul>
 </section>
-<section id="kontekst-prawny" class="level3" data-number="9.3">
-<h3 data-number="9.3" class="anchored" data-anchor-id="kontekst-prawny"><span class="header-section-number">9.3</span> Kontekst prawny</h3>
+<section id="kontekst-prawny" class="level3" data-number="10.3">
+<h3 data-number="10.3" class="anchored" data-anchor-id="kontekst-prawny"><span class="header-section-number">10.3</span> Kontekst prawny</h3>
 <p>Sytuacja prawna web scrapingu różni się między jurysdykcjami i nie ma jednoznacznych, uniwersalnych reguł. <code>robots.txt</code> nie jest dokumentem prawnym, ale jego łamanie może być argumentem w sporze. Na tym kursie pracujemy na lokalnych serwerach i na stronach stworzonych do nauki scrapingu (np. books.toscrape.com) — nie ma tu ryzyka prawnego ani etycznego.</p>
 <hr>
 </section>
 </section>
-<section id="podsumowanie" class="level2" data-number="10">
-<h2 data-number="10" class="anchored" data-anchor-id="podsumowanie"><span class="header-section-number">10</span> Podsumowanie</h2>
+<section id="podsumowanie" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="podsumowanie"><span class="header-section-number">11</span> Podsumowanie</h2>
 <p>Na tym wykładzie:</p>
 <ul>
 <li>zobaczyliśmy, że ręczny crawler wymaga dużo powtarzalnego kodu infrastrukturalnego — i że framework przejmuje tę odpowiedzialność,</li>
