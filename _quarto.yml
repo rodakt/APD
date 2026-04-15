@@ -22,6 +22,7 @@ website:
           - wyklady/wyklad_4.md
           - wyklady/wyklad_5.md
           - wyklady/wyklad_6.md
+          - wyklady/wyklad_7.md
       - section: "Laboratoria"
         contents:
           - laby/lab_0.md

@@ -14,6 +14,7 @@ Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z si
 - [Wykład 4: Cookies, sesje i formularze](wyklady/wyklad_4.md)
 - [Wykład 5: Asynchroniczność w Pythonie — od intuicji do httpx](wyklady/wyklad_5.md)
 - [Wykład 6: Scrapy — framework do web scrapingu](wyklady/wyklad_6.md)
+- [Wykład 7: Strony dynamiczne — JavaScript, AJAX, Selenium](wyklady/wyklad_7.md)
 
 ## Laboratoria
 
