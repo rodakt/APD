@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Wykład 7: Strony dynamiczne — JavaScript, AJAX, Selenium – Automatyczne pozyskiwanie danych</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-f81f3c79f694eaf6f88ebcce70241f9e.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-48c95295d902c81ffd89ff58ae6d84a1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_7.html">Wykład 7: Strony dynamiczne — JavaScript, AJAX, Selenium</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Automatyczne pozyskiwanie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automatyczne pozyskiwanie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: HTTP i klienci HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: Serwer HTTP - framework Flask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 3: HTML jako drzewo — selekcja danych</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 4: Cookies, sesje i formularze</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 5: Asynchroniczność w Pythonie — od intuicji do httpx</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 6: Scrapy — framework do web scrapingu</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_7.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Wykład 7: Strony dynamiczne — JavaScript, AJAX, Selenium</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Python — odświeżenie podstaw</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Klienci HTTP (curl, requests)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: Nawigacja po API — stronicowanie, pipeline, retry</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 3: Tworzenie serwera HTTP w Flask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: Paginacja HTML i prosty crawler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Parsowanie HTML — BeautifulSoup i selektory CSS</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#cele-i-zakres" id="toc-cele-i-zakres" class="nav-link active" data-scroll-target="#cele-i-zakres"><span class="header-section-number">1</span> Cele i zakres</a></li>
+  <li><a href="#problem-requests-nie-widzi-danych" id="toc-problem-requests-nie-widzi-danych" class="nav-link" data-scroll-target="#problem-requests-nie-widzi-danych"><span class="header-section-number">2</span> Problem: <code>requests</code> nie widzi danych</a>
+  <ul class="collapse">
+  <li><a href="#model-z-wykładu-1-przypomnienie" id="toc-model-z-wykładu-1-przypomnienie" class="nav-link" data-scroll-target="#model-z-wykładu-1-przypomnienie"><span class="header-section-number">2.1</span> Model z Wykładu 1 — przypomnienie</a></li>
+  <li><a href="#nowy-aktor-javascript-w-przeglądarce" id="toc-nowy-aktor-javascript-w-przeglądarce" class="nav-link" data-scroll-target="#nowy-aktor-javascript-w-przeglądarce"><span class="header-section-number">2.2</span> Nowy aktor: JavaScript w przeglądarce</a></li>
+  <li><a href="#demo-quotes.toscrape.comscroll" id="toc-demo-quotes.toscrape.comscroll" class="nav-link" data-scroll-target="#demo-quotes.toscrape.comscroll"><span class="header-section-number">2.3</span> Demo: <code>quotes.toscrape.com/scroll</code></a></li>
+  </ul></li>
+  <li><a href="#diagnostyka-devtools-i-zakładka-network" id="toc-diagnostyka-devtools-i-zakładka-network" class="nav-link" data-scroll-target="#diagnostyka-devtools-i-zakładka-network"><span class="header-section-number">3</span> Diagnostyka: DevTools i zakładka Network</a>
+  <ul class="collapse">
+  <li><a href="#gdzie-javascript-bierze-dane" id="toc-gdzie-javascript-bierze-dane" class="nav-link" data-scroll-target="#gdzie-javascript-bierze-dane"><span class="header-section-number">3.1</span> Gdzie JavaScript bierze dane?</a></li>
+  <li><a href="#ajax-shortcut" id="toc-ajax-shortcut" class="nav-link" data-scroll-target="#ajax-shortcut"><span class="header-section-number">3.2</span> AJAX shortcut</a></li>
+  <li><a href="#kiedy-shortcut-nie-działa" id="toc-kiedy-shortcut-nie-działa" class="nav-link" data-scroll-target="#kiedy-shortcut-nie-działa"><span class="header-section-number">3.3</span> Kiedy shortcut nie działa</a></li>
+  </ul></li>
+  <li><a href="#selenium-sterowanie-przeglądarką-z-pythona" id="toc-selenium-sterowanie-przeglądarką-z-pythona" class="nav-link" data-scroll-target="#selenium-sterowanie-przeglądarką-z-pythona"><span class="header-section-number">4</span> Selenium: sterowanie przeglądarką z Pythona</a>
+  <ul class="collapse">
+  <li><a href="#czym-jest-selenium" id="toc-czym-jest-selenium" class="nav-link" data-scroll-target="#czym-jest-selenium"><span class="header-section-number">4.1</span> Czym jest Selenium</a></li>
+  <li><a href="#instalacja" id="toc-instalacja" class="nav-link" data-scroll-target="#instalacja"><span class="header-section-number">4.2</span> Instalacja</a></li>
+  <li><a href="#otwarcie-strony-i-ekstrakcja-elementów" id="toc-otwarcie-strony-i-ekstrakcja-elementów" class="nav-link" data-scroll-target="#otwarcie-strony-i-ekstrakcja-elementów"><span class="header-section-number">4.3</span> Otwarcie strony i ekstrakcja elementów</a></li>
+  <li><a href="#webdriverwait-czekanie-na-elementy" id="toc-webdriverwait-czekanie-na-elementy" class="nav-link" data-scroll-target="#webdriverwait-czekanie-na-elementy"><span class="header-section-number">4.4</span> <code>WebDriverWait</code> — czekanie na elementy</a></li>
+  <li><a href="#przewijanie-strony" id="toc-przewijanie-strony" class="nav-link" data-scroll-target="#przewijanie-strony"><span class="header-section-number">4.5</span> Przewijanie strony</a></li>
+  <li><a href="#kompletny-przykład-wszystkie-cytaty-z-infinite-scroll" id="toc-kompletny-przykład-wszystkie-cytaty-z-infinite-scroll" class="nav-link" data-scroll-target="#kompletny-przykład-wszystkie-cytaty-z-infinite-scroll"><span class="header-section-number">4.6</span> Kompletny przykład: wszystkie cytaty z infinite scroll</a></li>
+  <li><a href="#selenium-vs-requests-kluczowe-różnice" id="toc-selenium-vs-requests-kluczowe-różnice" class="nav-link" data-scroll-target="#selenium-vs-requests-kluczowe-różnice"><span class="header-section-number">4.7</span> Selenium vs <code>requests</code> — kluczowe różnice</a></li>
+  </ul></li>
+  <li><a href="#drzewo-decyzyjne" id="toc-drzewo-decyzyjne" class="nav-link" data-scroll-target="#drzewo-decyzyjne"><span class="header-section-number">5</span> Drzewo decyzyjne</a></li>
+  <li><a href="#podsumowanie-kursu" id="toc-podsumowanie-kursu" class="nav-link" data-scroll-target="#podsumowanie-kursu"><span class="header-section-number">6</span> Podsumowanie kursu</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../wyklady/wyklad_1.html">Wykłady</a></li><li class="breadcrumb-item"><a href="../wyklady/wyklad_7.html">Wykład 7: Strony dynamiczne — JavaScript, AJAX, Selenium</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Wykład 7: Strony dynamiczne — JavaScript, AJAX, Selenium</h1>
+<p class="subtitle lead">Automatyczne pozyskiwanie danych</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="cele-i-zakres" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="cele-i-zakres"><span class="header-section-number">1</span> Cele i zakres</h2>
+<p>Dotychczasowe narzędzia — <code>requests</code>, BeautifulSoup, Scrapy — działały na HTML zwróconym przez serwer. Wysyłaliśmy żądanie HTTP, dostawaliśmy dokument HTML, parsowaliśmy go i wyciągaliśmy dane. Ten model zakładał, że <strong>wszystkie dane są obecne w HTML już w momencie odpowiedzi serwera</strong>. Coraz więcej stron tak nie działa. Serwer wysyła szkielet HTML z kodem JavaScript, a dopiero przeglądarka — po odebraniu dokumentu — uruchamia ten kod, który pobiera dane z serwera i wstawia je do strony. <code>requests</code> nie jest przeglądarką, nie wykonuje JavaScriptu, więc widzi pusty szkielet.</p>
+<p>Ten wykład pokazuje, jak rozpoznać taki scenariusz i jak sobie z nim radzić.</p>
+<p>Zakres obejmuje:</p>
+<ul>
+<li>problem: dlaczego <code>requests</code> czasem „nie widzi” danych,</li>
+<li>diagnostyka: DevTools → Network → XHR/Fetch — jak znaleźć ukryte API,</li>
+<li>AJAX shortcut: bezpośrednie odpytanie API z poziomu <code>requests</code>,</li>
+<li>Selenium: sterowanie przeglądarką, gdy shortcut nie istnieje,</li>
+<li>drzewo decyzyjne — dobór narzędzia do problemu.</li>
+</ul>
+<hr>
+</section>
+<section id="problem-requests-nie-widzi-danych" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="problem-requests-nie-widzi-danych"><span class="header-section-number">2</span> Problem: <code>requests</code> nie widzi danych</h2>
+<section id="model-z-wykładu-1-przypomnienie" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="model-z-wykładu-1-przypomnienie"><span class="header-section-number">2.1</span> Model z Wykładu 1 — przypomnienie</h3>
+<p>Na Wykładzie 1 opisaliśmy cykl żądanie–odpowiedź:</p>
+<ol type="1">
+<li>Klient wysyła żądanie HTTP (<code>GET /page</code>).</li>
+<li>Serwer przetwarza żądanie i zwraca odpowiedź — dokument HTML.</li>
+<li>Klient (przeglądarka, <code>requests</code>, Scrapy) odbiera dokument.</li>
+</ol>
+<p>W tym modelu <strong>dane są w HTML</strong>. Dokument, który dostajemy od serwera, zawiera wszystkie teksty, linki, tabele — gotowe do parsowania. Tak działały strony z naszych serwerów Flask i tak działał <code>books.toscrape.com</code>.</p>
+</section>
+<section id="nowy-aktor-javascript-w-przeglądarce" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="nowy-aktor-javascript-w-przeglądarce"><span class="header-section-number">2.2</span> Nowy aktor: JavaScript w przeglądarce</h3>
+<p>Wiele współczesnych stron działa inaczej. Serwer wysyła <strong>szkielet HTML</strong> — sam układ strony, menu, nagłówki — ale bez właściwych danych. W szkielecie jest za to kod JavaScript, który:</p>
+<ol type="1">
+<li>uruchamia się <strong>w przeglądarce</strong>, po odebraniu dokumentu,</li>
+<li>wysyła <strong>własne żądania HTTP</strong> do serwera (po dane),</li>
+<li>otrzymuje dane (zwykle JSON),</li>
+<li>wstawia je do strony — modyfikując DOM.</li>
+</ol>
+<p>Z perspektywy użytkownika wygląda to tak samo: strona się ładuje i po chwili pojawiają się dane. Ale z perspektywy <code>requests</code> sytuacja jest zupełnie inna — <code>requests</code> nie jest przeglądarką. Nie uruchamia JavaScriptu. Dostaje szkielet HTML i na tym kończy.</p>
+</section>
+<section id="demo-quotes.toscrape.comscroll" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="demo-quotes.toscrape.comscroll"><span class="header-section-number">2.3</span> Demo: <code>quotes.toscrape.com/scroll</code></h3>
+<p>Strona <code>quotes.toscrape.com/scroll</code> wyświetla cytaty ładowane dynamicznie — w miarę przewijania strony JavaScript pobiera kolejne porcje danych z serwera.</p>
+<p>Spróbujmy pobrać ją za pomocą <code>requests</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="st">"https://quotes.toscrape.com/scroll"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(r.status_code)  <span class="co"># 200</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(r.text))    <span class="co"># kilka KB</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Status 200, odpowiedź niepusta — wygląda normalnie. Ale szukając cytatów:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>soup <span class="op">=</span> BeautifulSoup(r.text, <span class="st">"html.parser"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>quotes <span class="op">=</span> soup.select(<span class="st">"div.quote"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(quotes))  <span class="co"># 0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Zero cytatów. Strona odpowiedziała poprawnie, ale HTML, który dostaliśmy, to <strong>szkielet bez danych</strong>. Cytaty zostaną pobrane i wstawione dopiero po uruchomieniu JavaScriptu — a <code>requests</code> tego nie robi.</p>
+<p>To jest punkt wyjścia: musimy albo znaleźć sposób na dotarcie do danych bez przeglądarki, albo użyć narzędzia, które przeglądarkę uruchomi.</p>
+<hr>
+</section>
+</section>
+<section id="diagnostyka-devtools-i-zakładka-network" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="diagnostyka-devtools-i-zakładka-network"><span class="header-section-number">3</span> Diagnostyka: DevTools i zakładka Network</h2>
+<section id="gdzie-javascript-bierze-dane" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="gdzie-javascript-bierze-dane"><span class="header-section-number">3.1</span> Gdzie JavaScript bierze dane?</h3>
+<p>Skoro JavaScript pobiera dane z serwera, to robi to za pomocą zwykłych żądań HTTP — tyle że wysyłanych z poziomu przeglądarki, nie z naszego kodu. Te żądania można zobaczyć w narzędziach deweloperskich przeglądarki (DevTools).</p>
+<p>Procedura:</p>
+<ol type="1">
+<li>Otwieramy <code>https://quotes.toscrape.com/scroll</code> w przeglądarce (Chrome lub Firefox).</li>
+<li>Otwieramy DevTools: <code>F12</code> (lub <code>Ctrl+Shift+I</code>).</li>
+<li>Przechodzimy do zakładki <strong>Network</strong>.</li>
+<li>W filtrze wybieramy <strong>Fetch/XHR</strong> — pokazuje tylko żądania wysyłane przez JavaScript (AJAX).</li>
+<li>Przewijamy stronę w dół.</li>
+</ol>
+<p>Po przewinięciu pojawiają się żądania do:</p>
+<pre><code>https://quotes.toscrape.com/api/quotes?page=1
+https://quotes.toscrape.com/api/quotes?page=2
+https://quotes.toscrape.com/api/quotes?page=3
+...</code></pre>
+<p>Klikając na dowolne z nich i sprawdzając zakładkę <strong>Response</strong>, widzimy JSON z cytatami:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"has_next"</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"page"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"quotes"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"author"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"name"</span><span class="fu">:</span> <span class="st">"Albert Einstein"</span><span class="fu">,</span> <span class="dt">"goodreads_link"</span><span class="fu">:</span> <span class="st">"..."</span><span class="fu">},</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"tags"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"change"</span><span class="ot">,</span> <span class="st">"deep-thoughts"</span><span class="ot">,</span> <span class="st">"thinking"</span><span class="ot">,</span> <span class="st">"world"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"text"</span><span class="fu">:</span> <span class="st">"</span><span class="ch">\u201c</span><span class="st">The world as we have created it is a process of our thinking..."</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="er">...</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Dane są tu — po prostu nie w HTML, lecz w osobnym endpoincie JSON, który JavaScript odpytuje w tle.</p>
+</section>
+<section id="ajax-shortcut" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="ajax-shortcut"><span class="header-section-number">3.2</span> AJAX shortcut</h3>
+<p>Skoro znamy URL API, nie potrzebujemy ani JavaScriptu, ani przeglądarki. Możemy odpytać ten endpoint bezpośrednio z <code>requests</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="st">"https://quotes.toscrape.com/api/quotes?page=1"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> r.json()</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data[<span class="st">"page"</span>])       <span class="co"># 1</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(data[<span class="st">"has_next"</span>])   <span class="co"># True</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(data[<span class="st">"quotes"</span>]))  <span class="co"># 10</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> q <span class="kw">in</span> data[<span class="st">"quotes"</span>]:</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f'</span><span class="sc">{</span>q[<span class="st">"author"</span>][<span class="st">"name"</span>]<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>q[<span class="st">"text"</span>][:<span class="dv">50</span>]<span class="sc">}</span><span class="ss">...'</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>To działa, bo endpoint API jest publiczny i nie wymaga żadnych tokenów ani sesji. Możemy iterować po stronach tak samo jak w Labach 1–2:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>all_quotes <span class="op">=</span> []</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>page <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> requests.get(<span class="ss">f"https://quotes.toscrape.com/api/quotes?page=</span><span class="sc">{</span>page<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    data <span class="op">=</span> r.json()</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    all_quotes.extend(data[<span class="st">"quotes"</span>])</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> data[<span class="st">"has_next"</span>]:</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    page <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Zebrano </span><span class="sc">{</span><span class="bu">len</span>(all_quotes)<span class="sc">}</span><span class="ss"> cytatów"</span>)  <span class="co"># 100</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>To jest <strong>AJAX shortcut</strong>: zamiast uruchamiać przeglądarkę i symulować przewijanie, odpytujemy API bezpośrednio. Jest to szybsze, prostsze i nie wymaga dodatkowych narzędzi.</p>
+</section>
+<section id="kiedy-shortcut-nie-działa" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="kiedy-shortcut-nie-działa"><span class="header-section-number">3.3</span> Kiedy shortcut nie działa</h3>
+<p>Nie zawsze jest to możliwe:</p>
+<ul>
+<li>endpoint API może wymagać tokenu lub sesji, których nie da się łatwo odtworzyć,</li>
+<li>dane mogą być generowane po stronie klienta (np. obliczenia w JavaScript),</li>
+<li>strona może nie mieć osobnego API — JavaScript może otrzymywać dane osadzone w HTML lub renderowane z szablonu po stronie klienta.</li>
+</ul>
+<p>W tych przypadkach potrzebujemy narzędzia, które uruchomi prawdziwą przeglądarkę.</p>
+<hr>
+</section>
+</section>
+<section id="selenium-sterowanie-przeglądarką-z-pythona" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="selenium-sterowanie-przeglądarką-z-pythona"><span class="header-section-number">4</span> Selenium: sterowanie przeglądarką z Pythona</h2>
+<section id="czym-jest-selenium" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="czym-jest-selenium"><span class="header-section-number">4.1</span> Czym jest Selenium</h3>
+<p>Selenium to biblioteka, która pozwala programowo sterować przeglądarką — otwierać strony, klikać elementy, wypełniać formularze, przewijać i czytać zawartość strony <strong>po wykonaniu JavaScriptu</strong>. Przeglądarka uruchamiana przez Selenium jest prawdziwą przeglądarką (Chrome, Firefox) — wykonuje JavaScript, renderuje stronę, obsługuje AJAX — dokładnie tak, jak gdyby siedział przed nią użytkownik.</p>
+</section>
+<section id="instalacja" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="instalacja"><span class="header-section-number">4.2</span> Instalacja</h3>
+<p>Selenium wymaga dwóch elementów: biblioteki Pythona i sterownika przeglądarki (ChromeDriver). Pakiet <code>webdriver-manager</code> automatyzuje pobieranie sterownika:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install selenium webdriver-manager</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>webdriver-manager</code> pobiera odpowiednią wersję ChromeDriver z sieci przy pierwszym uruchomieniu. W środowisku laboratoryjnym (GoBack) instalację powtarzamy przy każdej sesji — tak samo jak przy Scrapy.</p>
+</section>
+<section id="otwarcie-strony-i-ekstrakcja-elementów" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="otwarcie-strony-i-ekstrakcja-elementów"><span class="header-section-number">4.3</span> Otwarcie strony i ekstrakcja elementów</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium.webdriver.chrome.service <span class="im">import</span> Service</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> webdriver_manager.chrome <span class="im">import</span> ChromeDriverManager</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>driver <span class="op">=</span> webdriver.Chrome(service<span class="op">=</span>Service(ChromeDriverManager().install()))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>driver.get(<span class="st">"https://quotes.toscrape.com/scroll"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Po wykonaniu <code>driver.get(...)</code> otwiera się okno przeglądarki i ładuje strona. JavaScript wykonuje się automatycznie — po chwili na stronie pojawiają się cytaty (pierwsza strona, załadowana przez JS przy starcie).</p>
+<p>Elementy na stronie wyszukujemy za pomocą metody <code>find_elements</code>, podając strategię wyszukiwania (CSS, XPath, id, name) i selektor:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium.webdriver.common.by <span class="im">import</span> By</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>quotes <span class="op">=</span> driver.find_elements(By.CSS_SELECTOR, <span class="st">"div.quote span.text"</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(quotes))  <span class="co"># 10 (pierwsza strona)</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(quotes[<span class="dv">0</span>].text)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>find_elements</code> zwraca listę obiektów <code>WebElement</code>. Właściwość <code>.text</code> daje tekst widoczny na stronie — już po renderowaniu przez JavaScript.</p>
+</section>
+<section id="webdriverwait-czekanie-na-elementy" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="webdriverwait-czekanie-na-elementy"><span class="header-section-number">4.4</span> <code>WebDriverWait</code> — czekanie na elementy</h3>
+<p>JavaScript potrzebuje czasu, żeby pobrać dane i wstawić je do strony. Jeśli spróbujemy wyciągnąć elementy zbyt wcześnie, strona może być jeszcze pusta. Naiwne rozwiązanie to <code>time.sleep(3)</code> — ale jest kruche: na wolnym łączu 3 sekundy mogą nie wystarczyć, na szybkim — marnujemy czas.</p>
+<p>Selenium oferuje mechanizm <strong>jawnego czekania</strong> (<code>WebDriverWait</code>), który odpytuje stronę co chwilę i kontynuuje, gdy warunek zostanie spełniony:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium.webdriver.support.ui <span class="im">import</span> WebDriverWait</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium.webdriver.support <span class="im">import</span> expected_conditions <span class="im">as</span> EC</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Czekaj do 10 sekund, aż na stronie pojawi się element div.quote</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>WebDriverWait(driver, <span class="dv">10</span>).until(</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    EC.presence_of_element_located((By.CSS_SELECTOR, <span class="st">"div.quote"</span>))</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>WebDriverWait(driver, 10)</code> oznacza: sprawdzaj warunek co pół sekundy, przez maksymalnie 10 sekund. Jeśli element pojawi się po 1 sekundzie — kontynuujemy od razu. Jeśli nie pojawi się w ciągu 10 sekund — rzucony zostanie wyjątek <code>TimeoutException</code>.</p>
+<p><code>EC.presence_of_element_located(...)</code> to jeden z wielu gotowych warunków z modułu <code>expected_conditions</code>. Inne przydatne warunki:</p>
+<ul>
+<li><code>EC.visibility_of_element_located(...)</code> — element jest obecny <em>i</em> widoczny,</li>
+<li><code>EC.element_to_be_clickable(...)</code> — element można kliknąć.</li>
+</ul>
+<p><strong>Reguła: zawsze używaj <code>WebDriverWait</code> zamiast <code>time.sleep</code>.</strong> <code>WebDriverWait</code> jest szybszy (nie czeka niepotrzebnie), odporniejszy (dostosowuje się do czasu ładowania) i czytelniejszy (jawnie mówi, na co czekamy).</p>
+</section>
+<section id="przewijanie-strony" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="przewijanie-strony"><span class="header-section-number">4.5</span> Przewijanie strony</h3>
+<p>Strona <code>quotes.toscrape.com/scroll</code> ładuje kolejne cytaty przy przewijaniu (infinite scroll). Aby załadować wszystkie, musimy programowo przewinąć stronę do końca:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>driver.execute_script(<span class="st">"window.scrollTo(0, document.body.scrollHeight)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>execute_script</code> wykonuje dowolny kod JavaScript w kontekście strony. <code>window.scrollTo(0, document.body.scrollHeight)</code> przewija na sam dół — co powoduje załadowanie kolejnej porcji cytatów.</p>
+</section>
+<section id="kompletny-przykład-wszystkie-cytaty-z-infinite-scroll" class="level3" data-number="4.6">
+<h3 data-number="4.6" class="anchored" data-anchor-id="kompletny-przykład-wszystkie-cytaty-z-infinite-scroll"><span class="header-section-number">4.6</span> Kompletny przykład: wszystkie cytaty z infinite scroll</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium <span class="im">import</span> webdriver</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium.webdriver.common.by <span class="im">import</span> By</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium.webdriver.chrome.service <span class="im">import</span> Service</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium.webdriver.support.ui <span class="im">import</span> WebDriverWait</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> selenium.webdriver.support <span class="im">import</span> expected_conditions <span class="im">as</span> EC</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> webdriver_manager.chrome <span class="im">import</span> ChromeDriverManager</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>driver <span class="op">=</span> webdriver.Chrome(service<span class="op">=</span>Service(ChromeDriverManager().install()))</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>driver.get(<span class="st">"https://quotes.toscrape.com/scroll"</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Czekamy na pierwszą porcję cytatów</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>WebDriverWait(driver, <span class="dv">10</span>).until(</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    EC.presence_of_element_located((By.CSS_SELECTOR, <span class="st">"div.quote"</span>))</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>previous_count <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Przewiń na dół</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    driver.execute_script(<span class="st">"window.scrollTo(0, document.body.scrollHeight)"</span>)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Daj chwilę na załadowanie nowych elementów</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">1</span>)</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Sprawdź, ile cytatów jest teraz na stronie</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>    current_count <span class="op">=</span> <span class="bu">len</span>(driver.find_elements(By.CSS_SELECTOR, <span class="st">"div.quote"</span>))</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> current_count <span class="op">==</span> previous_count:</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">break</span>  <span class="co"># Nic nowego nie załadowano — koniec danych</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>    previous_count <span class="op">=</span> current_count</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Ekstrakcja wszystkich cytatów</span></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>quotes <span class="op">=</span> driver.find_elements(By.CSS_SELECTOR, <span class="st">"div.quote"</span>)</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> q <span class="kw">in</span> quotes:</span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>    text <span class="op">=</span> q.find_element(By.CSS_SELECTOR, <span class="st">"span.text"</span>).text</span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>    author <span class="op">=</span> q.find_element(By.CSS_SELECTOR, <span class="st">"small.author"</span>).text</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>author<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>text[:<span class="dv">60</span>]<span class="sc">}</span><span class="ss">..."</span>)</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Łącznie: </span><span class="sc">{</span><span class="bu">len</span>(quotes)<span class="sc">}</span><span class="ss"> cytatów"</span>)</span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>driver.quit()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Uwagi do tego kodu:</p>
+<ul>
+<li><code>time.sleep(1)</code> w pętli przewijania to wyjątek od reguły „nie używaj sleep” — tu czekamy nie na konkretny element, lecz na efekt uboczny przewinięcia. Alternatywą byłby <code>WebDriverWait</code> z własnym warunkiem sprawdzającym liczbę elementów, ale <code>sleep(1)</code> jest tu prostszy i wystarczający.</li>
+<li>Warunek stopu: <code>current_count == previous_count</code> — jeśli po przewinięciu nie pojawiły się nowe cytaty, zakładamy, że dane się skończyły.</li>
+<li><code>driver.quit()</code> zamyka przeglądarkę i zwalnia zasoby. Bez tego okno Chrome pozostanie otwarte.</li>
+</ul>
+</section>
+<section id="selenium-vs-requests-kluczowe-różnice" class="level3" data-number="4.7">
+<h3 data-number="4.7" class="anchored" data-anchor-id="selenium-vs-requests-kluczowe-różnice"><span class="header-section-number">4.7</span> Selenium vs <code>requests</code> — kluczowe różnice</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 27%">
+<col style="width: 37%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Aspekt</th>
+<th><code>requests</code></th>
+<th>Selenium</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Wykonuje JavaScript</td>
+<td>nie</td>
+<td>tak</td>
+</tr>
+<tr class="even">
+<td>Szybkość</td>
+<td>szybki (sam HTTP)</td>
+<td>wolny (przeglądarka)</td>
+</tr>
+<tr class="odd">
+<td>Zużycie zasobów</td>
+<td>minimalne</td>
+<td>duże (RAM, CPU)</td>
+</tr>
+<tr class="even">
+<td>Zależności</td>
+<td>brak (czysty Python)</td>
+<td>przeglądarka + sterownik</td>
+</tr>
+<tr class="odd">
+<td>Kiedy używać</td>
+<td>HTML zwracany przez serwer zawiera dane</td>
+<td>dane generowane przez JavaScript</td>
+</tr>
+</tbody>
+</table>
+<p>Selenium to narzędzie <strong>ostateczne</strong> — używamy go, gdy prostsze metody (<code>requests</code> + parsowanie, AJAX shortcut) nie dają dostępu do danych.</p>
+<hr>
+</section>
+</section>
+<section id="drzewo-decyzyjne" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="drzewo-decyzyjne"><span class="header-section-number">5</span> Drzewo decyzyjne</h2>
+<p>Poniższy diagram podsumowuje, jak dobrać narzędzie do problemu:</p>
+<pre><code>Czy dane, których szukam, są na stronie w przeglądarce?
+│
+├── NIE → inny problem (auth, paywall, Cloudflare, brak danych)
+│
+└── TAK → Czy są w HTML zwracanym przez serwer?
+    │     (sprawdź: requests.get → BeautifulSoup → szukaj danych)
+    │
+    ├── TAK → requests + BeautifulSoup / Scrapy
+    │
+    └── NIE (JS-rendered) → Czy w DevTools → Network → XHR
+                             widać żądania z danymi?
+        │
+        ├── TAK → requests bezpośrednio do API (AJAX shortcut)
+        │
+        └── NIE → Selenium</code></pre>
+<p>Pierwsze pytanie to zawsze: <strong>czy dane w ogóle są na stronie?</strong> Drugie: <strong>czy da się je dostać bez przeglądarki?</strong> Selenium pojawia się dopiero wtedy, gdy prostsze ścieżki zawiodą.</p>
+<hr>
+</section>
+<section id="podsumowanie-kursu" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="podsumowanie-kursu"><span class="header-section-number">6</span> Podsumowanie kursu</h2>
+<p>Na tym kursie przeszliśmy od ręcznego żądania HTTP do zautomatyzowanego pozyskiwania danych — budując narzędzia warstwa po warstwie:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Narzędzie</th>
+<th>Zastosowanie</th>
+<th>Laby</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>requests</code></td>
+<td>proste HTTP, API, JSON</td>
+<td>1–2</td>
+</tr>
+<tr class="even">
+<td>Flask (serwer)</td>
+<td>kontrolowane środowisko do nauki</td>
+<td>3–4</td>
+</tr>
+<tr class="odd">
+<td>BeautifulSoup / lxml</td>
+<td>parsowanie HTML, selektory CSS, XPath</td>
+<td>5–6</td>
+</tr>
+<tr class="even">
+<td><code>requests.Session</code></td>
+<td>cookies, logowanie, formularze</td>
+<td>7–8</td>
+</tr>
+<tr class="odd">
+<td><code>httpx.AsyncClient</code></td>
+<td>wiele żądań równolegle</td>
+<td>9–10</td>
+</tr>
+<tr class="even">
+<td>Scrapy</td>
+<td>duże projekty, crawling, pipeline</td>
+<td>11–12</td>
+</tr>
+<tr class="odd">
+<td>Selenium</td>
+<td>strony JS-rendered, interakcja z przeglądarką</td>
+<td>13</td>
+</tr>
+</tbody>
+</table>
+<p>Każde narzędzie rozwiązuje problem, którego poprzednie nie mogło obsłużyć. Narzędzie dobieramy do problemu, nie odwrotnie.</p>
+<p><strong>Co dalej:</strong></p>
+<ul>
+<li><strong>Lab 13</strong>: Dwie ścieżki do tych samych danych — AJAX shortcut (<code>requests</code> bezpośrednio do API <code>quotes.toscrape.com</code>) vs Selenium (infinite scroll, przewijanie, ekstrakcja z DOM). Plus opcjonalny challenge: Selenium na formularzu wyszukiwania.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/APD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
