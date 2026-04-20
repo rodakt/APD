@@ -24,6 +24,7 @@ Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z si
 - [Laboratorium 3: Tworzenie serwera HTTP w Flask](laby/lab_3.md)
 - [Laboratorium 4: Paginacja HTML i prosty crawler](laby/lab_4.md)
 - [Laboratorium 5: Parsowanie HTML — BeautifulSoup i selektory CSS](laby/lab_5.md)
+- [Laboratorium 6: Parsowanie HTML — XPath i lxml](laby/lab_6.md)
 
 ## Zaliczenie
 
