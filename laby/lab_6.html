@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Lab 6: Parsowanie HTML — XPath i lxml – Automatyczne pozyskiwanie danych</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-f81f3c79f694eaf6f88ebcce70241f9e.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-48c95295d902c81ffd89ff58ae6d84a1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_0.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_6.html">Lab 6: Parsowanie HTML — XPath i lxml</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Automatyczne pozyskiwanie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automatyczne pozyskiwanie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: HTTP i klienci HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: Serwer HTTP - framework Flask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 3: HTML jako drzewo — selekcja danych</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 4: Cookies, sesje i formularze</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 5: Asynchroniczność w Pythonie — od intuicji do httpx</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 6: Scrapy — framework do web scrapingu</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 7: Strony dynamiczne — JavaScript, AJAX, Selenium</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Python — odświeżenie podstaw</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Klienci HTTP (curl, requests)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: Nawigacja po API — stronicowanie, pipeline, retry</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 3: Tworzenie serwera HTTP w Flask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: Paginacja HTML i prosty crawler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Parsowanie HTML — BeautifulSoup i selektory CSS</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_6.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Lab 6: Parsowanie HTML — XPath i lxml</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#cel" id="toc-cel" class="nav-link active" data-scroll-target="#cel"><span class="header-section-number">1</span> Cel</a></li>
+  <li><a href="#przygotowanie" id="toc-przygotowanie" class="nav-link" data-scroll-target="#przygotowanie"><span class="header-section-number">2</span> Przygotowanie</a></li>
+  <li><a href="#szybka-ściąga-xpath" id="toc-szybka-ściąga-xpath" class="nav-link" data-scroll-target="#szybka-ściąga-xpath"><span class="header-section-number">3</span> Szybka ściąga XPath</a>
+  <ul class="collapse">
+  <li><a href="#ścieżki" id="toc-ścieżki" class="nav-link" data-scroll-target="#ścieżki"><span class="header-section-number">3.1</span> Ścieżki</a></li>
+  <li><a href="#predykaty-..." id="toc-predykaty-..." class="nav-link" data-scroll-target="#predykaty-..."><span class="header-section-number">3.2</span> Predykaty (<code>[...]</code>)</a></li>
+  <li><a href="#wyciąganie-danych" id="toc-wyciąganie-danych" class="nav-link" data-scroll-target="#wyciąganie-danych"><span class="header-section-number">3.3</span> Wyciąganie danych</a></li>
+  <li><a href="#osie" id="toc-osie" class="nav-link" data-scroll-target="#osie"><span class="header-section-number">3.4</span> Osie</a></li>
+  <li><a href="#relatywne-vs-absolutne" id="toc-relatywne-vs-absolutne" class="nav-link" data-scroll-target="#relatywne-vs-absolutne"><span class="header-section-number">3.5</span> Relatywne vs absolutne</a></li>
+  </ul></li>
+  <li><a href="#demonstracja-crawler-miast-w-xpath" id="toc-demonstracja-crawler-miast-w-xpath" class="nav-link" data-scroll-target="#demonstracja-crawler-miast-w-xpath"><span class="header-section-number">4</span> Demonstracja: crawler miast w XPath</a></li>
+  <li><a href="#ćwiczenie-1-bookshop-listing-i-strona-detali" id="toc-ćwiczenie-1-bookshop-listing-i-strona-detali" class="nav-link" data-scroll-target="#ćwiczenie-1-bookshop-listing-i-strona-detali"><span class="header-section-number">5</span> Ćwiczenie 1: bookshop — listing i strona detali</a></li>
+  <li><a href="#ćwiczenie-2-dziesięć-zapytań-xpath" id="toc-ćwiczenie-2-dziesięć-zapytań-xpath" class="nav-link" data-scroll-target="#ćwiczenie-2-dziesięć-zapytań-xpath"><span class="header-section-number">6</span> Ćwiczenie 2: dziesięć zapytań XPath</a></li>
+  <li><a href="#ćwiczenie-3-pełny-crawl-bookshop-w-xpath" id="toc-ćwiczenie-3-pełny-crawl-bookshop-w-xpath" class="nav-link" data-scroll-target="#ćwiczenie-3-pełny-crawl-bookshop-w-xpath"><span class="header-section-number">7</span> Ćwiczenie 3: pełny crawl bookshop w XPath</a>
+  <ul class="collapse">
+  <li><a href="#wymagania" id="toc-wymagania" class="nav-link" data-scroll-target="#wymagania"><span class="header-section-number">7.1</span> Wymagania</a></li>
+  <li><a href="#szkielet" id="toc-szkielet" class="nav-link" data-scroll-target="#szkielet"><span class="header-section-number">7.2</span> Szkielet</a></li>
+  </ul></li>
+  <li><a href="#ćwiczenie-4-dodatkowe-hacker-news-osie-w-akcji" id="toc-ćwiczenie-4-dodatkowe-hacker-news-osie-w-akcji" class="nav-link" data-scroll-target="#ćwiczenie-4-dodatkowe-hacker-news-osie-w-akcji"><span class="header-section-number">8</span> Ćwiczenie 4 (dodatkowe): Hacker News — osie w akcji</a>
+  <ul class="collapse">
+  <li><a href="#zadanie" id="toc-zadanie" class="nav-link" data-scroll-target="#zadanie"><span class="header-section-number">8.1</span> Zadanie</a></li>
+  </ul></li>
+  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">9</span> Podsumowanie</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_0.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_6.html">Lab 6: Parsowanie HTML — XPath i lxml</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Lab 6: Parsowanie HTML — XPath i lxml</h1>
+<p class="subtitle lead">Automatyczne pozyskiwanie danych — ćwiczenia</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="cel" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Cel</h1>
+<p>Zakres materiału:</p>
+<ul>
+<li>XPath w praktyce: <code>//</code>, predykaty, osie, funkcje tekstowe i liczbowe,</li>
+<li><code>lxml.etree</code> jako alternatywa dla BeautifulSoup,</li>
+<li>te same dane co w Lab 5 — teraz wyciągane XPath-em,</li>
+<li>zadania, których nie załatwisz selektorem CSS: selekcja po tekście, oś <code>following-sibling</code>, predykat arytmetyczny.</li>
+</ul>
+<p>Narzędzia: Python (<code>lxml</code>, <code>requests</code>, Flask), VSCode.</p>
+<hr>
+</section>
+<section id="przygotowanie" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Przygotowanie</h1>
+<p>Serwery — te same co w Lab 5: serwer miast z Labu 4 oraz <code>bookshop</code>. Jeśli masz foldery z poprzednich labów, możesz je po prostu uruchomić.</p>
+<p>Zainstaluj <code>lxml</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install lxml</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sprawdź:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-c</span> <span class="st">"from lxml import etree; print('OK')"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Utwórz folder <code>lab6/</code> i otwórz go w VSCode.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Instalacja pakietów w pracowni
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Komputery w pracowni mogą resetować pakiety między sesjami. Na początku każdego labu sprawdź, czy <code>lxml</code> i <code>flask</code> są dostępne, i w razie potrzeby zainstaluj ponownie.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="szybka-ściąga-xpath" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Szybka ściąga XPath</h1>
+<p>Poniżej minimum, które wystarczy na wszystkie zadania z tego labu. Pełna składnia — w Wykładzie 3.</p>
+<section id="ścieżki" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="ścieżki"><span class="header-section-number">3.1</span> Ścieżki</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Wyrażenie</th>
+<th>Znaczenie</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>//tag</code></td>
+<td>wszystkie <code>&lt;tag&gt;</code> w całym dokumencie</td>
+</tr>
+<tr class="even">
+<td><code>//table//tr</code></td>
+<td><code>&lt;tr&gt;</code> wewnątrz <code>&lt;table&gt;</code> (dowolna głębokość)</td>
+</tr>
+<tr class="odd">
+<td><code>//table/tr</code></td>
+<td><code>&lt;tr&gt;</code> będące bezpośrednim dzieckiem <code>&lt;table&gt;</code></td>
+</tr>
+<tr class="even">
+<td><code>td[1]/text()</code></td>
+<td>ścieżka względna — liczona od bieżącego węzła</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="predykaty-..." class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="predykaty-..."><span class="header-section-number">3.2</span> Predykaty (<code>[...]</code>)</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Wyrażenie</th>
+<th>Znaczenie</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>//td[@class="price"]</code></td>
+<td><code>&lt;td&gt;</code> z <code>class="price"</code></td>
+</tr>
+<tr class="even">
+<td><code>//a[@href]</code></td>
+<td><code>&lt;a&gt;</code> z dowolnym atrybutem <code>href</code></td>
+</tr>
+<tr class="odd">
+<td><code>//td[contains(@class,"price")]</code></td>
+<td>klasa zawiera „price”</td>
+</tr>
+<tr class="even">
+<td><code>//tr[1]</code> / <code>//tr[last()]</code></td>
+<td>pierwszy / ostatni <code>&lt;tr&gt;</code> (numerowanie od 1)</td>
+</tr>
+<tr class="odd">
+<td><code>//tr[position()&gt;1]</code></td>
+<td>wszystkie <code>&lt;tr&gt;</code> oprócz pierwszego</td>
+</tr>
+<tr class="even">
+<td><code>//a[text()="Dalej"]</code></td>
+<td>dokładny tekst</td>
+</tr>
+<tr class="odd">
+<td><code>//a[contains(text(),"Dalej")]</code></td>
+<td>tekst zawiera „Dalej”</td>
+</tr>
+<tr class="even">
+<td><code>//tr[number(td[2]/text()) &gt; 500000]</code></td>
+<td>predykat arytmetyczny</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="wyciąganie-danych" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="wyciąganie-danych"><span class="header-section-number">3.3</span> Wyciąganie danych</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Wyrażenie</th>
+<th>Zwraca</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>//td</code></td>
+<td>listę elementów <code>&lt;td&gt;</code></td>
+</tr>
+<tr class="even">
+<td><code>//td/text()</code></td>
+<td>listę stringów — tekst każdej komórki</td>
+</tr>
+<tr class="odd">
+<td><code>//a/@href</code></td>
+<td>listę wartości atrybutu <code>href</code></td>
+</tr>
+<tr class="even">
+<td><code>el.text</code> / <code>el.get("class")</code></td>
+<td>pojedyncza wartość (jak w bs4)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="osie" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="osie"><span class="header-section-number">3.4</span> Osie</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Wyrażenie</th>
+<th>Znaczenie</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>//td[text()="X"]/..</code></td>
+<td>rodzic (skrót od <code>parent::node()</code>)</td>
+</tr>
+<tr class="even">
+<td><code>//td[text()="X"]/following-sibling::td[1]</code></td>
+<td>następna komórka obok</td>
+</tr>
+<tr class="odd">
+<td><code>//td[text()="X"]/preceding-sibling::td[1]</code></td>
+<td>poprzednia komórka obok</td>
+</tr>
+<tr class="even">
+<td><code>//td[@class="price"]/ancestor::table</code></td>
+<td>przodek typu <code>&lt;table&gt;</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="relatywne-vs-absolutne" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="relatywne-vs-absolutne"><span class="header-section-number">3.5</span> Relatywne vs absolutne</h2>
+<p><code>.xpath(...)</code> można wywołać na dowolnym węźle. Wyrażenia bez <code>//</code> są wtedy <strong>względne</strong> do tego węzła:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>row <span class="op">=</span> tree.xpath(<span class="st">'//tr[2]'</span>)[<span class="dv">0</span>]</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>row.xpath(<span class="st">'td[1]/text()'</span>)    <span class="co"># pierwsze &lt;td&gt; TEGO wiersza</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>row.xpath(<span class="st">'.//a/@href'</span>)      <span class="co"># wszystkie &lt;a&gt; wewnątrz tego wiersza</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Uwaga: <code>//a</code> wywołane na węźle wciąż oznacza „gdziekolwiek w dokumencie”. Dla „gdziekolwiek wewnątrz tego węzła” używaj <code>.//</code>.</p>
+<hr>
+</section>
+</section>
+<section id="demonstracja-crawler-miast-w-xpath" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Demonstracja: crawler miast w XPath</h1>
+<p>Ten sam crawler co w Demonstracji z Labu 5 — tym razem z <code>lxml</code> i XPath. Serwer, pętla <code>while</code>, <code>requests.get</code> i zapis do JSON zostają bez zmian.</p>
+<p>Uruchom serwer miast (Lab 4/5) w <strong>Terminalu 1</strong>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">flask</span> run <span class="at">--debug</span> <span class="at">-p</span> 5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Utwórz <code>crawler_xpath.py</code> w <strong>Terminalu 2</strong>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lxml <span class="im">import</span> etree</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>BASE <span class="op">=</span> <span class="st">"http://127.0.0.1:5000"</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> crawl_catalog(start_url):</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    all_cities <span class="op">=</span> []</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> start_url</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> url <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        r <span class="op">=</span> requests.get(url)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        r.raise_for_status()</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        tree <span class="op">=</span> etree.HTML(r.text)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Ekstrakcja ---</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        rows <span class="op">=</span> tree.xpath(<span class="st">'//table//tr[position()&gt;1]'</span>)   <span class="co"># pomijamy nagłówek</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> rows:</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>            all_cities.append({</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>                <span class="st">"name"</span>: row.xpath(<span class="st">'td[1]/text()'</span>)[<span class="dv">0</span>],</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>                <span class="st">"population"</span>: <span class="bu">int</span>(row.xpath(<span class="st">'td[2]/text()'</span>)[<span class="dv">0</span>]),</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>                <span class="st">"voivodeship"</span>: row.xpath(<span class="st">'td[3]/text()'</span>)[<span class="dv">0</span>],</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>            })</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Nawigacja ---</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        hrefs <span class="op">=</span> tree.xpath(<span class="st">'//a[contains(text(),"Następna")]/@href'</span>)</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        url <span class="op">=</span> BASE <span class="op">+</span> hrefs[<span class="dv">0</span>] <span class="cf">if</span> hrefs <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Pobrano stronę, łącznie miast: </span><span class="sc">{</span><span class="bu">len</span>(all_cities)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> all_cities</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>cities <span class="op">=</span> crawl_catalog(<span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/catalog?page=1"</span>)</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Zebrano </span><span class="sc">{</span><span class="bu">len</span>(cities)<span class="sc">}</span><span class="ss"> miast."</span>)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"cities.json"</span>, <span class="st">"w"</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>) <span class="im">as</span> f:</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    json.dump(cities, f, ensure_ascii<span class="op">=</span><span class="va">False</span>, indent<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Uruchom i porównaj wynik z plikiem <code>cities.json</code> z Labu 5 — powinien być identyczny.</p>
+<p>Dwie rzeczy warte odnotowania:</p>
+<ul>
+<li><code>tr[position()&gt;1]</code> — pomijamy nagłówek <strong>w wyrażeniu XPath</strong>, nie przez <code>[1:]</code> po stronie Pythona.</li>
+<li>Nawigacja po tekście linku (<code>contains(text(),"Następna")</code>) — zamiast klasy <code>.next-page</code>. Działałoby nawet, gdyby link nie miał żadnej klasy.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Czy crawler zebrał 30 miast?</li>
+<li>Otwórz <code>cities.json</code> i porównaj z plikiem z Labu 5 — czy zawartość jest taka sama?</li>
+<li>Policz linijki parsowania (od <code>tree = ...</code> do przypisania <code>url</code>). Porównaj z wersją BeautifulSoup.</li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
+<section id="ćwiczenie-1-bookshop-listing-i-strona-detali" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Ćwiczenie 1: bookshop — listing i strona detali</h1>
+<p>Port <code>bookshop_css.py</code> z Labu 5 na XPath. Zatrzymaj serwer miast (<code>Ctrl+C</code>) i uruchom <code>bookshop</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> bookshop</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">flask</span> run <span class="at">--debug</span> <span class="at">-p</span> 5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Utwórz <code>bookshop_xpath.py</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lxml <span class="im">import</span> etree</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>BASE <span class="op">=</span> <span class="st">"http://127.0.0.1:5000"</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Część A: listing ---</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/books"</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>r.raise_for_status()</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> etree.HTML(r.text)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>books <span class="op">=</span> []</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Znajdź wszystkie elementy książek (klasa "book").</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> book_el <span class="kw">in</span> tree.xpath(<span class="st">'...'</span>):                       <span class="co"># &lt;- uzupełnij</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Wyciągnij tytuł, autora, cenę i URL strony detali.</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    Ścieżka jest względna do book_el.</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    Tekst: .../text() ; atrybut: .../@href</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> book_el.xpath(<span class="st">'...'</span>)[<span class="dv">0</span>]                     <span class="co"># &lt;- uzupełnij</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    author <span class="op">=</span> book_el.xpath(<span class="st">'...'</span>)[<span class="dv">0</span>]                    <span class="co"># &lt;- uzupełnij</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    price <span class="op">=</span> book_el.xpath(<span class="st">'...'</span>)[<span class="dv">0</span>]                     <span class="co"># &lt;- uzupełnij</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    detail_url <span class="op">=</span> BASE <span class="op">+</span> book_el.xpath(<span class="st">'...'</span>)[<span class="dv">0</span>]         <span class="co"># &lt;- uzupełnij</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    books.append({</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        <span class="st">"title"</span>: title,</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>        <span class="st">"author"</span>: author,</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>        <span class="st">"price"</span>: price,</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>        <span class="st">"detail_url"</span>: detail_url,</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> b <span class="kw">in</span> books:</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>b[<span class="st">'title'</span>]<span class="sc">}</span><span class="ss"> — </span><span class="sc">{</span>b[<span class="st">'author'</span>]<span class="sc">}</span><span class="ss"> — </span><span class="sc">{</span>b[<span class="st">'price'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Część B: strona detali ---</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Pobierz stronę detali pierwszej książki.</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="co">#    Wyciągnij: tytuł (h1.title), autora, opis (klasa "description"),</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="co">#    cenę i stan magazynowy (klasa "stock").</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="co">#    Użyj XPath na nowym drzewie.</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Twój kod ---</span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Szczegóły: </span><span class="sc">{</span>title<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Autor: </span><span class="sc">{</span>author<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Cena: </span><span class="sc">{</span>price<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Opis: </span><span class="sc">{</span>description[:<span class="dv">80</span>]<span class="sc">}</span><span class="ss">..."</span>)</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Magazyn: </span><span class="sc">{</span>stock<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span><code>xpath(...)[0]</code> i lista jednoelementowa
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>XPath zawsze zwraca listę — nawet gdy wynik jest jeden. <code>[0]</code> bierze pierwszy element. Jeśli lista jest pusta (element nie istnieje), dostaniesz <code>IndexError</code> — to prostszy i bardziej wykrywalny błąd niż <code>None</code> z <code>find()</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Czy Część A wypisuje 5 książek?</li>
+<li>Czy Część B poprawnie wyciąga opis i stan magazynowy?</li>
+<li>Czy <code>detail_url</code> to pełny URL, nie sama ścieżka?</li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
+<section id="ćwiczenie-2-dziesięć-zapytań-xpath" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Ćwiczenie 2: dziesięć zapytań XPath</h1>
+<p>Jeden plik, jedna strona (listing bookshop), dziesięć niezależnych zapytań od najłatwiejszych do najtrudniejszych. Każde zadanie to jedna linia komentarza + miejsce na wyrażenie. Stronę pobierasz raz, na górze pliku.</p>
+<p>Utwórz <code>bookshop_queries.py</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lxml <span class="im">import</span> etree</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>BASE <span class="op">=</span> <span class="st">"http://127.0.0.1:5000"</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>listing <span class="op">=</span> etree.HTML(requests.get(<span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/books"</span>).text)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># === Rozgrzewka ===</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Tytuły wszystkich książek.</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(listing.xpath(<span class="st">'...'</span>))</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Wszystkie wartości atrybutu href na stronie.</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(listing.xpath(<span class="st">'...'</span>))</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Liczba książek na stronie.</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="bu">len</span>(listing.xpath(<span class="st">'...'</span>)))</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co"># === Osie i tekst ===</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Href linku do następnej strony — po tekście linku, nie po klasie.</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(listing.xpath(<span class="st">'...'</span>))</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co"># 5. Cena książki "Pan Tadeusz" — przechodząc osią od jej tytułu.</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(listing.xpath(<span class="st">'...'</span>))</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co"># 6. URL detali "Pana Tadeusza" — również osią.</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(listing.xpath(<span class="st">'...'</span>))</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 7. Słownik {tytuł: cena} dla wszystkich książek.</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>prices <span class="op">=</span> {}</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> book <span class="kw">in</span> listing.xpath(<span class="st">'...'</span>):</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    title <span class="op">=</span> book.xpath(<span class="st">'...'</span>)[<span class="dv">0</span>]</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    price <span class="op">=</span> book.xpath(<span class="st">'...'</span>)[<span class="dv">0</span>]</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    prices[title] <span class="op">=</span> price</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(prices)</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co"># === Predykaty i funkcje ===</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="co"># 8. Tytuły książek, których autor ma w nazwisku "icz".</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(listing.xpath(<span class="st">'...'</span>))</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co"># 9. Tytuły książek tańszych niż 30 zł.</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="co">#    Ceny są w formacie "34,90 zł" — w jednym wyrażeniu XPath potrzebujesz:</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="co">#      substring-before(..., " zł")   — odcina jednostkę,</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="co">#      translate(..., ",", ".")       — zamienia przecinek na kropkę,</span></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="co">#      number(...)                    — parsuje jako liczbę.</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(listing.xpath(<span class="st">'...'</span>))</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="co"># === Granica XPath ===</span></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="co"># 10. Tytuł najdroższej książki na stronie.</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a><span class="co">#     XPath 1.0 nie ma funkcji max — wyciągnij pary (tytuł, cena) i znajdź</span></span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a><span class="co">#     maksimum Pythonem.</span></span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Twój kod ---</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Zadania 1–3: pięć tytułów, siedem wartości <code>href</code>, pięć książek.</li>
+<li>Zadania 5–6: dla „Pana Tadeusza” cena to <code>22,00 zł</code>, a URL detali to <code>/book/3</code>.</li>
+<li>Zadanie 8: wynik to dokładnie „Ferdydurke” i „Pan Tadeusz”.</li>
+<li>Zadanie 9: ten sam wynik co zadanie 8, ale z zupełnie innego powodu.</li>
+<li>Zadanie 10: „Chłopi” (44,90 zł).</li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
+<section id="ćwiczenie-3-pełny-crawl-bookshop-w-xpath" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Ćwiczenie 3: pełny crawl bookshop w XPath</h1>
+<p>Odpowiednik Ćwiczenia 3 z Lab 5 — teraz wyłącznie w XPath. Masz już <code>bookshop.json</code> z Labu 5 jako punkt odniesienia.</p>
+<section id="wymagania" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="wymagania"><span class="header-section-number">7.1</span> Wymagania</h2>
+<ol type="1">
+<li>Start: <code>http://127.0.0.1:5000/books</code>.</li>
+<li>Na każdej stronie listingu: wyciągnij tytuł, autora, cenę, URL detali każdej książki. Znajdź link do następnej strony (klasa <code>next-page</code>) — jeśli go nie ma, koniec.</li>
+<li>Dla każdej książki wejdź na stronę detali, dociągnij opis i stan magazynowy.</li>
+<li>Zapisz wszystko do <code>bookshop_xpath.json</code>.</li>
+</ol>
+</section>
+<section id="szkielet" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="szkielet"><span class="header-section-number">7.2</span> Szkielet</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lxml <span class="im">import</span> etree</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>BASE <span class="op">=</span> <span class="st">"http://127.0.0.1:5000"</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_book_detail(url):</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Zwraca (opis, stan_magazynowy) ze strony detali."""</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> crawl_bookshop(start_url):</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    all_books <span class="op">=</span> []</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    url <span class="op">=</span> start_url</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> url <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        r <span class="op">=</span> requests.get(url)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>        r.raise_for_status()</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>        tree <span class="op">=</span> etree.HTML(r.text)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 1. Wyciągnij książki z bieżącej strony (jak w Ćw. 1, Część A).</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 2. Dla każdej książki dociągnij detale (get_book_detail).</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 3. Link do następnej strony.</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    Wskazówka: //a[@class="next-page"]/@href</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    Uwaga: xpath() zwraca listę — sprawdź, czy jest niepusta.</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Strona pobrana, łącznie książek: </span><span class="sc">{</span><span class="bu">len</span>(all_books)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> all_books</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>books <span class="op">=</span> crawl_bookshop(<span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/books"</span>)</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Zebrano </span><span class="sc">{</span><span class="bu">len</span>(books)<span class="sc">}</span><span class="ss"> książek."</span>)</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"bookshop_xpath.json"</span>, <span class="st">"w"</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>) <span class="im">as</span> f:</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    json.dump(books, f, ensure_ascii<span class="op">=</span><span class="va">False</span>, indent<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Porównanie z Labem 5
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Po zakończeniu sprawdź: <code>bookshop_xpath.json</code> i <code>bookshop.json</code> (Lab 5) powinny zawierać te same dane. Jeśli nie — masz żywą regresję: różne narzędzia, ta sama strona, różny wynik → gdzieś jest błąd w ekstrakcji.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Ile książek zebrał crawler? Czy zgadza się z liczbą z Labu 5?</li>
+<li>Czy każda książka ma wszystkie pola (tytuł, autor, cena, opis, stan)?</li>
+<li>Czy crawler zatrzymał się na ostatniej stronie (nie zapętlił się)?</li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="ćwiczenie-4-dodatkowe-hacker-news-osie-w-akcji" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Ćwiczenie 4 (dodatkowe): Hacker News — osie w akcji</h1>
+<p>Struktura Hacker News (<code>https://news.ycombinator.com</code>) jest specyficzna: każdy wpis to <strong>para wierszy</strong> tabeli.</p>
+<ul>
+<li><code>&lt;tr class="athing"&gt;</code> — tytuł i link,</li>
+<li>następny <code>&lt;tr&gt;</code> (bez klasy) — metadane: punkty, autor, komentarze.</li>
+</ul>
+<p>W Labie 5 obejście tego wymagało iteracji po rodzeństwie przez bs4 (<code>find_next_sibling</code>) albo parowania <code>zip</code>. W XPath — jedna oś:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>row.xpath(<span class="st">'following-sibling::tr[1]'</span>)   <span class="co"># następny wiersz</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="zadanie" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="zadanie"><span class="header-section-number">8.1</span> Zadanie</h2>
+<p>Napisz <code>hackernews_xpath.py</code>. Pobierz stronę główną (jedno żądanie) i wyciągnij listę wpisów — dla każdego: tytuł, URL, liczba punktów, liczba komentarzy. Zapisz do <code>hackernews.json</code>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json, re</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> lxml <span class="im">import</span> etree</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> requests.get(<span class="st">"https://news.ycombinator.com"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>r.raise_for_status()</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>tree <span class="op">=</span> etree.HTML(r.text)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>items <span class="op">=</span> []</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Wiersze tytułowe.</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row <span class="kw">in</span> tree.xpath(<span class="st">'//tr[@class="athing"]'</span>):</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Tytuł i URL — w row, w .titleline &gt; a.</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    Uwaga: relatywny XPath z .// (szukamy wewnątrz row).</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Wiersz metadanych — following-sibling::tr[1].</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 4. Z metadanych wyciągnij:</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="co">#      - punkty ze .score, np. "153 points" -&gt; 153</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        (uwaga: nie każdy wpis ma .score — zabezpiecz się)</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    <span class="co">#      - liczbę komentarzy z ostatniego &lt;a&gt;, np. "87 comments" -&gt; 87</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="co">#        (uwaga: wpisy bez komentarzy mają tekst "discuss")</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>    items.append({...})</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> <span class="bu">open</span>(<span class="st">"hackernews.json"</span>, <span class="st">"w"</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>) <span class="im">as</span> f:</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>    json.dump(items, f, ensure_ascii<span class="op">=</span><span class="va">False</span>, indent<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Zebrano </span><span class="sc">{</span><span class="bu">len</span>(items)<span class="sc">}</span><span class="ss"> wpisów."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Czy zebrałeś ~30 wpisów?</li>
+<li>Czy punkty i komentarze to <code>int</code>, nie stringi?</li>
+<li>Porównaj kod z rozwiązaniem tego samego zadania w Labie 5 (jeśli je robiłeś). Który fragment był wyraźnie krótszy dzięki <code>following-sibling</code>?</li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="podsumowanie" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Podsumowanie</h1>
+<p>W tym labie:</p>
+<ul>
+<li>ten sam crawler miast i bookshop co w Labie 5 — teraz w XPath i <code>lxml</code>,</li>
+<li>predykaty pozycyjne (<code>[position()&gt;1]</code>, <code>[last()]</code>) i tekstowe (<code>contains(text(),...)</code>),</li>
+<li>osie — w szczególności <code>following-sibling</code> jako naturalny sposób na „komórka obok”,</li>
+<li>predykat arytmetyczny (<code>number(...) &gt; X</code>) — filtrowanie, którego CSS nie zrobi,</li>
+<li>relatywne XPath (<code>td[1]/text()</code>, <code>.//a</code>) — wyrażenie względne do węzła, na którym wywołasz <code>.xpath(...)</code>.</li>
+</ul>
+<p><strong>Co dalej:</strong></p>
+<ul>
+<li><strong>Wykład 4</strong>: cookies, sesje, formularze HTML — serwer „pamięta” klienta.</li>
+<li><strong>Lab 7</strong>: budujemy serwer Flask z logowaniem i formularzem.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/APD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
