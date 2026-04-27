@@ -25,6 +25,7 @@ Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z si
 - [Laboratorium 4: Paginacja HTML i prosty crawler](laby/lab_4.md)
 - [Laboratorium 5: Parsowanie HTML — BeautifulSoup i selektory CSS](laby/lab_5.md)
 - [Laboratorium 6: Parsowanie HTML — XPath i lxml](laby/lab_6.md)
+- [Laboratorium 7: Serwer z sesjami i logowaniem](laby/lab_7.md)
 
 ## Zaliczenie
 
