@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Tomasz Rodak">
+
+<title>Lab 8: Klient z sesją — requests.Session – Automatyczne pozyskiwanie danych</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-f81f3c79f694eaf6f88ebcce70241f9e.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-48c95295d902c81ffd89ff58ae6d84a1.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_0.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_8.html">Lab 8: Klient z sesją — <code>requests.Session</code></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Automatyczne pozyskiwanie danych</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Automatyczne pozyskiwanie danych</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Wykłady</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 1: HTTP i klienci HTTP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 2: Serwer HTTP - framework Flask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 3: HTML jako drzewo — selekcja danych</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 4: Cookies, sesje i formularze</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 5: Asynchroniczność w Pythonie — od intuicji do httpx</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 6: Scrapy — framework do web scrapingu</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../wyklady/wyklad_7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Wykład 7: Strony dynamiczne — JavaScript, AJAX, Selenium</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Laboratoria</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_0.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 0: Python — odświeżenie podstaw</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 1: Klienci HTTP (curl, requests)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 2: Nawigacja po API — stronicowanie, pipeline, retry</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 3: Tworzenie serwera HTTP w Flask</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 4: Paginacja HTML i prosty crawler</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_5.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 5: Parsowanie HTML — BeautifulSoup i selektory CSS</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 6: Parsowanie HTML — XPath i lxml</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_7.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Lab 7: Serwer z sesjami i logowaniem</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../laby/lab_8.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Lab 8: Klient z sesją — <code>requests.Session</code></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Spis treści</h2>
+   
+  <ul>
+  <li><a href="#cel" id="toc-cel" class="nav-link active" data-scroll-target="#cel"><span class="header-section-number">1</span> Cel</a></li>
+  <li><a href="#przygotowanie" id="toc-przygotowanie" class="nav-link" data-scroll-target="#przygotowanie"><span class="header-section-number">2</span> Przygotowanie</a></li>
+  <li><a href="#wstęp-gdzie-jesteśmy" id="toc-wstęp-gdzie-jesteśmy" class="nav-link" data-scroll-target="#wstęp-gdzie-jesteśmy"><span class="header-section-number">3</span> Wstęp: gdzie jesteśmy</a></li>
+  <li><a href="#demonstracja-1-klient-który-pamięta-cookies" id="toc-demonstracja-1-klient-który-pamięta-cookies" class="nav-link" data-scroll-target="#demonstracja-1-klient-który-pamięta-cookies"><span class="header-section-number">4</span> Demonstracja 1: klient, który pamięta cookies</a></li>
+  <li><a href="#demonstracja-2-anatomia-logowania" id="toc-demonstracja-2-anatomia-logowania" class="nav-link" data-scroll-target="#demonstracja-2-anatomia-logowania"><span class="header-section-number">5</span> Demonstracja 2: anatomia logowania</a></li>
+  <li><a href="#ćwiczenie-1-pełny-pipeline-scrapingu-strony-chronionej" id="toc-ćwiczenie-1-pełny-pipeline-scrapingu-strony-chronionej" class="nav-link" data-scroll-target="#ćwiczenie-1-pełny-pipeline-scrapingu-strony-chronionej"><span class="header-section-number">6</span> Ćwiczenie 1: pełny pipeline scrapingu strony chronionej</a>
+  <ul class="collapse">
+  <li><a href="#zadanie" id="toc-zadanie" class="nav-link" data-scroll-target="#zadanie"><span class="header-section-number">6.1</span> Zadanie</a></li>
+  <li><a href="#spodziewany-wynik" id="toc-spodziewany-wynik" class="nav-link" data-scroll-target="#spodziewany-wynik"><span class="header-section-number">6.2</span> Spodziewany wynik</a></li>
+  </ul></li>
+  <li><a href="#ćwiczenie-2-trzy-konta-trzy-sesje" id="toc-ćwiczenie-2-trzy-konta-trzy-sesje" class="nav-link" data-scroll-target="#ćwiczenie-2-trzy-konta-trzy-sesje"><span class="header-section-number">7</span> Ćwiczenie 2: trzy konta, trzy sesje</a>
+  <ul class="collapse">
+  <li><a href="#zadanie-1" id="toc-zadanie-1" class="nav-link" data-scroll-target="#zadanie-1"><span class="header-section-number">7.1</span> Zadanie</a></li>
+  <li><a href="#spodziewany-wynik-1" id="toc-spodziewany-wynik-1" class="nav-link" data-scroll-target="#spodziewany-wynik-1"><span class="header-section-number">7.2</span> Spodziewany wynik</a></li>
+  </ul></li>
+  <li><a href="#ćwiczenie-3-walidacja-logowania" id="toc-ćwiczenie-3-walidacja-logowania" class="nav-link" data-scroll-target="#ćwiczenie-3-walidacja-logowania"><span class="header-section-number">8</span> Ćwiczenie 3: walidacja logowania</a>
+  <ul class="collapse">
+  <li><a href="#zadanie-2" id="toc-zadanie-2" class="nav-link" data-scroll-target="#zadanie-2"><span class="header-section-number">8.1</span> Zadanie</a></li>
+  <li><a href="#spodziewany-wynik-2" id="toc-spodziewany-wynik-2" class="nav-link" data-scroll-target="#spodziewany-wynik-2"><span class="header-section-number">8.2</span> Spodziewany wynik</a></li>
+  </ul></li>
+  <li><a href="#co-dalej-w-realu-token-csrf" id="toc-co-dalej-w-realu-token-csrf" class="nav-link" data-scroll-target="#co-dalej-w-realu-token-csrf"><span class="header-section-number">9</span> Co dalej w realu: token CSRF</a></li>
+  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">10</span> Podsumowanie</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_0.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_8.html">Lab 8: Klient z sesją — <code>requests.Session</code></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Lab 8: Klient z sesją — <code>requests.Session</code></h1>
+<p class="subtitle lead">Automatyczne pozyskiwanie danych — ćwiczenia</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Rodak </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="cel" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Cel</h1>
+<p>Zakres materiału:</p>
+<ul>
+<li><code>requests.Session</code> jako klient HTTP z trwałym cookie jar — jedyna istotna zmiana w stosunku do gołego <code>requests.get</code>/<code>requests.post</code>,</li>
+<li>przepływ logowania widziany z perspektywy klienta: POST → 302 → GET, automatyczne podążanie za przekierowaniem,</li>
+<li>diagnostyka udanego logowania: <code>r.url</code>, <code>r.history</code>, <code>s.cookies.get_dict()</code>,</li>
+<li>pełny pipeline scrapingu strony chronionej: logowanie → pobranie HTML → parsowanie BeautifulSoup,</li>
+<li>wiele niezależnych sesji w jednym programie — każdy <code>Session()</code> to osobny klient,</li>
+<li>walidacja poprawności logowania jako element pipeline’u (nie tylko <code>r.status_code == 200</code>).</li>
+</ul>
+<p>Narzędzia: Python (<code>requests</code>, <code>beautifulsoup4</code>), VSCode, serwer Flask z Lab 7 jako cel scrapingu.</p>
+<hr>
+</section>
+<section id="przygotowanie" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Przygotowanie</h1>
+<p>Środowisko jak na poprzednich labach: VSCode, dwa terminale.</p>
+<p>Sprawdź, czy potrzebne pakiety są dostępne:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install flask requests beautifulsoup4</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Instalacja pakietów w pracowni
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Komputery w pracowni mogą resetować pakiety między sesjami. Na początku każdego labu sprawdź, czy potrzebne pakiety są dostępne, i w razie potrzeby zainstaluj je ponownie.</p>
+</div>
+</div>
+<p>W tym labie pracujemy w nowym folderze <code>lab8/</code>, ale <strong>serwerem jest aplikacja z Labu 7</strong> — ta sama, którą zbudowałeś krok po kroku tydzień temu (<code>/login</code>, <code>/logout</code>, <code>/dashboard</code>, <code>/admin</code>, <code>/notes</code>).</p>
+<p>Otwórz <strong>Terminal 1</strong> w folderze <code>lab7/</code> i uruchom serwer:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">flask</span> run <span class="at">--debug</span> <span class="at">-p</span> 5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Pozostaw go uruchomionego przez cały lab. <strong>Terminal 2</strong> otwórz w folderze <code>lab8/</code> — tam będzie cały kod tego labu.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Sprawdzenie startowe
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Otwórz w przeglądarce <code>http://127.0.0.1:5000/login</code> — powinieneś zobaczyć formularz logowania. Zaloguj się jako <code>jan</code> / <code>haslo123</code>, sprawdź <code>/notes</code>, wyloguj się. Jeśli to działa, serwer jest gotowy.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="wstęp-gdzie-jesteśmy" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Wstęp: gdzie jesteśmy</h1>
+<p>Lab 7 zakończył się pesymistycznie. Plik <code>bezsesji.py</code> pokazał, że dwa kolejne wywołania <code>requests.post</code>/<code>requests.get</code> <strong>nie współdzielą cookies</strong> — każde żądanie startuje z pustym kontekstem. Logowanie jako pojedyncze wywołanie się powiodło, ale zaraz potem <code>requests.get("/notes")</code> wracał na <code>/login</code>, bo serwer nie widział żadnego cookie sesyjnego.</p>
+<p>Tym razem napiszemy klienta, który <strong>pamięta cookies między żądaniami</strong>. Zmiana jest minimalna: z <code>requests.&lt;metoda&gt;(...)</code> przechodzimy na <code>s.&lt;metoda&gt;(...)</code>, gdzie <code>s = requests.Session()</code>. Reszta API jest identyczna — to jest istota całego labu, więc warto to dostrzec na samym początku.</p>
+<hr>
+</section>
+<section id="demonstracja-1-klient-który-pamięta-cookies" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Demonstracja 1: klient, który pamięta cookies</h1>
+<p>W folderze <code>lab8/</code> utwórz plik <code>zsesja.py</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>BASE <span class="op">=</span> <span class="st">"http://127.0.0.1:5000"</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> requests.Session()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Logowanie — POST z danymi formularza.</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Krok 1: logowanie ==="</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>r1 <span class="op">=</span> s.post(</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/login"</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>{<span class="st">"username"</span>: <span class="st">"jan"</span>, <span class="st">"password"</span>: <span class="st">"haslo123"</span>},</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Status: </span><span class="sc">{</span>r1<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"URL końcowy: </span><span class="sc">{</span>r1<span class="sc">.</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Cookies w sesji: </span><span class="sc">{</span>s<span class="sc">.</span>cookies<span class="sc">.</span>get_dict()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Pobranie chronionej strony — w tej samej sesji.</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== Krok 2: pobranie /notes ==="</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>r2 <span class="op">=</span> s.get(<span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/notes"</span>)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Status: </span><span class="sc">{</span>r2<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"URL końcowy: </span><span class="sc">{</span>r2<span class="sc">.</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Cookie wysłane do serwera: </span><span class="sc">{</span>r2<span class="sc">.</span>request<span class="sc">.</span>headers<span class="sc">.</span>get(<span class="st">'Cookie'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Próba wejścia na /admin (jan nie jest adminem).</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== Krok 3: próba /admin ==="</span>)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>r3 <span class="op">=</span> s.get(<span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/admin"</span>)</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Status: </span><span class="sc">{</span>r3<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Uruchom:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> zsesja.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Spodziewany wynik:</p>
+<pre><code>=== Krok 1: logowanie ===
+Status: 200
+URL końcowy: http://127.0.0.1:5000/dashboard
+Cookies w sesji: {'session': '.eJyrVi...'}
+
+=== Krok 2: pobranie /notes ===
+Status: 200
+URL końcowy: http://127.0.0.1:5000/notes
+Cookie wysłane do serwera: session=.eJyrVi...
+
+=== Krok 3: próba /admin ===
+Status: 403</code></pre>
+<p>Porównaj to z <code>bezsesji.py</code> z Labu 7. Tam Krok 2 lądował na <code>/login</code> (przekierowanie wymuszone brakiem sesji), Krok 3 zwracał 401. Tutaj wszystkie trzy żądania widzą tę samą tożsamość: <code>jan</code> jest zalogowany, więc <code>/notes</code> działa, a <code>/admin</code> zwraca 403 — bo <code>jan</code> jest uwierzytelniony, ale <strong>nie jest adminem</strong>. To jest dokładnie różnica między 401 a 403, z którą zmierzyliśmy się na Labie 7 — tylko teraz po stronie klienta.</p>
+<p>Zwróć uwagę na trzy szczegóły:</p>
+<ul>
+<li><strong>Krok 1: status 200, URL <code>/dashboard</code>.</strong> Wysłaliśmy POST na <code>/login</code>, serwer odpowiedział <code>302 → /dashboard</code>, a <code>requests</code> automatycznie podążył za przekierowaniem (<code>allow_redirects=True</code> to wartość domyślna). Ostatecznie <code>r1</code> to odpowiedź na GET <code>/dashboard</code>, nie na POST <code>/login</code>.</li>
+<li><strong>Krok 2: cookie <code>session</code> jest dosłane.</strong> Sesja <code>s</code> przechowuje cookie otrzymane w Kroku 1 i automatycznie dokleja je do każdego kolejnego żądania — dokładnie tak, jak robi to przeglądarka.</li>
+<li><strong>Krok 3: 403, nie 401.</strong> Gdyby <code>Session</code> nie pamiętał cookies, dostalibyśmy 401 (jak w <code>bezsesji.py</code>). 403 dowodzi, że serwer <strong>rozpoznaje</strong> klienta — ale rola <code>jan</code> nie wystarcza.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Czy w Kroku 1 <code>r1.url</code> kończy się na <code>/dashboard</code>?</li>
+<li>Czy <code>s.cookies.get_dict()</code> zawiera klucz <code>session</code>?</li>
+<li>Czy w Kroku 2 nagłówek <code>Cookie</code> jest niepusty?</li>
+<li>Czy Krok 3 zwraca <strong>403</strong> (a nie 401)? Dlaczego ta różnica jest istotna?</li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span><code>Session</code> to nie magia
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>requests.Session</code> to obiekt, który przechowuje wewnętrzny <em>cookie jar</em> (<code>s.cookies</code>) i automatycznie dokleja jego zawartość do każdego żądania wykonanego przez <code>s.get</code>/<code>s.post</code>. Każda odpowiedź z nagłówkiem <code>Set-Cookie</code> aktualizuje ten jar. To wszystko — ten sam mechanizm, który przeglądarka realizuje od strony użytkownika, tu masz w obiekcie Pythona.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="demonstracja-2-anatomia-logowania" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Demonstracja 2: anatomia logowania</h1>
+<p>Demo 1 ukryło istotny szczegół: <code>r1.status_code</code> to 200, ale to <strong>nie był</strong> kod odpowiedzi z <code>/login</code>. To był kod z <code>/dashboard</code>, na który <code>requests</code> przekierowało nas automatycznie. Zobaczmy, co dokładnie się stało, i jak rozpoznać sukces logowania.</p>
+<p>Utwórz plik <code>anatomia.py</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>BASE <span class="op">=</span> <span class="st">"http://127.0.0.1:5000"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> opisz(r: requests.Response) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Final status: </span><span class="sc">{</span>r<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Final URL:    </span><span class="sc">{</span>r<span class="sc">.</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Historia:     </span><span class="sc">{</span>[(h.status_code, h.url) <span class="cf">for</span> h <span class="kw">in</span> r.history]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Scenariusz 1: poprawne logowanie.</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Scenariusz 1: jan / haslo123 ==="</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>s1 <span class="op">=</span> requests.Session()</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> s1.post(<span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/login"</span>, data<span class="op">=</span>{<span class="st">"username"</span>: <span class="st">"jan"</span>, <span class="st">"password"</span>: <span class="st">"haslo123"</span>})</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>opisz(r)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Cookies sesji: </span><span class="sc">{</span>s1<span class="sc">.</span>cookies<span class="sc">.</span>get_dict()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Scenariusz 2: błędne hasło.</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== Scenariusz 2: jan / ZLEHASLO ==="</span>)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>s2 <span class="op">=</span> requests.Session()</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> s2.post(<span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/login"</span>, data<span class="op">=</span>{<span class="st">"username"</span>: <span class="st">"jan"</span>, <span class="st">"password"</span>: <span class="st">"ZLEHASLO"</span>})</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>opisz(r)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Cookies sesji: </span><span class="sc">{</span>s2<span class="sc">.</span>cookies<span class="sc">.</span>get_dict()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Scenariusz 3: nieznany login.</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== Scenariusz 3: nieznany / cokolwiek ==="</span>)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>s3 <span class="op">=</span> requests.Session()</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>r <span class="op">=</span> s3.post(<span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/login"</span>, data<span class="op">=</span>{<span class="st">"username"</span>: <span class="st">"nieznany"</span>, <span class="st">"password"</span>: <span class="st">"x"</span>})</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>opisz(r)</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Cookies sesji: </span><span class="sc">{</span>s3<span class="sc">.</span>cookies<span class="sc">.</span>get_dict()<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Uruchom. Spodziewany wynik:</p>
+<pre><code>=== Scenariusz 1: jan / haslo123 ===
+  Final status: 200
+  Final URL:    http://127.0.0.1:5000/dashboard
+  Historia:     [(302, 'http://127.0.0.1:5000/login')]
+  Cookies sesji: {'session': '.eJyrVi...'}
+
+=== Scenariusz 2: jan / ZLEHASLO ===
+  Final status: 401
+  Final URL:    http://127.0.0.1:5000/login
+  Historia:     []
+  Cookies sesji: {}
+
+=== Scenariusz 3: nieznany / cokolwiek ===
+  Final status: 401
+  Final URL:    http://127.0.0.1:5000/login
+  Historia:     []
+  Cookies sesji: {}</code></pre>
+<p>Zwróć uwagę na trzy sygnały, które razem opisują „udane logowanie”:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Sygnał</th>
+<th>Sukces</th>
+<th>Porażka</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>r.url</code></td>
+<td><code>…/dashboard</code></td>
+<td><code>…/login</code></td>
+</tr>
+<tr class="even">
+<td><code>r.history</code></td>
+<td><code>[&lt;302&gt;]</code> (jeden element)</td>
+<td><code>[]</code> (pusta)</td>
+</tr>
+<tr class="odd">
+<td><code>s.cookies.get_dict()</code></td>
+<td>zawiera <code>session</code></td>
+<td>pusty</td>
+</tr>
+</tbody>
+</table>
+<p>Najsilniejszy sygnał to <code>r.history</code>. Pusta historia oznacza, że serwer odpowiedział od razu (a ponieważ <code>/login</code> przy poprawnym haśle <strong>zawsze</strong> zwraca 302, brak przekierowania = brak sukcesu). Drugim dobrym sygnałem jest końcowy URL — jeśli zostaliśmy na <code>/login</code>, znaczy, że formularz wrócił z błędem.</p>
+<p>Sam <code>r.status_code == 200</code> to <strong>zły</strong> sygnał: w obu scenariuszach 200 może oznaczać „dashboard” albo „strona błędu z formularzem”. Status 401 jest informatywny tylko dlatego, że ten konkretny serwer go zwraca — inne serwery mogą zwracać 200 z błędem w ciele HTML.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Czy w Scenariuszu 1 <code>r.history</code> zawiera dokładnie jeden element ze statusem 302?</li>
+<li>Czy w Scenariuszach 2 i 3 <code>s.cookies</code> jest pusty?</li>
+<li>Dlaczego <code>r.status_code == 200</code> nie wystarcza do rozpoznania udanego logowania?</li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span><code>r.history</code> w <code>requests</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>r.history</code> to lista odpowiedzi pośrednich, przez które klient przeszedł, zanim zatrzymał się na finalnej. Przy logowaniu PRG mamy zawsze dokładnie jeden element: 302 z <code>/login</code>. Przy zwykłym GET strony bez przekierowań lista jest pusta. Jeśli chcesz wyłączyć podążanie za przekierowaniami (jak w Labie 7 dla diagnostyki), użyj <code>allow_redirects=False</code>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="ćwiczenie-1-pełny-pipeline-scrapingu-strony-chronionej" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Ćwiczenie 1: pełny pipeline scrapingu strony chronionej</h1>
+<p>Czas zamknąć łańcuch narzędzi, który budujemy od pierwszego labu:</p>
+<pre><code>POST /login (Session)  →  GET /notes (Session)  →  BeautifulSoup  →  lista notatek</code></pre>
+<p>Każde z tych ogniw widziałeś już osobno: <code>requests.post</code> (Lab 1), serwer z formularzem (Lab 7), <code>BeautifulSoup</code> (Lab 5). Teraz złożymy je w jeden program.</p>
+<section id="zadanie" class="level2" data-number="6.1">
+<h2 data-number="6.1" class="anchored" data-anchor-id="zadanie"><span class="header-section-number">6.1</span> Zadanie</h2>
+<p>Utwórz plik <code>notatki_jana.py</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>BASE <span class="op">=</span> <span class="st">"http://127.0.0.1:5000"</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> requests.Session()</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Zaloguj się jako jan.</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Twój kod ---</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Pobierz stronę /notes.</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Twój kod ---</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Sparsuj HTML i wyciągnij teksty wszystkich &lt;li&gt; z listy notatek.</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co">#    Wskazówka: notatki są w pojedynczym &lt;ul&gt;, każda jako &lt;li&gt;.</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Twój kod ---</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Wypisz każdą notatkę w osobnej linii, z numeracją.</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Twój kod ---</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Uruchom:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> notatki_jana.py</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="spodziewany-wynik" class="level2" data-number="6.2">
+<h2 data-number="6.2" class="anchored" data-anchor-id="spodziewany-wynik"><span class="header-section-number">6.2</span> Spodziewany wynik</h2>
+<pre><code>1. Kupić mleko
+2. Zadzwonić do mamy
+3. Oddać książkę do biblioteki</code></pre>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Czy widzisz dokładnie trzy notatki Jana w wyniku?</li>
+<li>Co się stanie, jeśli zakomentujesz logowanie (krok 1) i uruchomisz tylko kroki 2–4? Spróbuj — co znajdziesz w <code>r.text</code>? (Wskazówka: będzie to formularz logowania, bo <code>/notes</code> przekierowuje niezalogowanego klienta na <code>/login</code>.)</li>
+<li>Co się stanie, jeśli w <code>s.post(...)</code> użyjesz <code>json={...}</code> zamiast <code>data={...}</code>? Spróbuj — dlaczego logowanie się nie powiedzie? (Powrót do Wykładu 4: formularz HTML wysyła <code>application/x-www-form-urlencoded</code>, nie JSON.)</li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Selektor <code>ul li</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>W szablonie strony <code>/notes</code> jest dokładnie jeden <code>&lt;ul&gt;</code> z notatkami. Selektor CSS <code>ul li</code> znajdzie wszystkie <code>&lt;li&gt;</code> wewnątrz dowolnego <code>&lt;ul&gt;</code> na stronie — w naszym przypadku to ta jedna lista. Pełny selektor mógłby być bardziej szczegółowy, ale dla tej strony <code>ul li</code> wystarcza.</p>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="ćwiczenie-2-trzy-konta-trzy-sesje" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Ćwiczenie 2: trzy konta, trzy sesje</h1>
+<p>Sesja w <code>requests</code> to nie tylko cookie jar. To <strong>tożsamość klienta</strong> — każdy <code>Session()</code> zachowuje się jak osobna przeglądarka, z osobnym kompletem zalogowanych użytkowników. W tym ćwiczeniu zescrapujesz notatki <strong>wszystkich trzech</strong> użytkowników, każdego w osobnej sesji.</p>
+<section id="zadanie-1" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="zadanie-1"><span class="header-section-number">7.1</span> Zadanie</h2>
+<p>Utwórz plik <code>wszystkie_notatki.py</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bs4 <span class="im">import</span> BeautifulSoup</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>BASE <span class="op">=</span> <span class="st">"http://127.0.0.1:5000"</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>UZYTKOWNICY <span class="op">=</span> [</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"admin"</span>, <span class="st">"secret"</span>),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"jan"</span>, <span class="st">"haslo123"</span>),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"anna"</span>, <span class="st">"qwerty"</span>),</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> pobierz_notatki(login: <span class="bu">str</span>, haslo: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">str</span>]:</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Loguje użytkownika w nowej sesji i zwraca listę jego notatek."""</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Utwórz nową sesję dla tego użytkownika.</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Zaloguj się.</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. Pobierz /notes.</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 4. Sparsuj listę notatek i zwróć ją.</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Pętla po użytkownikach z agregacją wyników.</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>wszystkie <span class="op">=</span> {}</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> login, haslo <span class="kw">in</span> UZYTKOWNICY:</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>    wszystkie[login] <span class="op">=</span> pobierz_notatki(login, haslo)</span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="fl">0.1</span>)  <span class="co"># etyka — także wobec localhost</span></span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Wypisz zebrany materiał.</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> login, notatki <span class="kw">in</span> wszystkie.items():</span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">=== </span><span class="sc">{</span>login<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span><span class="bu">len</span>(notatki)<span class="sc">}</span><span class="ss">) ==="</span>)</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n <span class="kw">in</span> notatki:</span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  - </span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="spodziewany-wynik-1" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="spodziewany-wynik-1"><span class="header-section-number">7.2</span> Spodziewany wynik</h2>
+<pre><code>=== admin (2) ===
+  - TODO: zrobić backup bazy
+  - Spotkanie z zespołem w piątek
+
+=== jan (3) ===
+  - Kupić mleko
+  - Zadzwonić do mamy
+  - Oddać książkę do biblioteki
+
+=== anna (1) ===
+  - Brak notatek.</code></pre>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Anna i „Brak notatek.”
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Anna ma jedną „notatkę” o treści <code>Brak notatek.</code> — i to nie jest błąd Twojego kodu. To <strong>placeholder</strong>, który serwer wkleja do <code>&lt;li&gt;</code>, gdy lista użytkownika jest pusta (zajrzyj do <code>lab7/app.py</code>, do funkcji <code>notes</code>). Z perspektywy parsera HTML jest to dokładnie taki sam <code>&lt;li&gt;</code> jak realna notatka — selektor <code>ul li</code> go znajdzie i zwróci.</p>
+<p>To jest typowa pułapka scrapingu: <strong>HTML to nie surowe dane</strong>. To, co widzimy oczami jako „pustą listę”, w drzewie DOM jest jednoelementową listą z komunikatem. Aplikacje frontendowe rzadko sygnalizują pustkę przez brak elementów — częściej wstawiają widget zastępczy.</p>
+<p>Jak to naprawić? W tym labie zostawiamy wynik jak jest — uświadomienie problemu jest celem. W realnym scraperze: albo dopasowałbyś selektor, żeby pominąć placeholder (np. używając atrybutu lub klasy CSS, jeśli jest), albo dodałbyś warunek pomijający <code>li</code> zawierające tag <code>&lt;i&gt;</code>.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Czy <code>admin</code> widzi tylko swoje notatki, a <code>jan</code> tylko swoje?</li>
+<li>Co się stanie, jeśli <strong>przeniesiesz</strong> linię <code>s = requests.Session()</code> z funkcji <code>pobierz_notatki</code> na sam początek pliku (poza pętlę), tak by wszyscy użytkownicy używali tej samej sesji? Spróbuj — czyje notatki dostanie każda iteracja? (Wskazówka: każdy nowy POST <code>/login</code> nadpisuje sesję poprzednika, ale… spójrz, czyje notatki widzi <code>anna</code> w drugim przebiegu — i pomyśl, dlaczego.)</li>
+<li>Dlaczego <code>time.sleep(0.1)</code> znajduje się <strong>w pętli żądań</strong>, a nie tylko po pętli? (Powtórka z Labu 4: każde żądanie do dowolnego serwera — także lokalnego — robimy z odstępem; to staje się odruchem, niezależnie od adresata.)</li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="ćwiczenie-3-walidacja-logowania" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Ćwiczenie 3: walidacja logowania</h1>
+<p>Pliki z Ćwiczeń 1 i 2 zakładają, że logowanie zawsze się powiedzie. W praktyce nigdy tak nie jest: hasło może być błędne, użytkownik zablokowany, formularz zmieniony. Każdy poważny pipeline musi <strong>sprawdzać</strong>, czy logowanie się udało, i czytelnie reagować, gdy nie.</p>
+<p>W Demonstracji 2 widziałeś trzy sygnały sukcesu. Teraz zamkniesz je w funkcję, która zwraca proste <code>True</code>/<code>False</code>.</p>
+<section id="zadanie-2" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="zadanie-2"><span class="header-section-number">8.1</span> Zadanie</h2>
+<p>Utwórz plik <code>walidacja.py</code>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>BASE <span class="op">=</span> <span class="st">"http://127.0.0.1:5000"</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> zaloguj(s: requests.Session, login: <span class="bu">str</span>, haslo: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Próbuje zalogować się w sesji `s`. Zwraca True przy sukcesie, False przy porażce.</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Funkcja nie rzuca wyjątku przy błędnym haśle — porażka logowania to</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">    normalny przypadek, nie błąd programu.</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Wyślij POST na /login z danymi formularza.</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. Zwróć True, jeśli serwer przekierował nas na /dashboard,</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">#    False w przeciwnym razie.</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Testy — każdy w nowej sesji, żeby wyniki się nie nakładały.</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>przypadki <span class="op">=</span> [</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"jan"</span>, <span class="st">"haslo123"</span>),       <span class="co"># poprawne</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"jan"</span>, <span class="st">"ZLEHASLO"</span>),       <span class="co"># poprawny login, błędne hasło</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"nieznany"</span>, <span class="st">"byle_co"</span>),   <span class="co"># login nie istnieje</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"admin"</span>, <span class="st">"secret"</span>),       <span class="co"># poprawne, inny user</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>    (<span class="st">""</span>, <span class="st">""</span>),                  <span class="co"># puste pola</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> login, haslo <span class="kw">in</span> przypadki:</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> requests.Session()</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>    ok <span class="op">=</span> zaloguj(s, login, haslo)</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>    znacznik <span class="op">=</span> <span class="st">"OK "</span> <span class="cf">if</span> ok <span class="cf">else</span> <span class="st">"FAIL"</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"[</span><span class="sc">{</span>znacznik<span class="sc">}</span><span class="ss">] </span><span class="sc">{</span>login<span class="sc">!r}</span><span class="ss"> / </span><span class="sc">{</span>haslo<span class="sc">!r}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="spodziewany-wynik-2" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="spodziewany-wynik-2"><span class="header-section-number">8.2</span> Spodziewany wynik</h2>
+<pre><code>[OK ] 'jan' / 'haslo123'
+[FAIL] 'jan' / 'ZLEHASLO'
+[FAIL] 'nieznany' / 'byle_co'
+[OK ] 'admin' / 'secret'
+[FAIL] '' / ''</code></pre>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Czy wszystkie cztery przypadki failowe zwracają <code>False</code>?</li>
+<li>Jaki konkretnie sygnał sukcesu wybrałeś — <code>r.url</code>, <code>r.history</code>, czy zawartość <code>s.cookies</code>? Czy potrafisz uzasadnić wybór?</li>
+<li>Co by się stało, gdybyś <strong>dwukrotnie</strong> wywołał <code>zaloguj(s, "jan", "ZLEHASLO")</code> na <strong>tej samej</strong> sesji <code>s</code>, która wcześniej zalogowała <code>jana</code> poprawnie? Spróbuj — czy <code>s</code> traci zalogowanie po nieudanej próbie?</li>
+</ol>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Walidacja jako kontrakt funkcji
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>zaloguj</code> zwraca <code>bool</code>, nie rzuca wyjątku. To celowe: nieudane logowanie nie jest awarią programu, tylko jednym z dwóch normalnych wyników. Wyjątki rezerwujemy dla rzeczy nieoczekiwanych — np. brak połączenia z serwerem (<code>requests.exceptions.ConnectionError</code>). Ten kontrakt — <code>bool</code> dla rezultatów dziedzinowych, wyjątki dla błędów technicznych — przyda się też przy klientach Scrapy i async.</p>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="co-dalej-w-realu-token-csrf" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Co dalej w realu: token CSRF</h1>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Realne formularze logowania chroni token CSRF
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Serwer z Labu 7 jest celowo uproszczony — nie ma zabezpieczenia CSRF. W realnych aplikacjach formularz logowania zawiera dodatkowe ukryte pole, np.:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">"hidden"</span><span class="ot"> name</span><span class="op">=</span><span class="st">"csrf_token"</span><span class="ot"> value</span><span class="op">=</span><span class="st">"a1b2c3d4..."</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wartość tokenu jest losowa i ważna tylko dla danej sesji. Serwer odrzuca POST bez tokenu lub z nieprawidłowym tokenem (zwykle kodem 400 lub 403). Dla scrapera oznacza to <strong>dwa żądania</strong> zamiast jednego:</p>
+<ol type="1">
+<li><strong>GET <code>/login</code></strong> — pobierz stronę z formularzem, wyciągnij <code>csrf_token</code> przez BeautifulSoup,</li>
+<li><strong>POST <code>/login</code></strong> — wyślij dane formularza razem z odzyskanym tokenem.</li>
+</ol>
+<p><code>requests.Session</code> jest tu dodatkowo niezbędna: token CSRF często idzie w parze z tymczasowym cookie sesyjnym ustawianym już przy GET — bez sesji para token-cookie nie pasuje do siebie po stronie serwera.</p>
+<p>W tym labie ten krok pomijamy, ale wzorzec jest dokładnie taki sam jak Ćwiczenie 1, tylko z dodatkowym GET-em na początku. Wrócimy do tego konceptualnie w Labie 13 (Selenium), gdzie przeglądarka załatwia tę logikę za nas.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="podsumowanie" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Podsumowanie</h1>
+<p>W tym labie:</p>
+<ul>
+<li>zobaczyłeś, że jedyną istotną różnicą między „klientem niedziałającym” (Lab 7, <code>bezsesji.py</code>) a „klientem działającym” jest jeden obiekt — <code>requests.Session()</code>,</li>
+<li>zdiagnozowałeś przepływ logowania PRG po stronie klienta: <code>r.history</code>, <code>r.url</code>, <code>s.cookies</code> jako trzy uzupełniające się sygnały,</li>
+<li>zamknąłeś pełny pipeline scrapingu chronionej strony: logowanie → pobranie HTML → parsowanie BS4 → dane,</li>
+<li>zescrapowałeś dane trzech niezależnych użytkowników w trzech sesjach — każda jak osobny klient,</li>
+<li>zauważyłeś, że HTML rendowany dla pustej listy też zwraca element listy (placeholder) — pułapka, którą trzeba widzieć,</li>
+<li>wyodrębniłeś walidację logowania jako funkcję zwracającą <code>bool</code>, gotową do wpięcia w większy program.</li>
+</ul>
+<p><strong>Co dalej:</strong></p>
+<ul>
+<li><strong>Wykład 5</strong>: asynchroniczność. Mamy działającego klienta, który potrafi się zalogować — ale jest <strong>wolny</strong>. Scraping notatek trzech użytkowników to sześć sekwencyjnych żądań HTTP. Co, gdyby trzeba było tysiąca? Odpowiedzią jest <code>httpx.AsyncClient</code> i <code>asyncio</code>.</li>
+<li><strong>Lab 9</strong>: pierwszy lab asynchroniczny — <code>asyncio</code> od podstaw, prowadzone ćwiczenia.</li>
+<li><strong>Lab 10</strong>: async HTTP w praktyce — porównanie sync vs async, <code>Semaphore</code>, <code>gather</code>, <code>as_completed</code>.</li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/rodakt\.github\.io\/APD\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
