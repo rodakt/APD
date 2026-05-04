@@ -742,8 +742,8 @@ Status: 403</code></pre>
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>Czy <code>admin</code> widzi tylko swoje notatki, a <code>jan</code> tylko swoje?</li>
-<li>Co się stanie, jeśli <strong>przeniesiesz</strong> linię <code>s = requests.Session()</code> z funkcji <code>pobierz_notatki</code> na sam początek pliku (poza pętlę), tak by wszyscy użytkownicy używali tej samej sesji? Spróbuj - czyje notatki dostanie każda iteracja? (Wskazówka: każdy nowy POST <code>/login</code> nadpisuje sesję poprzednika, ale… spójrz, czyje notatki widzi <code>anna</code> w drugim przebiegu - i pomyśl, dlaczego.)</li>
-<li>Dlaczego <code>time.sleep(0.1)</code> znajduje się <strong>w pętli żądań</strong>, a nie tylko po pętli? (Powtórka z Labu 4: każde żądanie do dowolnego serwera - także lokalnego - robimy z odstępem; to staje się odruchem, niezależnie od adresata.)</li>
+<li>Funkcjonalnie ten kod działa też z jedną globalną sesją - kolejne logowania nadpisują poprzednie po stronie serwera, więc każda iteracja widzi notatki swojego użytkownika. Mimo to trzymamy osobny <code>Session()</code> per użytkownik. Pomyśl, dlaczego: co się stanie, gdy logowanie <code>anny</code> zwróci <code>False</code> (np. zmienione hasło) i program po prostu spróbuje pobrać <code>/notes</code> w tej samej globalnej sesji? Czyje notatki wtedy zescrapuje pod kluczem <code>anna</code>? (Izolacja sesji = izolacja błędów.)</li>
+<li>Dlaczego <code>time.sleep(0.1)</code> znajduje się <strong>w pętli żądań</strong>, a nie tylko po pętli? (Powtórka z Labu 4: każde żądanie do dowolnego serwera - także lokalnego - robimy z odstępem; powinno być odruchowe, niezależnie od adresata.)</li>
 </ol>
 </div>
 </div>
