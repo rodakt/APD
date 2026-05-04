@@ -370,8 +370,8 @@ Jak to naprawić? W tym labie zostawiamy wynik jak jest - uświadomienie problem
 ::: {.callout-note}
 ## Checkpoint
 1. Czy `admin` widzi tylko swoje notatki, a `jan` tylko swoje?
-2. Co się stanie, jeśli **przeniesiesz** linię `s = requests.Session()` z funkcji `pobierz_notatki` na sam początek pliku (poza pętlę), tak by wszyscy użytkownicy używali tej samej sesji? Spróbuj - czyje notatki dostanie każda iteracja? (Wskazówka: każdy nowy POST `/login` nadpisuje sesję poprzednika, ale… spójrz, czyje notatki widzi `anna` w drugim przebiegu - i pomyśl, dlaczego.)
-3. Dlaczego `time.sleep(0.1)` znajduje się **w pętli żądań**, a nie tylko po pętli? (Powtórka z Labu 4: każde żądanie do dowolnego serwera - także lokalnego - robimy z odstępem; to staje się odruchem, niezależnie od adresata.)
+2. Funkcjonalnie ten kod działa też z jedną globalną sesją - kolejne logowania nadpisują poprzednie po stronie serwera, więc każda iteracja widzi notatki swojego użytkownika. Mimo to trzymamy osobny `Session()` per użytkownik. Pomyśl, dlaczego: co się stanie, gdy logowanie `anny` zwróci `False` (np. zmienione hasło) i program po prostu spróbuje pobrać `/notes` w tej samej globalnej sesji? Czyje notatki wtedy zescrapuje pod kluczem `anna`? (Izolacja sesji = izolacja błędów.)
+3. Dlaczego `time.sleep(0.1)` znajduje się **w pętli żądań**, a nie tylko po pętli? (Powtórka z Labu 4: każde żądanie do dowolnego serwera - także lokalnego - robimy z odstępem; powinno być odruchowe, niezależnie od adresata.)
 :::
 
 ---
