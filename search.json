@@ -1867,78 +1867,78 @@
   {
     "objectID": "laby/lab_8.html",
     "href": "laby/lab_8.html",
-    "title": "Lab 8: Klient z sesją — requests.Session",
+    "title": "Lab 8: Klient z sesją - requests.Session",
     "section": "",
-    "text": "Zakres materiału:\n\nrequests.Session jako klient HTTP z trwałym cookie jar — jedyna istotna zmiana w stosunku do gołego requests.get/requests.post,\nprzepływ logowania widziany z perspektywy klienta: POST → 302 → GET, automatyczne podążanie za przekierowaniem,\ndiagnostyka udanego logowania: r.url, r.history, s.cookies.get_dict(),\npełny pipeline scrapingu strony chronionej: logowanie → pobranie HTML → parsowanie BeautifulSoup,\nwiele niezależnych sesji w jednym programie — każdy Session() to osobny klient,\nwalidacja poprawności logowania jako element pipeline’u (nie tylko r.status_code == 200).\n\nNarzędzia: Python (requests, beautifulsoup4), VSCode, serwer Flask z Lab 7 jako cel scrapingu.",
+    "text": "Zakres materiału:\n\nrequests.Session jako klient HTTP z trwałym cookie jar - jedyna istotna zmiana w stosunku do gołego requests.get/requests.post,\nprzepływ logowania widziany z perspektywy klienta: POST → 302 → GET, automatyczne podążanie za przekierowaniem,\ndiagnostyka udanego logowania: r.url, r.history, s.cookies.get_dict(),\npełny pipeline scrapingu strony chronionej: logowanie → pobranie HTML → parsowanie BeautifulSoup,\nwiele niezależnych sesji w jednym programie - każdy Session() to osobny klient,\nwalidacja poprawności logowania jako element pipeline’u (nie tylko r.status_code == 200).\n\nNarzędzia: Python (requests, beautifulsoup4), VSCode, serwer Flask z Lab 7 jako cel scrapingu.",
     "crumbs": [
       "Laboratoria",
-      "Lab 8: Klient z sesją — `requests.Session`"
+      "Lab 8: Klient z sesją - `requests.Session`"
     ]
   },
   {
     "objectID": "laby/lab_8.html#zadanie",
     "href": "laby/lab_8.html#zadanie",
-    "title": "Lab 8: Klient z sesją — requests.Session",
+    "title": "Lab 8: Klient z sesją - requests.Session",
     "section": "6.1 Zadanie",
     "text": "6.1 Zadanie\nUtwórz plik notatki_jana.py:\nimport requests\nfrom bs4 import BeautifulSoup\n\nBASE = \"http://127.0.0.1:5000\"\n\ns = requests.Session()\n\n# 1. Zaloguj się jako jan.\n# --- Twój kod ---\n\n# 2. Pobierz stronę /notes.\n# --- Twój kod ---\n\n# 3. Sparsuj HTML i wyciągnij teksty wszystkich &lt;li&gt; z listy notatek.\n#    Wskazówka: notatki są w pojedynczym &lt;ul&gt;, każda jako &lt;li&gt;.\n# --- Twój kod ---\n\n# 4. Wypisz każdą notatkę w osobnej linii, z numeracją.\n# --- Twój kod ---\nUruchom:\npython notatki_jana.py",
     "crumbs": [
       "Laboratoria",
-      "Lab 8: Klient z sesją — `requests.Session`"
+      "Lab 8: Klient z sesją - `requests.Session`"
     ]
   },
   {
     "objectID": "laby/lab_8.html#spodziewany-wynik",
     "href": "laby/lab_8.html#spodziewany-wynik",
-    "title": "Lab 8: Klient z sesją — requests.Session",
+    "title": "Lab 8: Klient z sesją - requests.Session",
     "section": "6.2 Spodziewany wynik",
-    "text": "6.2 Spodziewany wynik\n1. Kupić mleko\n2. Zadzwonić do mamy\n3. Oddać książkę do biblioteki\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nCzy widzisz dokładnie trzy notatki Jana w wyniku?\nCo się stanie, jeśli zakomentujesz logowanie (krok 1) i uruchomisz tylko kroki 2–4? Spróbuj — co znajdziesz w r.text? (Wskazówka: będzie to formularz logowania, bo /notes przekierowuje niezalogowanego klienta na /login.)\nCo się stanie, jeśli w s.post(...) użyjesz json={...} zamiast data={...}? Spróbuj — dlaczego logowanie się nie powiedzie? (Powrót do Wykładu 4: formularz HTML wysyła application/x-www-form-urlencoded, nie JSON.)\n\n\n\n\n\n\n\n\n\nTipSelektor ul li\n\n\n\nW szablonie strony /notes jest dokładnie jeden &lt;ul&gt; z notatkami. Selektor CSS ul li znajdzie wszystkie &lt;li&gt; wewnątrz dowolnego &lt;ul&gt; na stronie — w naszym przypadku to ta jedna lista. Pełny selektor mógłby być bardziej szczegółowy, ale dla tej strony ul li wystarcza.",
+    "text": "6.2 Spodziewany wynik\n1. Kupić mleko\n2. Zadzwonić do mamy\n3. Oddać książkę do biblioteki\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nCzy widzisz dokładnie trzy notatki Jana w wyniku?\nCo się stanie, jeśli zakomentujesz logowanie (krok 1) i uruchomisz tylko kroki 2–4? Spróbuj - co znajdziesz w r.text? (Wskazówka: będzie to formularz logowania, bo /notes przekierowuje niezalogowanego klienta na /login.)\nCo się stanie, jeśli w s.post(...) użyjesz json={...} zamiast data={...}? Spróbuj - dlaczego logowanie się nie powiedzie? (Powrót do Wykładu 4: formularz HTML wysyła application/x-www-form-urlencoded, nie JSON.)\n\n\n\n\n\n\n\n\n\nTipSelektor ul li\n\n\n\nW szablonie strony /notes jest dokładnie jeden &lt;ul&gt; z notatkami. Selektor CSS ul li znajdzie wszystkie &lt;li&gt; wewnątrz dowolnego &lt;ul&gt; na stronie - w naszym przypadku to ta jedna lista. Pełny selektor mógłby być bardziej szczegółowy, ale dla tej strony ul li wystarcza.",
     "crumbs": [
       "Laboratoria",
-      "Lab 8: Klient z sesją — `requests.Session`"
+      "Lab 8: Klient z sesją - `requests.Session`"
     ]
   },
   {
     "objectID": "laby/lab_8.html#zadanie-1",
     "href": "laby/lab_8.html#zadanie-1",
-    "title": "Lab 8: Klient z sesją — requests.Session",
+    "title": "Lab 8: Klient z sesją - requests.Session",
     "section": "7.1 Zadanie",
-    "text": "7.1 Zadanie\nUtwórz plik wszystkie_notatki.py:\nimport time\nimport requests\nfrom bs4 import BeautifulSoup\n\nBASE = \"http://127.0.0.1:5000\"\n\nUZYTKOWNICY = [\n    (\"admin\", \"secret\"),\n    (\"jan\", \"haslo123\"),\n    (\"anna\", \"qwerty\"),\n]\n\n\ndef pobierz_notatki(login: str, haslo: str) -&gt; list[str]:\n    \"\"\"Loguje użytkownika w nowej sesji i zwraca listę jego notatek.\"\"\"\n    # 1. Utwórz nową sesję dla tego użytkownika.\n    # --- Twój kod ---\n\n    # 2. Zaloguj się.\n    # --- Twój kod ---\n\n    # 3. Pobierz /notes.\n    # --- Twój kod ---\n\n    # 4. Sparsuj listę notatek i zwróć ją.\n    # --- Twój kod ---\n\n\n# Pętla po użytkownikach z agregacją wyników.\nwszystkie = {}\nfor login, haslo in UZYTKOWNICY:\n    wszystkie[login] = pobierz_notatki(login, haslo)\n    time.sleep(0.1)  # etyka — także wobec localhost\n\n# Wypisz zebrany materiał.\nfor login, notatki in wszystkie.items():\n    print(f\"\\n=== {login} ({len(notatki)}) ===\")\n    for n in notatki:\n        print(f\"  - {n}\")",
+    "text": "7.1 Zadanie\nUtwórz plik wszystkie_notatki.py:\nimport time\nimport requests\nfrom bs4 import BeautifulSoup\n\nBASE = \"http://127.0.0.1:5000\"\n\nUZYTKOWNICY = [\n    (\"admin\", \"secret\"),\n    (\"jan\", \"haslo123\"),\n    (\"anna\", \"qwerty\"),\n]\n\n\ndef pobierz_notatki(login: str, haslo: str) -&gt; list[str]:\n    \"\"\"Loguje użytkownika w nowej sesji i zwraca listę jego notatek.\"\"\"\n    # 1. Utwórz nową sesję dla tego użytkownika.\n    # --- Twój kod ---\n\n    # 2. Zaloguj się.\n    # --- Twój kod ---\n\n    # 3. Pobierz /notes.\n    # --- Twój kod ---\n\n    # 4. Sparsuj listę notatek i zwróć ją.\n    # --- Twój kod ---\n\n\n# Pętla po użytkownikach z agregacją wyników.\nwszystkie = {}\nfor login, haslo in UZYTKOWNICY:\n    wszystkie[login] = pobierz_notatki(login, haslo)\n    time.sleep(0.1)  # etyka - także wobec localhost\n\n# Wypisz zebrany materiał.\nfor login, notatki in wszystkie.items():\n    print(f\"\\n=== {login} ({len(notatki)}) ===\")\n    for n in notatki:\n        print(f\"  - {n}\")",
     "crumbs": [
       "Laboratoria",
-      "Lab 8: Klient z sesją — `requests.Session`"
+      "Lab 8: Klient z sesją - `requests.Session`"
     ]
   },
   {
     "objectID": "laby/lab_8.html#spodziewany-wynik-1",
     "href": "laby/lab_8.html#spodziewany-wynik-1",
-    "title": "Lab 8: Klient z sesją — requests.Session",
+    "title": "Lab 8: Klient z sesją - requests.Session",
     "section": "7.2 Spodziewany wynik",
-    "text": "7.2 Spodziewany wynik\n=== admin (2) ===\n  - TODO: zrobić backup bazy\n  - Spotkanie z zespołem w piątek\n\n=== jan (3) ===\n  - Kupić mleko\n  - Zadzwonić do mamy\n  - Oddać książkę do biblioteki\n\n=== anna (1) ===\n  - Brak notatek.\n\n\n\n\n\n\nWarningAnna i „Brak notatek.”\n\n\n\nAnna ma jedną „notatkę” o treści Brak notatek. — i to nie jest błąd Twojego kodu. To placeholder, który serwer wkleja do &lt;li&gt;, gdy lista użytkownika jest pusta (zajrzyj do lab7/app.py, do funkcji notes). Z perspektywy parsera HTML jest to dokładnie taki sam &lt;li&gt; jak realna notatka — selektor ul li go znajdzie i zwróci.\nTo jest typowa pułapka scrapingu: HTML to nie surowe dane. To, co widzimy oczami jako „pustą listę”, w drzewie DOM jest jednoelementową listą z komunikatem. Aplikacje frontendowe rzadko sygnalizują pustkę przez brak elementów — częściej wstawiają widget zastępczy.\nJak to naprawić? W tym labie zostawiamy wynik jak jest — uświadomienie problemu jest celem. W realnym scraperze: albo dopasowałbyś selektor, żeby pominąć placeholder (np. używając atrybutu lub klasy CSS, jeśli jest), albo dodałbyś warunek pomijający li zawierające tag &lt;i&gt;.\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nCzy admin widzi tylko swoje notatki, a jan tylko swoje?\nCo się stanie, jeśli przeniesiesz linię s = requests.Session() z funkcji pobierz_notatki na sam początek pliku (poza pętlę), tak by wszyscy użytkownicy używali tej samej sesji? Spróbuj — czyje notatki dostanie każda iteracja? (Wskazówka: każdy nowy POST /login nadpisuje sesję poprzednika, ale… spójrz, czyje notatki widzi anna w drugim przebiegu — i pomyśl, dlaczego.)\nDlaczego time.sleep(0.1) znajduje się w pętli żądań, a nie tylko po pętli? (Powtórka z Labu 4: każde żądanie do dowolnego serwera — także lokalnego — robimy z odstępem; to staje się odruchem, niezależnie od adresata.)",
+    "text": "7.2 Spodziewany wynik\n=== admin (2) ===\n  - TODO: zrobić backup bazy\n  - Spotkanie z zespołem w piątek\n\n=== jan (3) ===\n  - Kupić mleko\n  - Zadzwonić do mamy\n  - Oddać książkę do biblioteki\n\n=== anna (1) ===\n  - Brak notatek.\n\n\n\n\n\n\nWarningAnna i „Brak notatek.”\n\n\n\nAnna ma jedną „notatkę” o treści Brak notatek. - i to nie jest błąd Twojego kodu. To placeholder, który serwer wkleja do &lt;li&gt;, gdy lista użytkownika jest pusta (zajrzyj do lab7/app.py, do funkcji notes). Z perspektywy parsera HTML jest to dokładnie taki sam &lt;li&gt; jak realna notatka - selektor ul li go znajdzie i zwróci.\nTo jest typowa pułapka scrapingu: HTML to nie surowe dane. To, co widzimy oczami jako „pustą listę”, w drzewie DOM jest jednoelementową listą z komunikatem. Aplikacje frontendowe rzadko sygnalizują pustkę przez brak elementów - częściej wstawiają widget zastępczy.\nJak to naprawić? W tym labie zostawiamy wynik jak jest - uświadomienie problemu jest celem. W realnym scraperze: albo dopasowałbyś selektor, żeby pominąć placeholder (np. używając atrybutu lub klasy CSS, jeśli jest), albo dodałbyś warunek pomijający li zawierające tag &lt;i&gt;.\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nCzy admin widzi tylko swoje notatki, a jan tylko swoje?\nCo się stanie, jeśli przeniesiesz linię s = requests.Session() z funkcji pobierz_notatki na sam początek pliku (poza pętlę), tak by wszyscy użytkownicy używali tej samej sesji? Spróbuj - czyje notatki dostanie każda iteracja? (Wskazówka: każdy nowy POST /login nadpisuje sesję poprzednika, ale… spójrz, czyje notatki widzi anna w drugim przebiegu - i pomyśl, dlaczego.)\nDlaczego time.sleep(0.1) znajduje się w pętli żądań, a nie tylko po pętli? (Powtórka z Labu 4: każde żądanie do dowolnego serwera - także lokalnego - robimy z odstępem; to staje się odruchem, niezależnie od adresata.)",
     "crumbs": [
       "Laboratoria",
-      "Lab 8: Klient z sesją — `requests.Session`"
+      "Lab 8: Klient z sesją - `requests.Session`"
     ]
   },
   {
     "objectID": "laby/lab_8.html#zadanie-2",
     "href": "laby/lab_8.html#zadanie-2",
-    "title": "Lab 8: Klient z sesją — requests.Session",
+    "title": "Lab 8: Klient z sesją - requests.Session",
     "section": "8.1 Zadanie",
-    "text": "8.1 Zadanie\nUtwórz plik walidacja.py:\nimport requests\n\nBASE = \"http://127.0.0.1:5000\"\n\n\ndef zaloguj(s: requests.Session, login: str, haslo: str) -&gt; bool:\n    \"\"\"Próbuje zalogować się w sesji `s`. Zwraca True przy sukcesie, False przy porażce.\n\n    Funkcja nie rzuca wyjątku przy błędnym haśle — porażka logowania to\n    normalny przypadek, nie błąd programu.\n    \"\"\"\n    # 1. Wyślij POST na /login z danymi formularza.\n    # --- Twój kod ---\n\n    # 2. Zwróć True, jeśli serwer przekierował nas na /dashboard,\n    #    False w przeciwnym razie.\n    # --- Twój kod ---\n\n\n# Testy — każdy w nowej sesji, żeby wyniki się nie nakładały.\nprzypadki = [\n    (\"jan\", \"haslo123\"),       # poprawne\n    (\"jan\", \"ZLEHASLO\"),       # poprawny login, błędne hasło\n    (\"nieznany\", \"byle_co\"),   # login nie istnieje\n    (\"admin\", \"secret\"),       # poprawne, inny user\n    (\"\", \"\"),                  # puste pola\n]\n\nfor login, haslo in przypadki:\n    s = requests.Session()\n    ok = zaloguj(s, login, haslo)\n    znacznik = \"OK \" if ok else \"FAIL\"\n    print(f\"[{znacznik}] {login!r} / {haslo!r}\")",
+    "text": "8.1 Zadanie\nUtwórz plik walidacja.py:\nimport requests\n\nBASE = \"http://127.0.0.1:5000\"\n\n\ndef zaloguj(s: requests.Session, login: str, haslo: str) -&gt; bool:\n    \"\"\"Próbuje zalogować się w sesji `s`. Zwraca True przy sukcesie, False przy porażce.\n\n    Funkcja nie rzuca wyjątku przy błędnym haśle - porażka logowania to\n    normalny przypadek, nie błąd programu.\n    \"\"\"\n    # 1. Wyślij POST na /login z danymi formularza.\n    # --- Twój kod ---\n\n    # 2. Zwróć True, jeśli serwer przekierował nas na /dashboard,\n    #    False w przeciwnym razie.\n    # --- Twój kod ---\n\n\n# Testy - każdy w nowej sesji, żeby wyniki się nie nakładały.\nprzypadki = [\n    (\"jan\", \"haslo123\"),       # poprawne\n    (\"jan\", \"ZLEHASLO\"),       # poprawny login, błędne hasło\n    (\"nieznany\", \"byle_co\"),   # login nie istnieje\n    (\"admin\", \"secret\"),       # poprawne, inny user\n    (\"\", \"\"),                  # puste pola\n]\n\nfor login, haslo in przypadki:\n    s = requests.Session()\n    ok = zaloguj(s, login, haslo)\n    znacznik = \"OK \" if ok else \"FAIL\"\n    print(f\"[{znacznik}] {login!r} / {haslo!r}\")",
     "crumbs": [
       "Laboratoria",
-      "Lab 8: Klient z sesją — `requests.Session`"
+      "Lab 8: Klient z sesją - `requests.Session`"
     ]
   },
   {
     "objectID": "laby/lab_8.html#spodziewany-wynik-2",
     "href": "laby/lab_8.html#spodziewany-wynik-2",
-    "title": "Lab 8: Klient z sesją — requests.Session",
+    "title": "Lab 8: Klient z sesją - requests.Session",
     "section": "8.2 Spodziewany wynik",
-    "text": "8.2 Spodziewany wynik\n[OK ] 'jan' / 'haslo123'\n[FAIL] 'jan' / 'ZLEHASLO'\n[FAIL] 'nieznany' / 'byle_co'\n[OK ] 'admin' / 'secret'\n[FAIL] '' / ''\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nCzy wszystkie cztery przypadki failowe zwracają False?\nJaki konkretnie sygnał sukcesu wybrałeś — r.url, r.history, czy zawartość s.cookies? Czy potrafisz uzasadnić wybór?\nCo by się stało, gdybyś dwukrotnie wywołał zaloguj(s, \"jan\", \"ZLEHASLO\") na tej samej sesji s, która wcześniej zalogowała jana poprawnie? Spróbuj — czy s traci zalogowanie po nieudanej próbie?\n\n\n\n\n\n\n\n\n\nTipWalidacja jako kontrakt funkcji\n\n\n\nzaloguj zwraca bool, nie rzuca wyjątku. To celowe: nieudane logowanie nie jest awarią programu, tylko jednym z dwóch normalnych wyników. Wyjątki rezerwujemy dla rzeczy nieoczekiwanych — np. brak połączenia z serwerem (requests.exceptions.ConnectionError). Ten kontrakt — bool dla rezultatów dziedzinowych, wyjątki dla błędów technicznych — przyda się też przy klientach Scrapy i async.",
+    "text": "8.2 Spodziewany wynik\n[OK ] 'jan' / 'haslo123'\n[FAIL] 'jan' / 'ZLEHASLO'\n[FAIL] 'nieznany' / 'byle_co'\n[OK ] 'admin' / 'secret'\n[FAIL] '' / ''\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nCzy wszystkie cztery przypadki failowe zwracają False?\nJaki konkretnie sygnał sukcesu wybrałeś - r.url, r.history, czy zawartość s.cookies? Czy potrafisz uzasadnić wybór?\nCo by się stało, gdybyś dwukrotnie wywołał zaloguj(s, \"jan\", \"ZLEHASLO\") na tej samej sesji s, która wcześniej zalogowała jana poprawnie? Spróbuj - czy s traci zalogowanie po nieudanej próbie?\n\n\n\n\n\n\n\n\n\nTipWalidacja jako kontrakt funkcji\n\n\n\nzaloguj zwraca bool, nie rzuca wyjątku. To celowe: nieudane logowanie nie jest awarią programu, tylko jednym z dwóch normalnych wyników. Wyjątki rezerwujemy dla rzeczy nieoczekiwanych - np. brak połączenia z serwerem (requests.exceptions.ConnectionError). Ten kontrakt - bool dla rezultatów dziedzinowych, wyjątki dla błędów technicznych - przyda się też przy klientach Scrapy i async.",
     "crumbs": [
       "Laboratoria",
-      "Lab 8: Klient z sesją — `requests.Session`"
+      "Lab 8: Klient z sesją - `requests.Session`"
     ]
   },
   {

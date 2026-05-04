@@ -8,7 +8,7 @@
 
 <meta name="author" content="Tomasz Rodak">
 
-<title>Lab 8: Klient z sesją — requests.Session – Automatyczne pozyskiwanie danych</title>
+<title>Lab 8: Klient z sesją - requests.Session – Automatyczne pozyskiwanie danych</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -119,7 +119,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_0.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_8.html">Lab 8: Klient z sesją — <code>requests.Session</code></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_0.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_8.html">Lab 8: Klient z sesją - <code>requests.Session</code></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -263,7 +263,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../laby/lab_8.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Lab 8: Klient z sesją — <code>requests.Session</code></span></a>
+ <span class="menu-text">Lab 8: Klient z sesją - <code>requests.Session</code></span></a>
   </div>
 </li>
       </ul>
@@ -306,10 +306,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_0.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_8.html">Lab 8: Klient z sesją — <code>requests.Session</code></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../laby/lab_0.html">Laboratoria</a></li><li class="breadcrumb-item"><a href="../laby/lab_8.html">Lab 8: Klient z sesją - <code>requests.Session</code></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Lab 8: Klient z sesją — <code>requests.Session</code></h1>
-<p class="subtitle lead">Automatyczne pozyskiwanie danych — ćwiczenia</p>
+<h1 class="title">Lab 8: Klient z sesją - <code>requests.Session</code></h1>
+<p class="subtitle lead">Automatyczne pozyskiwanie danych - ćwiczenia</p>
 </div>
 
 
@@ -336,11 +336,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1 data-number="1"><span class="header-section-number">1</span> Cel</h1>
 <p>Zakres materiału:</p>
 <ul>
-<li><code>requests.Session</code> jako klient HTTP z trwałym cookie jar — jedyna istotna zmiana w stosunku do gołego <code>requests.get</code>/<code>requests.post</code>,</li>
+<li><code>requests.Session</code> jako klient HTTP z trwałym cookie jar - jedyna istotna zmiana w stosunku do gołego <code>requests.get</code>/<code>requests.post</code>,</li>
 <li>przepływ logowania widziany z perspektywy klienta: POST → 302 → GET, automatyczne podążanie za przekierowaniem,</li>
 <li>diagnostyka udanego logowania: <code>r.url</code>, <code>r.history</code>, <code>s.cookies.get_dict()</code>,</li>
 <li>pełny pipeline scrapingu strony chronionej: logowanie → pobranie HTML → parsowanie BeautifulSoup,</li>
-<li>wiele niezależnych sesji w jednym programie — każdy <code>Session()</code> to osobny klient,</li>
+<li>wiele niezależnych sesji w jednym programie - każdy <code>Session()</code> to osobny klient,</li>
 <li>walidacja poprawności logowania jako element pipeline’u (nie tylko <code>r.status_code == 200</code>).</li>
 </ul>
 <p>Narzędzia: Python (<code>requests</code>, <code>beautifulsoup4</code>), VSCode, serwer Flask z Lab 7 jako cel scrapingu.</p>
@@ -364,10 +364,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Komputery w pracowni mogą resetować pakiety między sesjami. Na początku każdego labu sprawdź, czy potrzebne pakiety są dostępne, i w razie potrzeby zainstaluj je ponownie.</p>
 </div>
 </div>
-<p>W tym labie pracujemy w nowym folderze <code>lab8/</code>, ale <strong>serwerem jest aplikacja z Labu 7</strong> — ta sama, którą zbudowałeś krok po kroku tydzień temu (<code>/login</code>, <code>/logout</code>, <code>/dashboard</code>, <code>/admin</code>, <code>/notes</code>).</p>
+<p>W tym labie pracujemy w nowym folderze <code>lab8/</code>, ale <strong>serwerem jest aplikacja z Labu 7</strong> - ta sama, którą zbudowałeś krok po kroku tydzień temu (<code>/login</code>, <code>/logout</code>, <code>/dashboard</code>, <code>/admin</code>, <code>/notes</code>).</p>
 <p>Otwórz <strong>Terminal 1</strong> w folderze <code>lab7/</code> i uruchom serwer:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">flask</span> run <span class="at">--debug</span> <span class="at">-p</span> 5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Pozostaw go uruchomionego przez cały lab. <strong>Terminal 2</strong> otwórz w folderze <code>lab8/</code> — tam będzie cały kod tego labu.</p>
+<p>Pozostaw go uruchomionego przez cały lab. <strong>Terminal 2</strong> otwórz w folderze <code>lab8/</code> - tam będzie cały kod tego labu.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -378,15 +378,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Otwórz w przeglądarce <code>http://127.0.0.1:5000/login</code> — powinieneś zobaczyć formularz logowania. Zaloguj się jako <code>jan</code> / <code>haslo123</code>, sprawdź <code>/notes</code>, wyloguj się. Jeśli to działa, serwer jest gotowy.</p>
+<p>Otwórz w przeglądarce <code>http://127.0.0.1:5000/login</code> - powinieneś zobaczyć formularz logowania. Zaloguj się jako <code>jan</code> / <code>haslo123</code>, sprawdź <code>/notes</code>, wyloguj się. Jeśli to działa, serwer jest gotowy.</p>
 </div>
 </div>
 <hr>
 </section>
 <section id="wstęp-gdzie-jesteśmy" class="level1" data-number="3">
 <h1 data-number="3"><span class="header-section-number">3</span> Wstęp: gdzie jesteśmy</h1>
-<p>Lab 7 zakończył się pesymistycznie. Plik <code>bezsesji.py</code> pokazał, że dwa kolejne wywołania <code>requests.post</code>/<code>requests.get</code> <strong>nie współdzielą cookies</strong> — każde żądanie startuje z pustym kontekstem. Logowanie jako pojedyncze wywołanie się powiodło, ale zaraz potem <code>requests.get("/notes")</code> wracał na <code>/login</code>, bo serwer nie widział żadnego cookie sesyjnego.</p>
-<p>Tym razem napiszemy klienta, który <strong>pamięta cookies między żądaniami</strong>. Zmiana jest minimalna: z <code>requests.&lt;metoda&gt;(...)</code> przechodzimy na <code>s.&lt;metoda&gt;(...)</code>, gdzie <code>s = requests.Session()</code>. Reszta API jest identyczna — to jest istota całego labu, więc warto to dostrzec na samym początku.</p>
+<p>Lab 7 zakończył się pesymistycznie. Plik <code>bezsesji.py</code> pokazał, że dwa kolejne wywołania <code>requests.post</code>/<code>requests.get</code> <strong>nie współdzielą cookies</strong> - każde żądanie startuje z pustym kontekstem. Logowanie jako pojedyncze wywołanie się powiodło, ale zaraz potem <code>requests.get("/notes")</code> wracał na <code>/login</code>, bo serwer nie widział żadnego cookie sesyjnego.</p>
+<p>Tym razem napiszemy klienta, który <strong>pamięta cookies między żądaniami</strong>. Zmiana jest minimalna: z <code>requests.&lt;metoda&gt;(...)</code> przechodzimy na <code>s.&lt;metoda&gt;(...)</code>, gdzie <code>s = requests.Session()</code>. Reszta API jest identyczna - to jest istota całego labu, więc warto to dostrzec na samym początku.</p>
 <hr>
 </section>
 <section id="demonstracja-1-klient-który-pamięta-cookies" class="level1" data-number="4">
@@ -398,7 +398,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>s <span class="op">=</span> requests.Session()</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Logowanie — POST z danymi formularza.</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Logowanie - POST z danymi formularza.</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Krok 1: logowanie ==="</span>)</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>r1 <span class="op">=</span> s.post(</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/login"</span>,</span>
@@ -408,7 +408,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"URL końcowy: </span><span class="sc">{</span>r1<span class="sc">.</span>url<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Cookies w sesji: </span><span class="sc">{</span>s<span class="sc">.</span>cookies<span class="sc">.</span>get_dict()<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Pobranie chronionej strony — w tej samej sesji.</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Pobranie chronionej strony - w tej samej sesji.</span></span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== Krok 2: pobranie /notes ==="</span>)</span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>r2 <span class="op">=</span> s.get(<span class="ss">f"</span><span class="sc">{</span>BASE<span class="sc">}</span><span class="ss">/notes"</span>)</span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Status: </span><span class="sc">{</span>r2<span class="sc">.</span>status_code<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -434,12 +434,12 @@ Cookie wysłane do serwera: session=.eJyrVi...
 
 === Krok 3: próba /admin ===
 Status: 403</code></pre>
-<p>Porównaj to z <code>bezsesji.py</code> z Labu 7. Tam Krok 2 lądował na <code>/login</code> (przekierowanie wymuszone brakiem sesji), Krok 3 zwracał 401. Tutaj wszystkie trzy żądania widzą tę samą tożsamość: <code>jan</code> jest zalogowany, więc <code>/notes</code> działa, a <code>/admin</code> zwraca 403 — bo <code>jan</code> jest uwierzytelniony, ale <strong>nie jest adminem</strong>. To jest dokładnie różnica między 401 a 403, z którą zmierzyliśmy się na Labie 7 — tylko teraz po stronie klienta.</p>
+<p>Porównaj to z <code>bezsesji.py</code> z Labu 7. Tam Krok 2 lądował na <code>/login</code> (przekierowanie wymuszone brakiem sesji), Krok 3 zwracał 401. Tutaj wszystkie trzy żądania widzą tę samą tożsamość: <code>jan</code> jest zalogowany, więc <code>/notes</code> działa, a <code>/admin</code> zwraca 403 - bo <code>jan</code> jest uwierzytelniony, ale <strong>nie jest adminem</strong>. To jest dokładnie różnica między 401 a 403, z którą zmierzyliśmy się na Labie 7 - tylko teraz po stronie klienta.</p>
 <p>Zwróć uwagę na trzy szczegóły:</p>
 <ul>
 <li><strong>Krok 1: status 200, URL <code>/dashboard</code>.</strong> Wysłaliśmy POST na <code>/login</code>, serwer odpowiedział <code>302 → /dashboard</code>, a <code>requests</code> automatycznie podążył za przekierowaniem (<code>allow_redirects=True</code> to wartość domyślna). Ostatecznie <code>r1</code> to odpowiedź na GET <code>/dashboard</code>, nie na POST <code>/login</code>.</li>
-<li><strong>Krok 2: cookie <code>session</code> jest dosłane.</strong> Sesja <code>s</code> przechowuje cookie otrzymane w Kroku 1 i automatycznie dokleja je do każdego kolejnego żądania — dokładnie tak, jak robi to przeglądarka.</li>
-<li><strong>Krok 3: 403, nie 401.</strong> Gdyby <code>Session</code> nie pamiętał cookies, dostalibyśmy 401 (jak w <code>bezsesji.py</code>). 403 dowodzi, że serwer <strong>rozpoznaje</strong> klienta — ale rola <code>jan</code> nie wystarcza.</li>
+<li><strong>Krok 2: cookie <code>session</code> jest dosłane.</strong> Sesja <code>s</code> przechowuje cookie otrzymane w Kroku 1 i automatycznie dokleja je do każdego kolejnego żądania - dokładnie tak, jak robi to przeglądarka.</li>
+<li><strong>Krok 3: 403, nie 401.</strong> Gdyby <code>Session</code> nie pamiętał cookies, dostalibyśmy 401 (jak w <code>bezsesji.py</code>). 403 dowodzi, że serwer <strong>rozpoznaje</strong> klienta - ale rola <code>jan</code> nie wystarcza.</li>
 </ul>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -469,7 +469,7 @@ Status: 403</code></pre>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><code>requests.Session</code> to obiekt, który przechowuje wewnętrzny <em>cookie jar</em> (<code>s.cookies</code>) i automatycznie dokleja jego zawartość do każdego żądania wykonanego przez <code>s.get</code>/<code>s.post</code>. Każda odpowiedź z nagłówkiem <code>Set-Cookie</code> aktualizuje ten jar. To wszystko — ten sam mechanizm, który przeglądarka realizuje od strony użytkownika, tu masz w obiekcie Pythona.</p>
+<p><code>requests.Session</code> to obiekt, który przechowuje wewnętrzny <em>cookie jar</em> (<code>s.cookies</code>) i automatycznie dokleja jego zawartość do każdego żądania wykonanego przez <code>s.get</code>/<code>s.post</code>. Każda odpowiedź z nagłówkiem <code>Set-Cookie</code> aktualizuje ten jar. To wszystko - ten sam mechanizm, który przeglądarka realizuje od strony użytkownika, tu masz w obiekcie Pythona.</p>
 </div>
 </div>
 <hr>
@@ -554,8 +554,8 @@ Status: 403</code></pre>
 </tr>
 </tbody>
 </table>
-<p>Najsilniejszy sygnał to <code>r.history</code>. Pusta historia oznacza, że serwer odpowiedział od razu (a ponieważ <code>/login</code> przy poprawnym haśle <strong>zawsze</strong> zwraca 302, brak przekierowania = brak sukcesu). Drugim dobrym sygnałem jest końcowy URL — jeśli zostaliśmy na <code>/login</code>, znaczy, że formularz wrócił z błędem.</p>
-<p>Sam <code>r.status_code == 200</code> to <strong>zły</strong> sygnał: w obu scenariuszach 200 może oznaczać „dashboard” albo „strona błędu z formularzem”. Status 401 jest informatywny tylko dlatego, że ten konkretny serwer go zwraca — inne serwery mogą zwracać 200 z błędem w ciele HTML.</p>
+<p>Najsilniejszy sygnał to <code>r.history</code>. Pusta historia oznacza, że serwer odpowiedział od razu (a ponieważ <code>/login</code> przy poprawnym haśle <strong>zawsze</strong> zwraca 302, brak przekierowania = brak sukcesu). Drugim dobrym sygnałem jest końcowy URL - jeśli zostaliśmy na <code>/login</code>, znaczy, że formularz wrócił z błędem.</p>
+<p>Sam <code>r.status_code == 200</code> to <strong>zły</strong> sygnał: w obu scenariuszach 200 może oznaczać „dashboard” albo „strona błędu z formularzem”. Status 401 jest informatywny tylko dlatego, że ten konkretny serwer go zwraca - inne serwery mogą zwracać 200 z błędem w ciele HTML.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -635,8 +635,8 @@ Status: 403</code></pre>
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>Czy widzisz dokładnie trzy notatki Jana w wyniku?</li>
-<li>Co się stanie, jeśli zakomentujesz logowanie (krok 1) i uruchomisz tylko kroki 2–4? Spróbuj — co znajdziesz w <code>r.text</code>? (Wskazówka: będzie to formularz logowania, bo <code>/notes</code> przekierowuje niezalogowanego klienta na <code>/login</code>.)</li>
-<li>Co się stanie, jeśli w <code>s.post(...)</code> użyjesz <code>json={...}</code> zamiast <code>data={...}</code>? Spróbuj — dlaczego logowanie się nie powiedzie? (Powrót do Wykładu 4: formularz HTML wysyła <code>application/x-www-form-urlencoded</code>, nie JSON.)</li>
+<li>Co się stanie, jeśli zakomentujesz logowanie (krok 1) i uruchomisz tylko kroki 2–4? Spróbuj - co znajdziesz w <code>r.text</code>? (Wskazówka: będzie to formularz logowania, bo <code>/notes</code> przekierowuje niezalogowanego klienta na <code>/login</code>.)</li>
+<li>Co się stanie, jeśli w <code>s.post(...)</code> użyjesz <code>json={...}</code> zamiast <code>data={...}</code>? Spróbuj - dlaczego logowanie się nie powiedzie? (Powrót do Wykładu 4: formularz HTML wysyła <code>application/x-www-form-urlencoded</code>, nie JSON.)</li>
 </ol>
 </div>
 </div>
@@ -650,7 +650,7 @@ Status: 403</code></pre>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>W szablonie strony <code>/notes</code> jest dokładnie jeden <code>&lt;ul&gt;</code> z notatkami. Selektor CSS <code>ul li</code> znajdzie wszystkie <code>&lt;li&gt;</code> wewnątrz dowolnego <code>&lt;ul&gt;</code> na stronie — w naszym przypadku to ta jedna lista. Pełny selektor mógłby być bardziej szczegółowy, ale dla tej strony <code>ul li</code> wystarcza.</p>
+<p>W szablonie strony <code>/notes</code> jest dokładnie jeden <code>&lt;ul&gt;</code> z notatkami. Selektor CSS <code>ul li</code> znajdzie wszystkie <code>&lt;li&gt;</code> wewnątrz dowolnego <code>&lt;ul&gt;</code> na stronie - w naszym przypadku to ta jedna lista. Pełny selektor mógłby być bardziej szczegółowy, ale dla tej strony <code>ul li</code> wystarcza.</p>
 </div>
 </div>
 <hr>
@@ -658,7 +658,7 @@ Status: 403</code></pre>
 </section>
 <section id="ćwiczenie-2-trzy-konta-trzy-sesje" class="level1" data-number="7">
 <h1 data-number="7"><span class="header-section-number">7</span> Ćwiczenie 2: trzy konta, trzy sesje</h1>
-<p>Sesja w <code>requests</code> to nie tylko cookie jar. To <strong>tożsamość klienta</strong> — każdy <code>Session()</code> zachowuje się jak osobna przeglądarka, z osobnym kompletem zalogowanych użytkowników. W tym ćwiczeniu zescrapujesz notatki <strong>wszystkich trzech</strong> użytkowników, każdego w osobnej sesji.</p>
+<p>Sesja w <code>requests</code> to nie tylko cookie jar. To <strong>tożsamość klienta</strong> - każdy <code>Session()</code> zachowuje się jak osobna przeglądarka, z osobnym kompletem zalogowanych użytkowników. W tym ćwiczeniu zescrapujesz notatki <strong>wszystkich trzech</strong> użytkowników, każdego w osobnej sesji.</p>
 <section id="zadanie-1" class="level2" data-number="7.1">
 <h2 data-number="7.1" class="anchored" data-anchor-id="zadanie-1"><span class="header-section-number">7.1</span> Zadanie</h2>
 <p>Utwórz plik <code>wszystkie_notatki.py</code>:</p>
@@ -694,7 +694,7 @@ Status: 403</code></pre>
 <span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>wszystkie <span class="op">=</span> {}</span>
 <span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> login, haslo <span class="kw">in</span> UZYTKOWNICY:</span>
 <span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>    wszystkie[login] <span class="op">=</span> pobierz_notatki(login, haslo)</span>
-<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="fl">0.1</span>)  <span class="co"># etyka — także wobec localhost</span></span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="fl">0.1</span>)  <span class="co"># etyka - także wobec localhost</span></span>
 <span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Wypisz zebrany materiał.</span></span>
 <span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> login, notatki <span class="kw">in</span> wszystkie.items():</span>
@@ -725,9 +725,9 @@ Status: 403</code></pre>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Anna ma jedną „notatkę” o treści <code>Brak notatek.</code> — i to nie jest błąd Twojego kodu. To <strong>placeholder</strong>, który serwer wkleja do <code>&lt;li&gt;</code>, gdy lista użytkownika jest pusta (zajrzyj do <code>lab7/app.py</code>, do funkcji <code>notes</code>). Z perspektywy parsera HTML jest to dokładnie taki sam <code>&lt;li&gt;</code> jak realna notatka — selektor <code>ul li</code> go znajdzie i zwróci.</p>
-<p>To jest typowa pułapka scrapingu: <strong>HTML to nie surowe dane</strong>. To, co widzimy oczami jako „pustą listę”, w drzewie DOM jest jednoelementową listą z komunikatem. Aplikacje frontendowe rzadko sygnalizują pustkę przez brak elementów — częściej wstawiają widget zastępczy.</p>
-<p>Jak to naprawić? W tym labie zostawiamy wynik jak jest — uświadomienie problemu jest celem. W realnym scraperze: albo dopasowałbyś selektor, żeby pominąć placeholder (np. używając atrybutu lub klasy CSS, jeśli jest), albo dodałbyś warunek pomijający <code>li</code> zawierające tag <code>&lt;i&gt;</code>.</p>
+<p>Anna ma jedną „notatkę” o treści <code>Brak notatek.</code> - i to nie jest błąd Twojego kodu. To <strong>placeholder</strong>, który serwer wkleja do <code>&lt;li&gt;</code>, gdy lista użytkownika jest pusta (zajrzyj do <code>lab7/app.py</code>, do funkcji <code>notes</code>). Z perspektywy parsera HTML jest to dokładnie taki sam <code>&lt;li&gt;</code> jak realna notatka - selektor <code>ul li</code> go znajdzie i zwróci.</p>
+<p>To jest typowa pułapka scrapingu: <strong>HTML to nie surowe dane</strong>. To, co widzimy oczami jako „pustą listę”, w drzewie DOM jest jednoelementową listą z komunikatem. Aplikacje frontendowe rzadko sygnalizują pustkę przez brak elementów - częściej wstawiają widget zastępczy.</p>
+<p>Jak to naprawić? W tym labie zostawiamy wynik jak jest - uświadomienie problemu jest celem. W realnym scraperze: albo dopasowałbyś selektor, żeby pominąć placeholder (np. używając atrybutu lub klasy CSS, jeśli jest), albo dodałbyś warunek pomijający <code>li</code> zawierające tag <code>&lt;i&gt;</code>.</p>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -742,8 +742,8 @@ Status: 403</code></pre>
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>Czy <code>admin</code> widzi tylko swoje notatki, a <code>jan</code> tylko swoje?</li>
-<li>Co się stanie, jeśli <strong>przeniesiesz</strong> linię <code>s = requests.Session()</code> z funkcji <code>pobierz_notatki</code> na sam początek pliku (poza pętlę), tak by wszyscy użytkownicy używali tej samej sesji? Spróbuj — czyje notatki dostanie każda iteracja? (Wskazówka: każdy nowy POST <code>/login</code> nadpisuje sesję poprzednika, ale… spójrz, czyje notatki widzi <code>anna</code> w drugim przebiegu — i pomyśl, dlaczego.)</li>
-<li>Dlaczego <code>time.sleep(0.1)</code> znajduje się <strong>w pętli żądań</strong>, a nie tylko po pętli? (Powtórka z Labu 4: każde żądanie do dowolnego serwera — także lokalnego — robimy z odstępem; to staje się odruchem, niezależnie od adresata.)</li>
+<li>Co się stanie, jeśli <strong>przeniesiesz</strong> linię <code>s = requests.Session()</code> z funkcji <code>pobierz_notatki</code> na sam początek pliku (poza pętlę), tak by wszyscy użytkownicy używali tej samej sesji? Spróbuj - czyje notatki dostanie każda iteracja? (Wskazówka: każdy nowy POST <code>/login</code> nadpisuje sesję poprzednika, ale… spójrz, czyje notatki widzi <code>anna</code> w drugim przebiegu - i pomyśl, dlaczego.)</li>
+<li>Dlaczego <code>time.sleep(0.1)</code> znajduje się <strong>w pętli żądań</strong>, a nie tylko po pętli? (Powtórka z Labu 4: każde żądanie do dowolnego serwera - także lokalnego - robimy z odstępem; to staje się odruchem, niezależnie od adresata.)</li>
 </ol>
 </div>
 </div>
@@ -765,7 +765,7 @@ Status: 403</code></pre>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> zaloguj(s: requests.Session, login: <span class="bu">str</span>, haslo: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Próbuje zalogować się w sesji `s`. Zwraca True przy sukcesie, False przy porażce.</span></span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Funkcja nie rzuca wyjątku przy błędnym haśle — porażka logowania to</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">    Funkcja nie rzuca wyjątku przy błędnym haśle - porażka logowania to</span></span>
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co">    normalny przypadek, nie błąd programu.</span></span>
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
 <span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. Wyślij POST na /login z danymi formularza.</span></span>
@@ -776,7 +776,7 @@ Status: 403</code></pre>
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># --- Twój kod ---</span></span>
 <span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Testy — każdy w nowej sesji, żeby wyniki się nie nakładały.</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Testy - każdy w nowej sesji, żeby wyniki się nie nakładały.</span></span>
 <span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>przypadki <span class="op">=</span> [</span>
 <span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"jan"</span>, <span class="st">"haslo123"</span>),       <span class="co"># poprawne</span></span>
 <span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"jan"</span>, <span class="st">"ZLEHASLO"</span>),       <span class="co"># poprawny login, błędne hasło</span></span>
@@ -810,8 +810,8 @@ Status: 403</code></pre>
 <div class="callout-body-container callout-body">
 <ol type="1">
 <li>Czy wszystkie cztery przypadki failowe zwracają <code>False</code>?</li>
-<li>Jaki konkretnie sygnał sukcesu wybrałeś — <code>r.url</code>, <code>r.history</code>, czy zawartość <code>s.cookies</code>? Czy potrafisz uzasadnić wybór?</li>
-<li>Co by się stało, gdybyś <strong>dwukrotnie</strong> wywołał <code>zaloguj(s, "jan", "ZLEHASLO")</code> na <strong>tej samej</strong> sesji <code>s</code>, która wcześniej zalogowała <code>jana</code> poprawnie? Spróbuj — czy <code>s</code> traci zalogowanie po nieudanej próbie?</li>
+<li>Jaki konkretnie sygnał sukcesu wybrałeś - <code>r.url</code>, <code>r.history</code>, czy zawartość <code>s.cookies</code>? Czy potrafisz uzasadnić wybór?</li>
+<li>Co by się stało, gdybyś <strong>dwukrotnie</strong> wywołał <code>zaloguj(s, "jan", "ZLEHASLO")</code> na <strong>tej samej</strong> sesji <code>s</code>, która wcześniej zalogowała <code>jana</code> poprawnie? Spróbuj - czy <code>s</code> traci zalogowanie po nieudanej próbie?</li>
 </ol>
 </div>
 </div>
@@ -825,7 +825,7 @@ Status: 403</code></pre>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><code>zaloguj</code> zwraca <code>bool</code>, nie rzuca wyjątku. To celowe: nieudane logowanie nie jest awarią programu, tylko jednym z dwóch normalnych wyników. Wyjątki rezerwujemy dla rzeczy nieoczekiwanych — np. brak połączenia z serwerem (<code>requests.exceptions.ConnectionError</code>). Ten kontrakt — <code>bool</code> dla rezultatów dziedzinowych, wyjątki dla błędów technicznych — przyda się też przy klientach Scrapy i async.</p>
+<p><code>zaloguj</code> zwraca <code>bool</code>, nie rzuca wyjątku. To celowe: nieudane logowanie nie jest awarią programu, tylko jednym z dwóch normalnych wyników. Wyjątki rezerwujemy dla rzeczy nieoczekiwanych - np. brak połączenia z serwerem (<code>requests.exceptions.ConnectionError</code>). Ten kontrakt - <code>bool</code> dla rezultatów dziedzinowych, wyjątki dla błędów technicznych - przyda się też przy klientach Scrapy i async.</p>
 </div>
 </div>
 <hr>
@@ -843,14 +843,14 @@ Status: 403</code></pre>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Serwer z Labu 7 jest celowo uproszczony — nie ma zabezpieczenia CSRF. W realnych aplikacjach formularz logowania zawiera dodatkowe ukryte pole, np.:</p>
+<p>Serwer z Labu 7 jest celowo uproszczony - nie ma zabezpieczenia CSRF. W realnych aplikacjach formularz logowania zawiera dodatkowe ukryte pole, np.:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">input</span><span class="ot"> type</span><span class="op">=</span><span class="st">"hidden"</span><span class="ot"> name</span><span class="op">=</span><span class="st">"csrf_token"</span><span class="ot"> value</span><span class="op">=</span><span class="st">"a1b2c3d4..."</span><span class="dt">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Wartość tokenu jest losowa i ważna tylko dla danej sesji. Serwer odrzuca POST bez tokenu lub z nieprawidłowym tokenem (zwykle kodem 400 lub 403). Dla scrapera oznacza to <strong>dwa żądania</strong> zamiast jednego:</p>
 <ol type="1">
-<li><strong>GET <code>/login</code></strong> — pobierz stronę z formularzem, wyciągnij <code>csrf_token</code> przez BeautifulSoup,</li>
-<li><strong>POST <code>/login</code></strong> — wyślij dane formularza razem z odzyskanym tokenem.</li>
+<li><strong>GET <code>/login</code></strong> - pobierz stronę z formularzem, wyciągnij <code>csrf_token</code> przez BeautifulSoup,</li>
+<li><strong>POST <code>/login</code></strong> - wyślij dane formularza razem z odzyskanym tokenem.</li>
 </ol>
-<p><code>requests.Session</code> jest tu dodatkowo niezbędna: token CSRF często idzie w parze z tymczasowym cookie sesyjnym ustawianym już przy GET — bez sesji para token-cookie nie pasuje do siebie po stronie serwera.</p>
+<p><code>requests.Session</code> jest tu dodatkowo niezbędna: token CSRF często idzie w parze z tymczasowym cookie sesyjnym ustawianym już przy GET - bez sesji para token-cookie nie pasuje do siebie po stronie serwera.</p>
 <p>W tym labie ten krok pomijamy, ale wzorzec jest dokładnie taki sam jak Ćwiczenie 1, tylko z dodatkowym GET-em na początku. Wrócimy do tego konceptualnie w Labie 13 (Selenium), gdzie przeglądarka załatwia tę logikę za nas.</p>
 </div>
 </div>
@@ -860,18 +860,18 @@ Status: 403</code></pre>
 <h1 data-number="10"><span class="header-section-number">10</span> Podsumowanie</h1>
 <p>W tym labie:</p>
 <ul>
-<li>zobaczyłeś, że jedyną istotną różnicą między „klientem niedziałającym” (Lab 7, <code>bezsesji.py</code>) a „klientem działającym” jest jeden obiekt — <code>requests.Session()</code>,</li>
+<li>zobaczyłeś, że jedyną istotną różnicą między „klientem niedziałającym” (Lab 7, <code>bezsesji.py</code>) a „klientem działającym” jest jeden obiekt - <code>requests.Session()</code>,</li>
 <li>zdiagnozowałeś przepływ logowania PRG po stronie klienta: <code>r.history</code>, <code>r.url</code>, <code>s.cookies</code> jako trzy uzupełniające się sygnały,</li>
 <li>zamknąłeś pełny pipeline scrapingu chronionej strony: logowanie → pobranie HTML → parsowanie BS4 → dane,</li>
-<li>zescrapowałeś dane trzech niezależnych użytkowników w trzech sesjach — każda jak osobny klient,</li>
-<li>zauważyłeś, że HTML rendowany dla pustej listy też zwraca element listy (placeholder) — pułapka, którą trzeba widzieć,</li>
+<li>zescrapowałeś dane trzech niezależnych użytkowników w trzech sesjach - każda jak osobny klient,</li>
+<li>zauważyłeś, że HTML rendowany dla pustej listy też zwraca element listy (placeholder) - pułapka, którą trzeba widzieć,</li>
 <li>wyodrębniłeś walidację logowania jako funkcję zwracającą <code>bool</code>, gotową do wpięcia w większy program.</li>
 </ul>
 <p><strong>Co dalej:</strong></p>
 <ul>
-<li><strong>Wykład 5</strong>: asynchroniczność. Mamy działającego klienta, który potrafi się zalogować — ale jest <strong>wolny</strong>. Scraping notatek trzech użytkowników to sześć sekwencyjnych żądań HTTP. Co, gdyby trzeba było tysiąca? Odpowiedzią jest <code>httpx.AsyncClient</code> i <code>asyncio</code>.</li>
-<li><strong>Lab 9</strong>: pierwszy lab asynchroniczny — <code>asyncio</code> od podstaw, prowadzone ćwiczenia.</li>
-<li><strong>Lab 10</strong>: async HTTP w praktyce — porównanie sync vs async, <code>Semaphore</code>, <code>gather</code>, <code>as_completed</code>.</li>
+<li><strong>Wykład 5</strong>: asynchroniczność. Mamy działającego klienta, który potrafi się zalogować - ale jest <strong>wolny</strong>. Scraping notatek trzech użytkowników to sześć sekwencyjnych żądań HTTP. Co, gdyby trzeba było tysiąca? Odpowiedzią jest <code>httpx.AsyncClient</code> i <code>asyncio</code>.</li>
+<li><strong>Lab 9</strong>: pierwszy lab asynchroniczny - <code>asyncio</code> od podstaw, prowadzone ćwiczenia.</li>
+<li><strong>Lab 10</strong>: async HTTP w praktyce - porównanie sync vs async, <code>Semaphore</code>, <code>gather</code>, <code>as_completed</code>.</li>
 </ul>
 
 
