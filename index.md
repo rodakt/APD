@@ -27,6 +27,7 @@ Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z si
 - [Laboratorium 6: Parsowanie HTML — XPath i lxml](laby/lab_6.md)
 - [Laboratorium 7: Serwer z sesjami i logowaniem](laby/lab_7.md)
 - [Laboratorium 8: Klient z sesją — `requests.Session`](laby/lab_8.md)
+- [Laboratorium 9: Async od zera](laby/lab_9.md)
 
 ## Zaliczenie
 
