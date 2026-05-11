@@ -371,7 +371,7 @@ Wyniki: ['dane-0', 'dane-1', 'dane-2', 'dane-3', 'dane-4']
 Zwróć uwagę na **kolejność**:
 
 * **`[w main] Tasks zarejestrowane`** pojawia się **PRZED** wszystkimi `START`. To dowód, że `create_task` zwraca natychmiast - `main` przeszedł przez pięć rejestracji bez ani jednego oddania sterowania, dotarł do printu, wykonał go, a dopiero **potem** (przy pierwszym `await`) event loop dostał szansę uruchomić zarejestrowane task-i.
-* **Pięć `START` w jednej salwie, pięć `DONE` po sekundzie** - efekt dokładnie taki sam jak w Ćwiczeniu 1 z `gather`.
+* **Pięć `START` w jednym uruchomieniu, pięć `DONE` po sekundzie** - efekt dokładnie taki sam jak w Ćwiczeniu 1 z `gather`.
 * **Łączny czas ~1 s** - identycznie jak `gather`.
 
 Funkcjonalnie efekt jest ten sam co w `gather`. Różnica jest **strukturalna**: między rejestracją a oczekiwaniem mamy dziurę, w której można zrobić cokolwiek innego (zalogować postęp, zarejestrować dodatkowe task-i na podstawie warunków, wykonać lokalne obliczenia). `gather` tej dziury nie daje - rejestruje i czeka w jednym ruchu.
@@ -379,7 +379,7 @@ Funkcjonalnie efekt jest ten sam co w `gather`. Różnica jest **strukturalna**:
 ::: {.callout-tip}
 ## Kiedy `gather`, a kiedy `create_task`
 * **`gather`** - domyślny wybór. Krótszy kod, jasna semantyka „uruchom te korutyny i daj mi wszystkie wyniki".
-* **`create_task`** - gdy potrzebujesz fine-grained kontroli: rejestracja zadań w trakcie pracy programu (nie z góry), task-i „fire and forget" (rejestracja bez `await`), kombinacja `await` z timeoutem (`asyncio.wait_for(task, timeout=5)`).
+* **`create_task`** - gdy potrzebujesz drobiazgowej kontroli: rejestracja zadań w trakcie pracy programu (nie z góry), kombinacja `await` z timeoutem (`asyncio.wait_for(task, timeout=5)`).
 
 W praktyce w tym kursie używamy `gather`. Pokazujemy `create_task`, żeby wiedzieć, że `gather` to skrót dla wzorca „create_task wszystkich + await wszystkich".
 :::
@@ -388,7 +388,7 @@ W praktyce w tym kursie używamy `gather`. Pokazujemy `create_task`, żeby wiedz
 ## Checkpoint
 1. Czy print `[w main] Tasks zarejestrowane` pojawia się **przed** czy **po** printach `START`? Co to mówi o tym, kiedy task-i zaczynają faktycznie biegnąć?
 2. Co by się stało, gdybyś usunął całą sekcję `wyniki = [await t for t in tasks]` (lub jak to zapisałeś)? Spróbuj. (Wskazówka: `asyncio.run` zamknie event loop po zakończeniu `main`, a zarejestrowane task-i nie zdążą się wykonać - dostaniesz ostrzeżenie o anulowanych zadaniach.)
-3. Czy potrafisz zapisać `wyniki` przez **list comprehension**, używając `await` wewnątrz? (To poprawna składnia: `[await t for t in tasks]`. `await` w comprehensji jest dozwolony tylko wewnątrz `async def`.)
+3. Czy potrafisz zapisać `wyniki` przez **list comprehension**, używając `await` wewnątrz? (To poprawna składnia: `[await t for t in tasks]`. `await` w wyrażeniu listowym jest dozwolony tylko wewnątrz `async def`.)
 :::
 
 ---
@@ -446,12 +446,12 @@ Uruchom. Spodziewany wynik:
 
 Wszystko jak w Ćwiczeniu 1 - `async def`, `await`, `gather` - ale **wynik dokładnie taki sam jak w pętli sekwencyjnej z Demonstracji 2**.
 
-Dlaczego? `time.sleep(1)` jest funkcją **synchroniczną**. Nie zawiera żadnego `await`. Nie ma punktu zawieszenia. Z perspektywy event loopu wygląda to jak długie obliczenie, którego nie ma jak przerwać. Cały event loop **stoi** przez tę sekundę. Inne korutyny czekają na swoją kolej.
+Dlaczego? `time.sleep(1)` jest funkcją **synchroniczną**, wywołanie `time.sleep(1)` nie zwraca korutyny. Nie zawiera żadnego `await`, nie ma punktu zawieszenia. Z perspektywy event loopu wygląda to jak długie obliczenie, którego nie ma jak przerwać. Cały event loop **stoi** przez tę sekundę. Inne korutyny czekają na swoją kolej.
 
 Dopóki któraś korutyna nie napotka prawdziwego `await` na czymś asynchronicznym (`asyncio.sleep`, `client.get`, `aiofiles.read`), event loop nie ma okazji przełączyć się na inną.
 
 ::: {.callout-warning}
-## Reguła kciuka
+## Zasada ogólna
 W korutynie **nigdy nie wywołuj funkcji blokujących**. Każde czekanie na I/O musi być pod `await`, a wołana funkcja musi być napisana z myślą o asyncio.
 
 | Synchronicznie (blokuje) | Asynchronicznie (`await`) |
@@ -474,7 +474,7 @@ Jeśli używasz biblioteki, która nie ma swojej wersji asynchronicznej - w koru
 
 # Ćwiczenie 3: pierwszy async HTTP
 
-Wszystko, co dotąd zrobiliśmy, działało na `asyncio.sleep` - symulowanym opóźnieniu w jednym procesie. Teraz pojadą prawdziwe żądania sieciowe do serwera Flask. Wzorzec pozostaje **identyczny** jak w Ćwiczeniu 1, podmieniamy tylko `asyncio.sleep` na `client.get`.
+Wszystko, co dotąd zrobiliśmy, działało na `asyncio.sleep` - symulowanym opóźnieniu w jednym procesie. Teraz wykonamy prawdziwe żądania sieciowe do serwera Flask. Wzorzec pozostaje **identyczny** jak w Ćwiczeniu 1, podmieniamy tylko `asyncio.sleep` na `client.get`.
 
 ## Krok 0: serwer
 
