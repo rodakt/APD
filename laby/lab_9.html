@@ -701,7 +701,7 @@ Wyniki: ['dane-0', 'dane-1', 'dane-2', 'dane-3', 'dane-4']
 <p>Zwróć uwagę na <strong>kolejność</strong>:</p>
 <ul>
 <li><strong><code>[w main] Tasks zarejestrowane</code></strong> pojawia się <strong>PRZED</strong> wszystkimi <code>START</code>. To dowód, że <code>create_task</code> zwraca natychmiast - <code>main</code> przeszedł przez pięć rejestracji bez ani jednego oddania sterowania, dotarł do printu, wykonał go, a dopiero <strong>potem</strong> (przy pierwszym <code>await</code>) event loop dostał szansę uruchomić zarejestrowane task-i.</li>
-<li><strong>Pięć <code>START</code> w jednej salwie, pięć <code>DONE</code> po sekundzie</strong> - efekt dokładnie taki sam jak w Ćwiczeniu 1 z <code>gather</code>.</li>
+<li><strong>Pięć <code>START</code> w jednym uruchomieniu, pięć <code>DONE</code> po sekundzie</strong> - efekt dokładnie taki sam jak w Ćwiczeniu 1 z <code>gather</code>.</li>
 <li><strong>Łączny czas ~1 s</strong> - identycznie jak <code>gather</code>.</li>
 </ul>
 <p>Funkcjonalnie efekt jest ten sam co w <code>gather</code>. Różnica jest <strong>strukturalna</strong>: między rejestracją a oczekiwaniem mamy dziurę, w której można zrobić cokolwiek innego (zalogować postęp, zarejestrować dodatkowe task-i na podstawie warunków, wykonać lokalne obliczenia). <code>gather</code> tej dziury nie daje - rejestruje i czeka w jednym ruchu.</p>
@@ -717,7 +717,7 @@ Wyniki: ['dane-0', 'dane-1', 'dane-2', 'dane-3', 'dane-4']
 <div class="callout-body-container callout-body">
 <ul>
 <li><strong><code>gather</code></strong> - domyślny wybór. Krótszy kod, jasna semantyka „uruchom te korutyny i daj mi wszystkie wyniki”.</li>
-<li><strong><code>create_task</code></strong> - gdy potrzebujesz fine-grained kontroli: rejestracja zadań w trakcie pracy programu (nie z góry), task-i „fire and forget” (rejestracja bez <code>await</code>), kombinacja <code>await</code> z timeoutem (<code>asyncio.wait_for(task, timeout=5)</code>).</li>
+<li><strong><code>create_task</code></strong> - gdy potrzebujesz drobiazgowej kontroli: rejestracja zadań w trakcie pracy programu (nie z góry), kombinacja <code>await</code> z timeoutem (<code>asyncio.wait_for(task, timeout=5)</code>).</li>
 </ul>
 <p>W praktyce w tym kursie używamy <code>gather</code>. Pokazujemy <code>create_task</code>, żeby wiedzieć, że <code>gather</code> to skrót dla wzorca „create_task wszystkich + await wszystkich”.</p>
 </div>
@@ -735,7 +735,7 @@ Wyniki: ['dane-0', 'dane-1', 'dane-2', 'dane-3', 'dane-4']
 <ol type="1">
 <li>Czy print <code>[w main] Tasks zarejestrowane</code> pojawia się <strong>przed</strong> czy <strong>po</strong> printach <code>START</code>? Co to mówi o tym, kiedy task-i zaczynają faktycznie biegnąć?</li>
 <li>Co by się stało, gdybyś usunął całą sekcję <code>wyniki = [await t for t in tasks]</code> (lub jak to zapisałeś)? Spróbuj. (Wskazówka: <code>asyncio.run</code> zamknie event loop po zakończeniu <code>main</code>, a zarejestrowane task-i nie zdążą się wykonać - dostaniesz ostrzeżenie o anulowanych zadaniach.)</li>
-<li>Czy potrafisz zapisać <code>wyniki</code> przez <strong>list comprehension</strong>, używając <code>await</code> wewnątrz? (To poprawna składnia: <code>[await t for t in tasks]</code>. <code>await</code> w comprehensji jest dozwolony tylko wewnątrz <code>async def</code>.)</li>
+<li>Czy potrafisz zapisać <code>wyniki</code> przez <strong>list comprehension</strong>, używając <code>await</code> wewnątrz? (To poprawna składnia: <code>[await t for t in tasks]</code>. <code>await</code> w wyrażeniu listowym jest dozwolony tylko wewnątrz <code>async def</code>.)</li>
 </ol>
 </div>
 </div>
@@ -785,7 +785,7 @@ Wyniki: ['dane-0', 'dane-1', 'dane-2', 'dane-3', 'dane-4']
 
 Łącznie: 5.01s</code></pre>
 <p>Wszystko jak w Ćwiczeniu 1 - <code>async def</code>, <code>await</code>, <code>gather</code> - ale <strong>wynik dokładnie taki sam jak w pętli sekwencyjnej z Demonstracji 2</strong>.</p>
-<p>Dlaczego? <code>time.sleep(1)</code> jest funkcją <strong>synchroniczną</strong>. Nie zawiera żadnego <code>await</code>. Nie ma punktu zawieszenia. Z perspektywy event loopu wygląda to jak długie obliczenie, którego nie ma jak przerwać. Cały event loop <strong>stoi</strong> przez tę sekundę. Inne korutyny czekają na swoją kolej.</p>
+<p>Dlaczego? <code>time.sleep(1)</code> jest funkcją <strong>synchroniczną</strong>, wywołanie <code>time.sleep(1)</code> nie zwraca korutyny. Nie zawiera żadnego <code>await</code>, nie ma punktu zawieszenia. Z perspektywy event loopu wygląda to jak długie obliczenie, którego nie ma jak przerwać. Cały event loop <strong>stoi</strong> przez tę sekundę. Inne korutyny czekają na swoją kolej.</p>
 <p>Dopóki któraś korutyna nie napotka prawdziwego <code>await</code> na czymś asynchronicznym (<code>asyncio.sleep</code>, <code>client.get</code>, <code>aiofiles.read</code>), event loop nie ma okazji przełączyć się na inną.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -793,7 +793,7 @@ Wyniki: ['dane-0', 'dane-1', 'dane-2', 'dane-3', 'dane-4']
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Warning</span>Reguła kciuka
+<span class="screen-reader-only">Warning</span>Zasada ogólna
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -848,7 +848,7 @@ Wyniki: ['dane-0', 'dane-1', 'dane-2', 'dane-3', 'dane-4']
 </section>
 <section id="ćwiczenie-3-pierwszy-async-http" class="level1" data-number="9">
 <h1 data-number="9"><span class="header-section-number">9</span> Ćwiczenie 3: pierwszy async HTTP</h1>
-<p>Wszystko, co dotąd zrobiliśmy, działało na <code>asyncio.sleep</code> - symulowanym opóźnieniu w jednym procesie. Teraz pojadą prawdziwe żądania sieciowe do serwera Flask. Wzorzec pozostaje <strong>identyczny</strong> jak w Ćwiczeniu 1, podmieniamy tylko <code>asyncio.sleep</code> na <code>client.get</code>.</p>
+<p>Wszystko, co dotąd zrobiliśmy, działało na <code>asyncio.sleep</code> - symulowanym opóźnieniu w jednym procesie. Teraz wykonamy prawdziwe żądania sieciowe do serwera Flask. Wzorzec pozostaje <strong>identyczny</strong> jak w Ćwiczeniu 1, podmieniamy tylko <code>asyncio.sleep</code> na <code>client.get</code>.</p>
 <section id="krok-0-serwer" class="level2" data-number="9.1">
 <h2 data-number="9.1" class="anchored" data-anchor-id="krok-0-serwer"><span class="header-section-number">9.1</span> Krok 0: serwer</h2>
 <p>W folderze <code>lab9/</code> utwórz plik <code>app.py</code> (skopiuj poniższy kod):</p>
