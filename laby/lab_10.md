@@ -40,8 +40,6 @@ pip install flask httpx
 Jeśli pracownia resetuje pakiety między sesjami, zainstaluj ponownie. Nic nowego w stosunku do Lab 9 - `httpx` już znasz.
 :::
 
-Skopiuj `app.py` z folderu `lab9/` do `lab10/`. Za chwilę go rozszerzymy.
-
 Każdy krok labu trafia do osobnego pliku (`demo1.py`, `cw1.py`, `cw5.py` itd.). Konwencja ta sama co w Lab 9.
 
 ---
@@ -69,7 +67,7 @@ Pierwsze pół labu spędzimy na motywie „kontrola współbieżności" (Demons
 
 Dorzucamy do `app.py` trzy nowe endpointy. Każdy izoluje jedno zjawisko, które będziemy badać.
 
-Otwórz `lab10/app.py` (skopiowany z Lab 9) i zastąp jego zawartość poniższym kodem:
+Otwórz `lab10/app.py` i wstaw poniższy kod:
 
 ```python
 # app.py - serwer dla Lab 10
