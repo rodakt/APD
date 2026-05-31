@@ -836,361 +836,102 @@
     ]
   },
   {
-    "objectID": "laby/lab_1.html",
-    "href": "laby/lab_1.html",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "objectID": "laby/lab_10.html",
+    "href": "laby/lab_10.html",
+    "title": "Lab 10: Async HTTP w praktyce",
     "section": "",
-    "text": "Zakres materiału:\n\nWysyłanie żądań HTTP do publicznego API i odbieranie odpowiedzi,\nRozpoznawanie w odpowiedzi kodu statusu, nagłówków i ciała (JSON),\nDiagnostyka HTTP z poziomu wiersza poleceń (curl),\nKorzystanie z interaktywnej dokumentacji API (Swagger),\nPoruszanie się po strukturze JSON:API: listy, obiekty, pola data, attributes, links,\nPobranie realnego pliku danych z API i zapis wyników do JSON.\n\nNarzędzia: Python (requests), curl, przeglądarka.",
+    "text": "W Lab 9 zobaczyłeś, że async daje ~10× przyspieszenie na dziesięciu żądaniach. Dziś sprawdzimy, co się dzieje, gdy żądań jest sto, niektóre się sypią, a niektóre wiszą. Innymi słowy: przechodzimy z „działa” do „działa w praktyce”.\nZakres materiału:\n\nskala bez kontroli - co dzieje się przy naiwnym gather na ~100 żądaniach,\nasyncio.Semaphore jako standardowy ogranicznik współbieżności po stronie klienta,\nlimit po stronie serwera - czego klient nie kontroluje,\ndwie strategie obsługi błędów w gather: return_exceptions=True vs try/except w korutynie,\ntimeouty w httpx - dlaczego są nieodzowne w pracy z Semaphore,\nas_completed - przetwarzanie wyników w miarę spływania, z raportowaniem postępu,\npełen pipeline: pobranie wielu żądań z kontrolą współbieżności, timeoutem, obsługą błędów, zapisem sukcesów i porażek do osobnych plików oraz końcowym raportem.\n\nNarzędzia: Python (asyncio, httpx, Flask), VSCode.",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
+      "Lab 10: Async HTTP w praktyce"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#portal-i-api",
-    "href": "laby/lab_1.html#portal-i-api",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "2.1 Portal i API",
-    "text": "2.1 Portal i API\ndane.gov.pl to polski portal otwartych danych publicznych. Publikuje zbiory danych (datasety) udostępniane przez instytucje państwowe — od jakości powietrza, przez rejestry szkół, po rozkłady jazdy.\nPortal udostępnia API (Application Programming Interface) — interfejs, przez który program komputerowy może pobierać te same dane, które widzisz na stronie, ale w formacie nadającym się do automatycznego przetwarzania (JSON zamiast HTML).\nAdres bazowy API: https://api.dane.gov.pl/1.4\nNumer 1.4 to wersja API. Gdyby się zmieniła, wystarczy podmienić go w jednym miejscu.",
+    "objectID": "laby/lab_10.html#krok-a-szkielet-skryptu",
+    "href": "laby/lab_10.html#krok-a-szkielet-skryptu",
+    "title": "Lab 10: Async HTTP w praktyce",
+    "section": "7.1 Krok A: szkielet skryptu",
+    "text": "7.1 Krok A: szkielet skryptu\nUtwórz plik cw1.py:\nimport asyncio\nimport sys\nimport time\n\nimport httpx\n\nBASE = \"http://127.0.0.1:5000\"\nN = 40\nSTART = None\n\n\nasync def fetch_page(client, page, sem):\n    # 1. Wewnątrz async with sem: wykonaj GET na /limited/&lt;page&gt;,\n    #    sprawdź status, zwróć r.json().\n    # --- Twój kod ---\n    ...\n\n\nasync def main(limit):\n    sem = asyncio.Semaphore(limit)\n    async with httpx.AsyncClient() as client:\n        # 2. Stwórz listę N korutyn fetch_page dla zakresu range(N).\n        # 3. Uruchom je przez asyncio.gather i zwróć listę wyników.\n        # --- Twój kod ---\n        ...\n\n\nif __name__ == \"__main__\":\n    limit = int(sys.argv[1])  # LIMIT przekazany z linii poleceń\n    START = time.perf_counter()\n    wyniki = asyncio.run(main(limit))\n    elapsed = time.perf_counter() - START\n    print(f\"limit={limit:3d}  N={N}  czas={elapsed:5.2f}s\")\nUzupełnij szkielet. Wzorzec jest identyczny jak w Demonstracji 2 - jedyna różnica to endpoint (/limited zamiast /data) i limit przekazany z linii poleceń.",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
+      "Lab 10: Async HTTP w praktyce"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#mapa-zasobów-api",
-    "href": "laby/lab_1.html#mapa-zasobów-api",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "2.2 Mapa zasobów API",
-    "text": "2.2 Mapa zasobów API\nAPI dane.gov.pl organizuje dane w hierarchię, którą najłatwiej zrozumieć jako zagnieżdżone kolekcje:\n/datasets                        ← kolekcja: lista wszystkich zbiorów danych\n/datasets/{id}                   ← element: szczegóły jednego zbioru\n/datasets/{id}/resources         ← kolekcja zagnieżdżona: zasoby (pliki) w zbiorze\n/datasets/{id}/resources/{rid}   ← element: metadane jednego zasobu\nPrzykładowo:\n\nGET /1.4/datasets?page=1&per_page=5 — pobierz pierwszych 5 zbiorów (kolekcja, stronicowana),\nGET /1.4/datasets/830 — pobierz szczegóły zbioru o id = 830,\nGET /1.4/datasets/830/resources — pobierz listę zasobów zbioru 830.",
+    "objectID": "laby/lab_10.html#krok-b-pomiar-przy-różnych-n",
+    "href": "laby/lab_10.html#krok-b-pomiar-przy-różnych-n",
+    "title": "Lab 10: Async HTTP w praktyce",
+    "section": "7.2 Krok B: pomiar przy różnych N",
+    "text": "7.2 Krok B: pomiar przy różnych N\nUruchom skrypt z różnymi limitami:\npython cw1.py 2\npython cw1.py 4\npython cw1.py 8\npython cw1.py 16\npython cw1.py 40\nWypełnij poniższą tabelkę uzyskanymi czasami:\n\n\n\nlimit po stronie klienta\nspodziewany czas\ntwój czas\n\n\n\n\n2\n~20 s\n…\n\n\n4\n~10 s\n…\n\n\n8\n~5 s\n…\n\n\n16\n~5 s\n…\n\n\n40\n~5 s\n…",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
+      "Lab 10: Async HTTP w praktyce"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#format-odpowiedzi-jsonapi",
-    "href": "laby/lab_1.html#format-odpowiedzi-jsonapi",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "2.3 Format odpowiedzi: JSON:API",
-    "text": "2.3 Format odpowiedzi: JSON:API\nAPI dane.gov.pl używa standardu JSON:API (specyfikacja: jsonapi.org). W praktyce oznacza to, że odpowiedzi mają stałą strukturę:\n{\n  \"data\": [\n    {\n      \"id\": \"830\",\n      \"type\": \"dataset\",\n      \"attributes\": {\n        \"title\": \"Wykaz szkół i placówek oświatowych\",\n        \"notes\": \"Rejestr Szkół i Placówek Oświatowych ...\",\n        \"category\": \"Education\",\n        \"modified\": \"2025-01-15T10:32:00Z\"\n      },\n      \"relationships\": { ... },\n      \"links\": {\n        \"self\": \"https://api.dane.gov.pl/1.4/datasets/830\"\n      }\n    },\n    ...\n  ],\n  \"links\": {\n    \"self\":  \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=5\",\n    \"next\":  \"https://api.dane.gov.pl/1.4/datasets?page=2&per_page=5\",\n    \"last\":  \"https://api.dane.gov.pl/1.4/datasets?page=...\"\n  },\n  \"meta\": {\n    \"count\": 12345\n  }\n}\nCo warto zapamiętać:\n\ndata — lista (lub pojedynczy obiekt) z wynikami; to jest główna część odpowiedzi,\nid i type — identyfikator i typ zasobu,\nattributes — słownik z właściwymi danymi (tytuł, opis, kategoria itd.),\nlinks — adresy do nawigacji (stronicowanie, powiązane zasoby),\nmeta — metadane (np. łączna liczba wyników).\n\nNagłówek Accept: application/vnd.api+json informuje serwer, że klient oczekuje odpowiedzi w formacie JSON:API. Jeśli go nie podasz, serwer dane.gov.pl i tak zwróci JSON — ale dobrą praktyką jest podawać go jawnie.",
+    "objectID": "laby/lab_10.html#krok-c-wniosek",
+    "href": "laby/lab_10.html#krok-c-wniosek",
+    "title": "Lab 10: Async HTTP w praktyce",
+    "section": "7.3 Krok C: wniosek",
+    "text": "7.3 Krok C: wniosek\nSpodziewany kształt krzywej:\n\nod limit=1 do limit=8 czas maleje odwrotnie proporcjonalnie - każda dodatkowa współbieżność po stronie klienta przekłada się na proporcjonalne przyspieszenie.\nod limit=8 wzwyż czas przestaje maleć - utyka w okolicach 5 s i tam zostaje, niezależnie od tego, czy klient próbuje 16, 40 czy 100 jednoczesnych żądań.\n\nLiczba 8 nie jest tu przypadkiem. Tyle pozwala SERVER_SEM po stronie serwera. Dla limit ≤ 8 to klient jest „wąskim gardłem” - serwer ma miejsce dla wszystkich, czekanie wynika z tego, że klient nie wysyła więcej. Dla limit &gt; 8 to serwer jest wąskim gardłem - klient wysyła 16 żądań, serwer przyjmuje 8, pozostałe 8 czeka w kolejce serwerowej i klient nic z tym nie zrobi.\n\n\n\n\n\n\nWarningTwój Semaphore to twoja decyzja, nie cudzy limit\n\n\n\nSemaphore(16) w kliencie nie sprawia, że serwer obsłuży 16 jednoczesnych żądań. Sprawia tylko, że klient wysyła 16. Decyzja, ile faktycznie obsłużyć, należy do serwera - i bywa wyrażana subtelnie: opóźnieniem, kodem 429, blokadą.\nW praktyce: dobieraj Semaphore niżej niż twoje podejrzenia o pojemność serwera, nie wyżej. Marża bezpieczeństwa kosztuje sekundy; jej brak kosztuje blokadę IP.\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nCzy twoja tabelka pokazuje kolano w okolicach limit=8? Jeśli kolano jest gdzie indziej - sprawdź, czy w app.py rzeczywiście jest SERVER_SEM = threading.Semaphore(8).\nDlaczego limit=2 i limit=4 dają liniowe przyspieszenie, a limit=16 i limit=40 daje to samo co limit=8? Sformułuj odpowiedź własnymi słowami, używając słów „klient”, „serwer”, „kolejka”.\nW realnym scrapingu nie widzisz SERVER_SEM w kodzie cudzego serwera. Jak praktycznie wyznaczyć dobry limit? (Wskazówka: zacznij od małej liczby i zwiększaj, dopóki czas maleje - moment, w którym przestaje maleć, jest twoim szczytem.)",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
+      "Lab 10: Async HTTP w praktyce"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#dokumentacja-interaktywna-swagger",
-    "href": "laby/lab_1.html#dokumentacja-interaktywna-swagger",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "2.4 Dokumentacja interaktywna (Swagger)",
-    "text": "2.4 Dokumentacja interaktywna (Swagger)\nAPI dane.gov.pl ma dokumentację Swagger pod adresem:\n\nhttps://api.dane.gov.pl/doc\n\nSwagger UI to interaktywna strona, na której możesz:\n\nprzeglądać listę endpointów (pogrupowanych tematycznie),\nsprawdzić jakie parametry przyjmuje dany endpoint,\nwypróbować zapytanie bezpośrednio w przeglądarce (przycisk Try it out → Execute).\n\n\n2.4.1 Czytanie Swaggera\nOtwórz w przeglądarce https://api.dane.gov.pl/doc i wykonaj po kolei:\n\nZnajdź sekcję dotyczącą Datasets.\nRozwiń endpoint GET /1.4/datasets.\nPrzejrzyj listę parametrów. Zwróć uwagę na:\n\npage — numer strony,\nper_page — liczba wyników na stronę,\nq — fraza wyszukiwania,\nsort — kryterium sortowania.\n\nKliknij Try it out.\nUstaw per_page na 2, wyczyść pozostałe pola, jeśli Swagger coś w nich dopisał automatycznie (zobacz uwagę poniżej).\nKliknij Execute.\nW sekcji Response body zobaczysz odpowiedź JSON. Zwróć uwagę na strukturę data → [{ id, type, attributes }].\nW sekcji Curl Swagger pokaże polecenie curl:\n\njeśli jest bardzo długie (z parametrami typu id[gt], id[lt], title[...], description[...] itd.), potraktuj je jako „szablon” i usuń z URL-a wszystkie te automatycznie dodane filtry, zostawiając tylko to, co ustawiłeś ręcznie (np. page i per_page).\n\n\n\n\n\n\n\n\nWarningUwaga dotycząca Swaggera\n\n\n\nSwagger często wypełnia „pusty formularz” przykładowymi wartościami we wszystkich polach naraz (zwłaszcza tam, gdzie parametr jest obiektem filtrów typu term/terms/gt/lt/gte/lte/...). To jest artefakt UI, nie wymaganie API. W praktyce zostawiasz tylko te pola, których faktycznie chcesz użyć (zwykle: page, per_page; ewentualnie jeden operator na pole).\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy widzisz pole data z listą obiektów? Czy potrafisz wskazać id i title pierwszego datasetu? Zapisz sobie jedno id — przyda się za chwilę.",
+    "objectID": "laby/lab_10.html#krok-a-return_exceptionstrue",
+    "href": "laby/lab_10.html#krok-a-return_exceptionstrue",
+    "title": "Lab 10: Async HTTP w praktyce",
+    "section": "9.1 Krok A: return_exceptions=True",
+    "text": "9.1 Krok A: return_exceptions=True\nUtwórz plik cw2a.py:\nimport asyncio\nimport time\n\nimport httpx\n\nBASE = \"http://127.0.0.1:5000\"\nN = 20\nSTART = None\n\n\nasync def fetch_page(client, page):\n    r = await client.get(f\"{BASE}/flaky/{page}\")\n    r.raise_for_status()\n    return r.json()\n\n\nasync def main():\n    async with httpx.AsyncClient() as client:\n        coros = [fetch_page(client, p) for p in range(N)]\n        # 1. Wywołaj asyncio.gather z parametrem return_exceptions=True.\n        #    Dzięki temu gather nie przerwie się na wyjątkach -\n        #    zwróci je w liście wyników na odpowiadających pozycjach.\n        # --- Twój kod ---\n        return ...\n\n\nSTART = time.perf_counter()\nwyniki = asyncio.run(main())\nelapsed = time.perf_counter() - START\n\n# 2. Rozdziel wyniki na sukcesy i porażki.\n#    Wyniki to lista długości N. Element na pozycji i odpowiada żądaniu o page=i.\n#    Jeśli element jest instancją Exception - to była porażka.\n#    W przeciwnym razie - sukces (dict z polami page, items).\nsukcesy = ...    # --- Twój kod ---\nporazki = ...    # --- Twój kod ---\n\n# 3. Wypisz raport:\n#    - łączny czas,\n#    - liczbę sukcesów i liczbę porażek,\n#    - dla każdej porażki: numer strony i typ wyjątku.\n# --- Twój kod ---\nUruchom. Spodziewany wynik:\nCzas: 1.05s   sukcesy: 14   porażki: 6\nPorażka page=2 : HTTPStatusError\nPorażka page=5 : HTTPStatusError\nPorażka page=11: HTTPStatusError\n...\nKonkretne liczby (14 vs 6) będą się różnić - są losowe. Ważne, że wszystkie 20 żądań doszło do skutku i mamy zarówno udane wyniki, jak i informację, czego nie udało się pobrać.\n\n\n\n\n\n\nTipreturn_exceptions=True - mocne i słabe strony\n\n\n\nPlusy:\n\nminimalna zmiana w stosunku do naiwnego gather. Jeden parametr i pętla rozdzielająca wyniki.\nzachowuje korespondencję pozycyjną - element na pozycji i odpowiada żądaniu i. Łatwo połączyć wyniki z wejściowymi parametrami.\n\nMinusy\n\ntyp elementów listy jest zmienny - albo dict, albo Exception. Każdy kod, który chce z tego korzystać, musi sprawdzić isinstance.\ntrudno przekazać dodatkową informację o tym, co dokładnie zawiodło. Wyjątek niesie tylko stack trace; jeśli chcesz wiedzieć, której strony dotyczył, musisz patrzeć na pozycję na liście.",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
+      "Lab 10: Async HTTP w praktyce"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#przygotowanie",
-    "href": "laby/lab_1.html#przygotowanie",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.1 Przygotowanie",
-    "text": "3.1 Przygotowanie\nSprawdź, czy masz curl (w terminalu / PowerShell):\ncurl --version\n\n\n\n\n\n\nWarningUwaga dotycząca Windows\n\n\n\nJeśli pracujesz w PowerShell, wpisz curl.exe zamiast curl. Samo curl w PowerShell bywa aliasem do Invoke-WebRequest — zupełnie innego programu. Jeśli widzisz błąd wspominający o Invoke-WebRequest, to właśnie ten przypadek.",
+    "objectID": "laby/lab_10.html#krok-b-tryexcept-w-korutynie",
+    "href": "laby/lab_10.html#krok-b-tryexcept-w-korutynie",
+    "title": "Lab 10: Async HTTP w praktyce",
+    "section": "9.2 Krok B: try/except w korutynie",
+    "text": "9.2 Krok B: try/except w korutynie\nDruga strategia: ucz korutynę zwracać dict z polem \"status\", niezależnie od tego, czy żądanie się udało.\nUtwórz plik cw2b.py:\nimport asyncio\nimport time\n\nimport httpx\n\nBASE = \"http://127.0.0.1:5000\"\nN = 20\nSTART = None\n\n\nasync def fetch_page(client, page):\n    \"\"\"Zawsze zwraca dict. Nigdy nie rzuca wyjątku.\"\"\"\n    # 1. Wewnątrz try wykonaj GET na /flaky/&lt;page&gt;, sprawdź status,\n    #    zwróć słownik o kształcie:\n    #      {\"status\": \"ok\", \"page\": page, \"data\": r.json()}\n    # 2. W except httpx.HTTPStatusError zwróć słownik:\n    #      {\"status\": \"err\", \"page\": page, \"error\": \"HTTP_\" + str(e.response.status_code)}\n    #    (Inne typy błędów też można łapać - np. httpx.RequestError - na tę chwilę\n    #    /flaky rzuca tylko HTTPStatusError.)\n    # --- Twój kod ---\n    ...\n\n\nasync def main():\n    async with httpx.AsyncClient() as client:\n        coros = [fetch_page(client, p) for p in range(N)]\n        return await asyncio.gather(*coros)\n\n\nSTART = time.perf_counter()\nwyniki = asyncio.run(main())\nelapsed = time.perf_counter() - START\n\n# 3. Rozdziel wyniki przez kolejną zwykłą iterację - już bez isinstance,\n#    bo wszystkie elementy to dict-y. Filtrujesz po kluczu \"status\":\nsukcesy = [r for r in wyniki if r[\"status\"] == \"ok\"]\nporazki = [r for r in wyniki if r[\"status\"] == \"err\"]\n\nprint(f\"Czas: {elapsed:.2f}s   sukcesy: {len(sukcesy)}   porażki: {len(porazki)}\")\nfor p in porazki:\n    print(f\"  page={p['page']:2d}  {p['error']}\")\nUruchom. Wynik jest tej samej postaci co w cw2a - inne dokładne liczby, ten sam kształt:\nCzas: 1.04s   sukcesy: 13   porażki: 7\n  page= 1  HTTP_500\n  page= 4  HTTP_500\n  ...\n\n\n\n\n\n\nTiptry/except w korutynie - mocne i słabe strony\n\n\n\nPlusy:\n\nwszystkie wyniki są tego samego typu. Kod, który je przetwarza, nie musi się rozglądać za wyjątkami.\nkorutyna ma kontekst (parametry wywołania), więc może wpisać do wyniku rzeczowe informacje - numer strony, URL, typ błędu, kod statusu. Wyjątek sam z siebie tego nie zawiera.\nłatwo dodać logikę pośrednią - np. retry przed zwróceniem porażki, ograniczenie tekstu błędu, normalizację formatu.\n\nMinus: korutyna musi wiedzieć, że ma „nie psuć”. Łatwo zapomnieć i puścić nowy typ wyjątku, którego nie złapie nasz except. Wtedy gather go znowu propaguje - i wracamy do Demonstracji 3.\n\n\n\n\n\n\n\n\nNoteKiedy co\n\n\n\nReguła praktyczna z tego labu:\n\nreturn_exceptions=True - prototyp, eksperymentowanie, jednorazowe skrypty. Krótszy kod.\ntry/except w korutynie - kod produkcyjny, długie pipelines, wiele etapów przetwarzania. Lepsza struktura wyników.\n\nW Ćwiczeniu 5 używamy wariantu drugiego - bo nasz pipeline ma raport końcowy z konkretnymi numerami stron, kategoriami błędów itd. Wymagałoby to dwukrotnie tyle kodu z return_exceptions=True.\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nCzy w obu wariantach cw2a i cw2b liczba sukcesów + liczba porażek to dokładnie N = 20? Powinno tak być.\nW cw2b - co się stanie, gdy serwer dorzuci nowy typ błędu, którego twój except nie łapie (np. httpx.RequestError przy zerwanym połączeniu)? Wypróbuj: w app.py zmień jeden z endpointów na return jsonify({\"error\": \"x\"}), 503, dodaj do fetch_page except httpx.HTTPStatusError i sprawdź, czy korutyna nadal nie wpada w nieprzewidziany wyjątek.\nSpróbuj rozszerzyć cw2b o pole \"latency\" - mierzony w korutynie czas wykonania pojedynczego żądania. Sukcesy i porażki powinny mieć to pole. Czy znacznie zmieniłeś strukturę kodu? (Powinno być proste - try/except w korutynie ma cały lokalny kontekst do dyspozycji.)",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
+      "Lab 10: Async HTTP w praktyce"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#nagłówki-ciało-odpowiedzi",
-    "href": "laby/lab_1.html#nagłówki-ciało-odpowiedzi",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.2 Nagłówki + ciało odpowiedzi",
-    "text": "3.2 Nagłówki + ciało odpowiedzi\nFlaga -i wyświetla nagłówki odpowiedzi razem z ciałem:\ncurl -i \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2\"\nNa ekranie zobaczysz coś w rodzaju:\nHTTP/2 200\ncontent-type: application/vnd.api+json\n...\n\n{\"data\":[{\"id\":\"...\", ...}], ...}\n\n\n\n\n\n\nNote\n\n\n\nWidzisz linię statusu (HTTP/2 200), nagłówki odpowiedzi (w tym content-type), pustą linię, a potem ciało odpowiedzi (JSON). To jest dokładnie struktura odpowiedzi HTTP z wykładu.",
+    "objectID": "laby/lab_10.html#ćwiczenie-a-krzywa-wydajności",
+    "href": "laby/lab_10.html#ćwiczenie-a-krzywa-wydajności",
+    "title": "Lab 10: Async HTTP w praktyce",
+    "section": "13.1 Ćwiczenie A: krzywa wydajności",
+    "text": "13.1 Ćwiczenie A: krzywa wydajności\nNapisz skrypt cwA_krzywa.py, który:\n\nDla N = 100 żądań do /data mierzy czas wykonania przy LIMIT ∈ {1, 2, 5, 10, 20, 50, 100}.\nWypisuje tabelkę: limit | czas | przyspieszenie vs limit=1.\nKomentuje wynikową krzywą jednym zdaniem - od którego momentu dalsze zwiększanie LIMIT nie daje przyspieszenia, i dlaczego.\n\nPowtórz to samo dla /limited. Jakie są dwie różnice w kształcie krzywej?",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
+      "Lab 10: Async HTTP w praktyce"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#tryb-diagnostyczny",
-    "href": "laby/lab_1.html#tryb-diagnostyczny",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.3 Tryb diagnostyczny",
-    "text": "3.3 Tryb diagnostyczny\nFlaga -v (verbose) pokazuje też żądanie, które wysłał twój klient:\ncurl -v \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\"\nW trybie -v curl oznacza różne typy linii prefiksami:\n\nLinie zaczynające się od * to informacje diagnostyczne klienta (np. rozwiązywanie DNS, TLS handshake).\nLinie zaczynające się od &gt; to żądanie wysyłane przez ciebie (linia GET ... oraz nagłówki żądania).\nLinie zaczynające się od &lt; to odpowiedź serwera (status i nagłówki odpowiedzi).\n\nUwaga: ciało odpowiedzi (np. JSON) pojawia się jako zwykły tekst bez prefiksów — jest wypisywane na standardowe wyjście, podczas gdy log -v idzie na standardowy błąd.",
+    "objectID": "laby/lab_10.html#ćwiczenie-b-async-retry-z-backoffem",
+    "href": "laby/lab_10.html#ćwiczenie-b-async-retry-z-backoffem",
+    "title": "Lab 10: Async HTTP w praktyce",
+    "section": "13.2 Ćwiczenie B: async retry z backoffem",
+    "text": "13.2 Ćwiczenie B: async retry z backoffem\nW Lab 2 napisałeś fetch_with_retry w wersji synchronicznej - z requests, time.sleep i pętlą for attempt in range(max_attempts). Przenieś ten sam wzorzec do asyncio.\nNapisz korutynę fetch_with_retry_async(client, url, max_attempts=3, base_delay=0.5), która:\n\nPróbuje pobrać url przez client.\nPrzy błędzie 5xx lub timeoucie ponawia próbę z opóźnieniem base_delay * 2 ** attempt (await asyncio.sleep, nie time.sleep!).\nPrzy błędzie 4xx (poza 429) nie ponawia - to są błędy klienta, nie poprawi ich powtórka.\nPo wyczerpaniu prób zwraca strukturalny błąd jak w Ćw 5.\n\nTest: pobierz 50 razy /flaky z Semaphore(8), TIMEOUT=2.0, max_attempts=3. Powinno udać się prawie wszystko - prawdopodobieństwo, że trzy kolejne próby z rzędu padną, to \\(0.3^3 \\approx 2.7\\%\\), czyli statystycznie 1-2 trwałe porażki na 50.",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
+      "Lab 10: Async HTTP w praktyce"
     ]
   },
   {
-    "objectID": "laby/lab_1.html#ćwiczenie-odczytywanie-surowego-http",
-    "href": "laby/lab_1.html#ćwiczenie-odczytywanie-surowego-http",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.4 Ćwiczenie: odczytywanie surowego HTTP",
-    "text": "3.4 Ćwiczenie: odczytywanie surowego HTTP\nWykonaj polecenie:\ncurl -v \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\" 2&gt;&1 | head -30\n(2&gt;&1 łączy oba strumienie, żeby head mógł ograniczyć wyjście.)\nOdpowiedz na pytania:\n\nJaka metoda HTTP została użyta? (szukaj w liniach &gt;)\nJaki nagłówek Host wysłał twój klient?\nJaki kod statusu zwrócił serwer? (szukaj w liniach &lt;)\nJaki content-type ma odpowiedź?",
+    "objectID": "laby/lab_10.html#ćwiczenie-c-async-pipeline-na-realnym-api",
+    "href": "laby/lab_10.html#ćwiczenie-c-async-pipeline-na-realnym-api",
+    "title": "Lab 10: Async HTTP w praktyce",
+    "section": "13.3 Ćwiczenie C: async pipeline na realnym API",
+    "text": "13.3 Ćwiczenie C: async pipeline na realnym API\nWróć do Labu 2 i przepisz fetch_all_datasets w wersji async, używając httpx.AsyncClient zamiast requests. Przygotuj się na trzy decyzje:\n\nSemaphore. Dane są publiczne, ale serwer (api.dane.gov.pl) jest produkcyjny - nie nasz. Zacznij od Semaphore(5). Wyżej nie idź bez bardzo dobrego powodu.\nTimeout. Realny serwer bywa wolniejszy niż lokalny - daj TIMEOUT = 10.0 jako wyjściowe ustawienie.\nStronicowanie. W Labie 2 stronicowanie było sekwencyjne („pobierz stronę, zerknij na links.next, pobierz następną”). W async to się psuje: nie wiemy, ilu stron jest, dopóki nie pobierzemy pierwszej. Strategia mieszana: pobierz stronę 1 sekwencyjnie, sprawdź meta.total, oblicz liczbę stron, pozostałe pobierz przez gather.\n\nPorównaj czas wersji sync (Lab 2) z async. Spodziewaj się przyspieszenia proporcjonalnego do liczby stron (Semaphore może ograniczyć - to celowe, nie zwiększaj).\nTo jest jedyne ćwiczenie tego labu, które wychodzi poza lokalny serwer. Argumentacja: API dane.gov.pl jest publiczne, znane z Labu 1-2 i wytrzymuje rozsądną liczbę zapytań. Semaphore(5) jest tu gwarantem grzeczności.",
     "crumbs": [
       "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#head-same-nagłówki-bez-ciała",
-    "href": "laby/lab_1.html#head-same-nagłówki-bez-ciała",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.5 HEAD — same nagłówki, bez ciała",
-    "text": "3.5 HEAD — same nagłówki, bez ciała\nFlaga -I wysyła żądanie HEAD — serwer zwraca tylko nagłówki, bez ciała odpowiedzi. Przydatne, gdy chcesz sprawdzić typ lub rozmiar zasobu przed jego pobraniem.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#ćwiczenie-żądanie-head",
-    "href": "laby/lab_1.html#ćwiczenie-żądanie-head",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.6 Ćwiczenie: żądanie HEAD",
-    "text": "3.6 Ćwiczenie: żądanie HEAD\nSprawdź to żądanie. Czy wszystko jest OK?\ncurl -I \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\"",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#ćwiczenie-head-vs-get",
-    "href": "laby/lab_1.html#ćwiczenie-head-vs-get",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.7 Ćwiczenie: HEAD vs GET",
-    "text": "3.7 Ćwiczenie: HEAD vs GET\nWykonaj dwa polecenia i porównaj wyniki:\ncurl -I \"https://httpbin.org/json\"\ncurl -i \"https://httpbin.org/json\"\nOdpowiedz:\n\nCzy kod statusu jest taki sam w obu przypadkach?\nCzy content-type jest taki sam?\nKtóre polecenie nie zwróciło ciała odpowiedzi?\nW jakiej sytuacji HEAD byłby przydatny?",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#formatowanie-odpowiedzi-json",
-    "href": "laby/lab_1.html#formatowanie-odpowiedzi-json",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.8 Formatowanie odpowiedzi JSON",
-    "text": "3.8 Formatowanie odpowiedzi JSON\ncurl wypisuje JSON w jednej linii — nieczytelnie. Pipe przez python3 -m json.tool formatuje z wcięciami:\ncurl -s \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2\" | python3 -m json.tool | head -40\nFlaga -s wycisza pasek postępu.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#ćwiczenie-parametry-zapytania-i-nagłówki",
-    "href": "laby/lab_1.html#ćwiczenie-parametry-zapytania-i-nagłówki",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "3.9 Ćwiczenie: parametry zapytania i nagłówki",
-    "text": "3.9 Ćwiczenie: parametry zapytania i nagłówki\nWykonaj żądanie z parametrem wyszukiwania i nagłówkiem Accept:\ncurl -s -H \"Accept: application/vnd.api+json\" \\\n  \"https://api.dane.gov.pl/1.4/datasets?q=transport&per_page=3\" \\\n  | python3 -m json.tool | head -30\n\nIle datasetów zwrócił serwer? (policz obiekty w data)\nZmień frazę transport na inną (np. szkoły, powietrze). Czy wyniki się zmieniły?\nUsuń flagę -s i wykonaj ponownie. Co się zmieniło w wyjściu?",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#instalacja-jeśli-potrzeba",
-    "href": "laby/lab_1.html#instalacja-jeśli-potrzeba",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "4.1 Instalacja (jeśli potrzeba)",
-    "text": "4.1 Instalacja (jeśli potrzeba)\nBiblioteka requests jest standardem do wysyłania zapytań HTTP w Pythonie, nie jest jednak częścią biblioteki standardowej, więc może wymagać instalacji:\npip install requests",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#obiekt-response-przypomnienie",
-    "href": "laby/lab_1.html#obiekt-response-przypomnienie",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "4.2 Obiekt Response — przypomnienie",
-    "text": "4.2 Obiekt Response — przypomnienie\nNa wykładzie poznaliśmy bibliotekę requests. Wykonajmy jedno żądanie, żeby przypomnieć kluczowe atrybuty obiektu Response:\nimport requests\n\nr = requests.get(\"https://example.com\", timeout=10)\n\nprint(\"Status:\", r.status_code)        # int, np. 200\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\nprint(\"Treść (100 znaków):\", r.text[:100])\nPełny zestaw atrybutów, z których będziemy korzystać:\n\nr.status_code — kod statusu (int),\nr.headers — słownik nagłówków odpowiedzi,\nr.text — ciało jako tekst (str),\nr.content — ciało jako bajty (bytes),\nr.json() — ciało sparsowane z JSON do dict/list,\nr.url — pełny URL po dołączeniu parametrów.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#httpbin.org-echo-i-symulacja-błędów",
-    "href": "laby/lab_1.html#httpbin.org-echo-i-symulacja-błędów",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "4.3 httpbin.org — echo i symulacja błędów",
-    "text": "4.3 httpbin.org — echo i symulacja błędów\nhttpbin.org to serwis testowy, który „odbija” twoje żądanie — pokazuje, co serwer otrzymał. Przydatny do nauki i debugowania.\nEcho żądania z parametrami i nagłówkami:\nr = requests.get(\n    \"https://httpbin.org/get\",\n    params={\"q\": \"python\", \"page\": 1},\n    headers={\"Accept\": \"application/json\", \"User-Agent\": \"MojSkrypt/1.0\"},\n    timeout=10,\n)\n\nprint(\"Pełny URL:\", r.url)\necho = r.json()\nprint(\"Serwer widzi nagłówki:\", echo[\"headers\"])\nprint(\"Serwer widzi parametry:\", echo[\"args\"])\nZwróć uwagę: requests sam zakoduje parametry i doda ?...&... do URL.\nSymulacja kodów błędów:\nhttpbin potrafi zwrócić dowolny kod statusu — przydatne, żeby przetestować obsługę błędów bez czekania na „prawdziwy” błąd:\nfor code in [200, 301, 404, 500]:\n    r = requests.get(f\"https://httpbin.org/status/{code}\", allow_redirects=False, timeout=10)\n    print(f\"  Żądany kod: {code}, otrzymany: {r.status_code}\")\n\n\n\n\n\n\nTipWażne\n\n\n\nr.json() rzuci wyjątek, jeśli ciało odpowiedzi nie jest poprawnym JSON-em (np. gdy serwer zwrócił HTML ze stroną błędu). Dlatego przed parsowaniem warto sprawdzić r.status_code lub użyć r.raise_for_status().",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#bezpieczny-wzorzec-sprawdzaj-przed-parsowaniem",
-    "href": "laby/lab_1.html#bezpieczny-wzorzec-sprawdzaj-przed-parsowaniem",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "4.4 Bezpieczny wzorzec: sprawdzaj przed parsowaniem",
-    "text": "4.4 Bezpieczny wzorzec: sprawdzaj przed parsowaniem\nr = requests.get(\"https://httpbin.org/json\", timeout=10)\nr.raise_for_status()  # rzuci wyjątek przy 4xx / 5xx\ndata = r.json()\nMetoda raise_for_status() zamienia kody błędów na wyjątek Pythona — dzięki temu nie próbujesz parsować odpowiedzi z błędem.\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nWykonaj requests.get(\"https://httpbin.org/status/418\"). Jaki kod statusu zwrócił serwer? Co się stanie, gdy na tym obiekcie wywołasz raise_for_status()?",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#przygotowanie-katalog-i-funkcja-zapisu",
-    "href": "laby/lab_1.html#przygotowanie-katalog-i-funkcja-zapisu",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "5.1 Przygotowanie: katalog i funkcja zapisu",
-    "text": "5.1 Przygotowanie: katalog i funkcja zapisu\nUtwórz nowy skrypt (np. lab1_api.py). Na początku przygotuj katalog na odpowiedzi i pomocniczą funkcję:\nimport json\nimport requests\nfrom pathlib import Path\n\nAPI = \"https://api.dane.gov.pl/1.4\"\nOUT = Path(\"lab1_output\")\nOUT.mkdir(exist_ok=True)\n\n\ndef save_response(data, filename):\n    \"\"\"Zapisuje odpowiedź JSON do pliku i wypisuje ścieżkę.\"\"\"\n    path = OUT / filename\n    path.write_text(\n        json.dumps(data, ensure_ascii=False, indent=2),\n        encoding=\"utf-8\",\n    )\n    print(f\"Zapisano: {path}\")\nTo jest wzorzec z Lab 0 (json.dumps + pathlib) — teraz używamy go na żywych danych.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#demonstracja-lista-datasetów",
-    "href": "laby/lab_1.html#demonstracja-lista-datasetów",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "5.2 Demonstracja: lista datasetów",
-    "text": "5.2 Demonstracja: lista datasetów\nPobierz pierwszą stronę kolekcji i zapisz do pliku:\nr = requests.get(\n    f\"{API}/datasets\",\n    params={\"page\": 1, \"per_page\": 5},\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\nr.raise_for_status()\n\nsave_response(r.json(), \"datasets_page1.json\")\nUruchom skrypt, a następnie otwórz plik lab1_output/datasets_page1.json w przeglądarce (Firefox i Chrome automatycznie formatują JSON).",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#co-zobaczyć-w-pliku",
-    "href": "laby/lab_1.html#co-zobaczyć-w-pliku",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "5.3 Co zobaczyć w pliku",
-    "text": "5.3 Co zobaczyć w pliku\nPlik ma kilkaset linii. Nie czytaj go całego — szukaj struktury:\nPoziom główny — trzy klucze:\n\n\"data\" — lista obiektów (datasetów). To główna zawartość odpowiedzi.\n\"links\" — adresy do nawigacji. Klucz \"next\" zawiera URL następnej strony wyników. To jest mechanizm stronicowania, którego użyjemy na Lab 2.\n\"meta\" — metadane. Klucz \"count\" mówi, ile jest datasetów łącznie (nie na tej stronie, lecz w całym API).\n\nPojedynczy dataset (element listy \"data\") — zwróć uwagę na:\n\n\"id\" — identyfikator, którego użyjesz w kolejnym zapytaniu,\n\"type\" — zawsze \"dataset\",\n\"attributes\" — słownik z właściwymi danymi: \"title\", \"notes\", \"category\", \"modified\" itd.,\n\"links\" → \"self\" — URL tego konkretnego datasetu.\n\nZapisz sobie id jednego datasetu, który wydaje ci się ciekawy.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#samodzielna-eksploracja-element-i-podzasoby",
-    "href": "laby/lab_1.html#samodzielna-eksploracja-element-i-podzasoby",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "5.4 Samodzielna eksploracja: element i podzasoby",
-    "text": "5.4 Samodzielna eksploracja: element i podzasoby\nMasz id wybranego datasetu. Teraz przejdź dwa kolejne poziomy hierarchii API — dokładnie te, które widziałeś w sekcji „Mapa zasobów API”:\n1. Szczegóły datasetu — endpoint /datasets/{id}\nPobierz szczegóły i zapisz do pliku (np. dataset_{id}.json). Otwórz plik i zwróć uwagę na kluczową różnicę: \"data\" jest teraz słownikiem, nie listą. Dla kolekcji API zwraca listę, dla pojedynczego elementu — obiekt.\n2. Zasoby datasetu — endpoint /datasets/{id}/resources\nPobierz listę zasobów (plików) i zapisz do osobnego pliku. W każdym zasobie znajdź w \"attributes\" pola: \"title\", \"format\", \"download_url\". Jeśli lista zasobów jest pusta — wybierz inny dataset i powtórz.\n\n\n\n\n\n\nTipWskazówka\n\n\n\nWzorzec kodu jest identyczny jak w demonstracji powyżej — zmienia się tylko URL i nazwa pliku wyjściowego. Użyj save_response().\n\n\n3. Podsumowanie na konsoli\nGdy masz już zapisane pliki, wczytaj plik z zasobami i wypisz podsumowanie:\nresources = json.loads(\n    (OUT / \"resources_TWOJE_ID.json\").read_text(encoding=\"utf-8\")\n)\n\nfor res in resources[\"data\"]:\n    attrs = res[\"attributes\"]\n    print(f\"  [{res['id']}] {attrs.get('title', '(bez tytułu)')}\")\n    print(f\"       format: {attrs.get('format', '?')}\")\nTen fragment pokazuje ważny wzorzec: dane zapisane na dysk można wczytać i przetwarzać bez ponownego odpytywania API. To jest kluczowa umiejętność: API → plik → analiza. Dzięki temu nie obciążasz serwera wielokrotnymi zapytaniami, a jednocześnie masz",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#błąd-404-nieistniejący-zasób",
-    "href": "laby/lab_1.html#błąd-404-nieistniejący-zasób",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "6.1 Błąd 404: nieistniejący zasób",
-    "text": "6.1 Błąd 404: nieistniejący zasób\nr = requests.get(\n    f\"{API}/datasets/999999999\",\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\n\nprint(\"Status:\", r.status_code)\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\nprint(\"Treść:\", r.text[:300])\nSerwer powinien zwrócić 404. Zwróć uwagę, że odpowiedź nadal ma ciało — serwer wysyła komunikat o błędzie (zwykle w JSON).",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#co-robi-raise_for_status-przy-404",
-    "href": "laby/lab_1.html#co-robi-raise_for_status-przy-404",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "6.2 Co robi raise_for_status() przy 404?",
-    "text": "6.2 Co robi raise_for_status() przy 404?\ntry:\n    r.raise_for_status()\nexcept requests.exceptions.HTTPError as e:\n    print(\"Wyjątek:\", e)",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#timeout",
-    "href": "laby/lab_1.html#timeout",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "6.3 Timeout",
-    "text": "6.3 Timeout\ntry:\n    r = requests.get(f\"{API}/datasets\", params={\"page\": 1}, timeout=0.001)\nexcept requests.exceptions.Timeout:\n    print(\"Przekroczono limit czasu!\")\nexcept requests.exceptions.RequestException as e:\n    print(\"Inny błąd:\", e)\nUstawiamy absurdalnie krótki timeout (0.001 s), żeby wymusić błąd. W praktyce sensowna wartość to 5–30 sekund.\n\n\n\n\n\n\nTipWzorzec minimalny do zapamiętania\n\n\n\ntry:\n    r = requests.get(url, timeout=10)\n    r.raise_for_status()\n    data = r.json()\nexcept requests.exceptions.Timeout:\n    print(\"Timeout\")\nexcept requests.exceptions.HTTPError as e:\n    print(\"Błąd HTTP:\", e)\nexcept requests.exceptions.RequestException as e:\n    print(\"Błąd połączenia:\", e)\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy umiesz rozróżnić trzy sytuacje: odpowiedź 200 (sukces), odpowiedź 404 (błąd serwera w sensie „nie znaleziono”), wyjątek Timeout (brak odpowiedzi)? To jest kluczowe w automatyzacji.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#zadanie-a-wyszukiwanie-datasetów",
-    "href": "laby/lab_1.html#zadanie-a-wyszukiwanie-datasetów",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "7.1 Zadanie A: wyszukiwanie datasetów",
-    "text": "7.1 Zadanie A: wyszukiwanie datasetów\nW dokumentacji Swagger (https://api.dane.gov.pl/doc) znajdź parametr, który pozwala wyszukiwać datasety po frazie (słowie kluczowym).\n\nWykonaj wyszukiwanie po wybranym słowie (np. \"transport\", \"szkoły\", \"powietrze\").\nWypisz id i title wyników.\nWybierz jeden dataset z wyników i pobierz jego szczegóły (/datasets/{id}).\nPobierz listę zasobów tego datasetu (/datasets/{id}/resources).\nWypisz tytuły i formaty zasobów.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#zadanie-b-porównanie-dwóch-stron-wyników",
-    "href": "laby/lab_1.html#zadanie-b-porównanie-dwóch-stron-wyników",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "7.2 Zadanie B: porównanie dwóch stron wyników",
-    "text": "7.2 Zadanie B: porównanie dwóch stron wyników\n\nPobierz stronę 1 i stronę 2 listy datasetów (np. per_page=5).\nWypisz id datasetów z obu stron.\nSprawdź (programowo lub ręcznie), że zbiory id się nie pokrywają.\nWypisz adres next z linków pierwszej strony i porównaj go z URL-em, który sam skonstruowałeś dla strony 2.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "laby/lab_1.html#zadanie-c-dodatkowe-metadane-zasobów-w-csv",
-    "href": "laby/lab_1.html#zadanie-c-dodatkowe-metadane-zasobów-w-csv",
-    "title": "Lab 1: Klienci HTTP (curl, requests)",
-    "section": "7.3 Zadanie C (dodatkowe): metadane zasobów w CSV",
-    "text": "7.3 Zadanie C (dodatkowe): metadane zasobów w CSV\nAPI dane.gov.pl pozwala pobrać metadane zasobów danego datasetu jako CSV:\nGET /1.4/datasets/{id}/resources/metadata.csv?lang=en\n\nPobierz ten plik za pomocą requests (uwaga: to nie jest JSON, tylko CSV — użyj r.text zamiast r.json()).\nZapisz odpowiedź do pliku .csv.\nWczytaj plik do pandas.DataFrame i wypisz nazwy kolumn.\nZnajdź kolumnę Download URL — zawiera adresy do pobrania realnych plików danych.",
-    "crumbs": [
-      "Laboratoria",
-      "Lab 1: Klienci HTTP (curl, requests)"
-    ]
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Automatyczne pozyskiwanie danych",
-    "section": "",
-    "text": "Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z sieci. Zaczynamy od protokołu HTTP i pracy z API, przechodzimy przez parsowanie HTML i crawling, kończymy na asynchronicznym pobieraniu danych, Scrapy i Selenium.",
-    "crumbs": [
-      "Automatyczne pozyskiwanie danych"
-    ]
-  },
-  {
-    "objectID": "index.html#opis-przedmiotu",
-    "href": "index.html#opis-przedmiotu",
-    "title": "Automatyczne pozyskiwanie danych",
-    "section": "",
-    "text": "Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z sieci. Zaczynamy od protokołu HTTP i pracy z API, przechodzimy przez parsowanie HTML i crawling, kończymy na asynchronicznym pobieraniu danych, Scrapy i Selenium.",
-    "crumbs": [
-      "Automatyczne pozyskiwanie danych"
-    ]
-  },
-  {
-    "objectID": "index.html#wykłady",
-    "href": "index.html#wykłady",
-    "title": "Automatyczne pozyskiwanie danych",
-    "section": "2 Wykłady",
-    "text": "2 Wykłady\n\nWykład 1: HTTP i klienci HTTP\nWykład 2: Serwer HTTP - framework Flask\nWykład 3: HTML jako drzewo — selekcja danych\nWykład 4: Cookies, sesje i formularze\nWykład 5: Asynchroniczność w Pythonie — od intuicji do httpx\nWykład 6: Scrapy — framework do web scrapingu\nWykład 7: Strony dynamiczne — JavaScript, AJAX, Selenium",
-    "crumbs": [
-      "Automatyczne pozyskiwanie danych"
-    ]
-  },
-  {
-    "objectID": "index.html#laboratoria",
-    "href": "index.html#laboratoria",
-    "title": "Automatyczne pozyskiwanie danych",
-    "section": "3 Laboratoria",
-    "text": "3 Laboratoria\n\nLaboratorium 0: Python — odświeżenie podstaw\nLaboratorium 1: HTTP i klienci HTTP\nLaboratorium 2: Nawigacja po API — stronicowanie, pipeline, retry\nLaboratorium 3: Tworzenie serwera HTTP w Flask\nLaboratorium 4: Paginacja HTML i prosty crawler\nLaboratorium 5: Parsowanie HTML — BeautifulSoup i selektory CSS\nLaboratorium 6: Parsowanie HTML — XPath i lxml\nLaboratorium 7: Serwer z sesjami i logowaniem\nLaboratorium 8: Klient z sesją — requests.Session\nLaboratorium 9: Async od zera\nLaboratorium 10: Async HTTP w praktyce",
-    "crumbs": [
-      "Automatyczne pozyskiwanie danych"
-    ]
-  },
-  {
-    "objectID": "index.html#zaliczenie",
-    "href": "index.html#zaliczenie",
-    "title": "Automatyczne pozyskiwanie danych",
-    "section": "4 Zaliczenie",
-    "text": "4 Zaliczenie\n\nWykład: Test pisemny stacjonarny. Brak dostępu do materiałów i elektroniki.\nĆwiczenia: Projekt/zadanie domowe z indywidualną obroną ustną.",
-    "crumbs": [
-      "Automatyczne pozyskiwanie danych"
+      "Lab 10: Async HTTP w praktyce"
     ]
   },
   {
@@ -1535,102 +1276,438 @@
     ]
   },
   {
-    "objectID": "laby/lab_10.html",
-    "href": "laby/lab_10.html",
-    "title": "Lab 10: Async HTTP w praktyce",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Automatyczne pozyskiwanie danych",
     "section": "",
-    "text": "W Lab 9 zobaczyłeś, że async daje ~10× przyspieszenie na dziesięciu żądaniach. Dziś sprawdzimy, co się dzieje, gdy żądań jest sto, niektóre się sypią, a niektóre wiszą. Innymi słowy: przechodzimy z „działa” do „działa w praktyce”.\nZakres materiału:\n\nskala bez kontroli - co dzieje się przy naiwnym gather na ~100 żądaniach,\nasyncio.Semaphore jako standardowy ogranicznik współbieżności po stronie klienta,\nlimit po stronie serwera - czego klient nie kontroluje,\ndwie strategie obsługi błędów w gather: return_exceptions=True vs try/except w korutynie,\ntimeouty w httpx - dlaczego są nieodzowne w pracy z Semaphore,\nas_completed - przetwarzanie wyników w miarę spływania, z raportowaniem postępu,\npełen pipeline: pobranie wielu żądań z kontrolą współbieżności, timeoutem, obsługą błędów, zapisem sukcesów i porażek do osobnych plików oraz końcowym raportem.\n\nNarzędzia: Python (asyncio, httpx, Flask), VSCode.",
+    "text": "Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z sieci. Zaczynamy od protokołu HTTP i pracy z API, przechodzimy przez parsowanie HTML i crawling, kończymy na asynchronicznym pobieraniu danych, Scrapy i Selenium.",
     "crumbs": [
-      "Laboratoria",
-      "Lab 10: Async HTTP w praktyce"
+      "Automatyczne pozyskiwanie danych"
     ]
   },
   {
-    "objectID": "laby/lab_10.html#krok-a-szkielet-skryptu",
-    "href": "laby/lab_10.html#krok-a-szkielet-skryptu",
-    "title": "Lab 10: Async HTTP w praktyce",
-    "section": "7.1 Krok A: szkielet skryptu",
-    "text": "7.1 Krok A: szkielet skryptu\nUtwórz plik cw1.py:\nimport asyncio\nimport sys\nimport time\n\nimport httpx\n\nBASE = \"http://127.0.0.1:5000\"\nN = 40\nSTART = None\n\n\nasync def fetch_page(client, page, sem):\n    # 1. Wewnątrz async with sem: wykonaj GET na /limited/&lt;page&gt;,\n    #    sprawdź status, zwróć r.json().\n    # --- Twój kod ---\n    ...\n\n\nasync def main(limit):\n    sem = asyncio.Semaphore(limit)\n    async with httpx.AsyncClient() as client:\n        # 2. Stwórz listę N korutyn fetch_page dla zakresu range(N).\n        # 3. Uruchom je przez asyncio.gather i zwróć listę wyników.\n        # --- Twój kod ---\n        ...\n\n\nif __name__ == \"__main__\":\n    limit = int(sys.argv[1])  # LIMIT przekazany z linii poleceń\n    START = time.perf_counter()\n    wyniki = asyncio.run(main(limit))\n    elapsed = time.perf_counter() - START\n    print(f\"limit={limit:3d}  N={N}  czas={elapsed:5.2f}s\")\nUzupełnij szkielet. Wzorzec jest identyczny jak w Demonstracji 2 - jedyna różnica to endpoint (/limited zamiast /data) i limit przekazany z linii poleceń.",
+    "objectID": "index.html#opis-przedmiotu",
+    "href": "index.html#opis-przedmiotu",
+    "title": "Automatyczne pozyskiwanie danych",
+    "section": "",
+    "text": "Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z sieci. Zaczynamy od protokołu HTTP i pracy z API, przechodzimy przez parsowanie HTML i crawling, kończymy na asynchronicznym pobieraniu danych, Scrapy i Selenium.",
     "crumbs": [
-      "Laboratoria",
-      "Lab 10: Async HTTP w praktyce"
+      "Automatyczne pozyskiwanie danych"
     ]
   },
   {
-    "objectID": "laby/lab_10.html#krok-b-pomiar-przy-różnych-n",
-    "href": "laby/lab_10.html#krok-b-pomiar-przy-różnych-n",
-    "title": "Lab 10: Async HTTP w praktyce",
-    "section": "7.2 Krok B: pomiar przy różnych N",
-    "text": "7.2 Krok B: pomiar przy różnych N\nUruchom skrypt z różnymi limitami:\npython cw1.py 2\npython cw1.py 4\npython cw1.py 8\npython cw1.py 16\npython cw1.py 40\nWypełnij poniższą tabelkę uzyskanymi czasami:\n\n\n\nlimit po stronie klienta\nspodziewany czas\ntwój czas\n\n\n\n\n2\n~20 s\n…\n\n\n4\n~10 s\n…\n\n\n8\n~5 s\n…\n\n\n16\n~5 s\n…\n\n\n40\n~5 s\n…",
+    "objectID": "index.html#wykłady",
+    "href": "index.html#wykłady",
+    "title": "Automatyczne pozyskiwanie danych",
+    "section": "2 Wykłady",
+    "text": "2 Wykłady\n\nWykład 1: HTTP i klienci HTTP\nWykład 2: Serwer HTTP - framework Flask\nWykład 3: HTML jako drzewo — selekcja danych\nWykład 4: Cookies, sesje i formularze\nWykład 5: Asynchroniczność w Pythonie — od intuicji do httpx\nWykład 6: Scrapy — framework do web scrapingu\nWykład 7: Strony dynamiczne — JavaScript, AJAX, Selenium",
     "crumbs": [
-      "Laboratoria",
-      "Lab 10: Async HTTP w praktyce"
+      "Automatyczne pozyskiwanie danych"
     ]
   },
   {
-    "objectID": "laby/lab_10.html#krok-c-wniosek",
-    "href": "laby/lab_10.html#krok-c-wniosek",
-    "title": "Lab 10: Async HTTP w praktyce",
-    "section": "7.3 Krok C: wniosek",
-    "text": "7.3 Krok C: wniosek\nSpodziewany kształt krzywej:\n\nod limit=1 do limit=8 czas maleje odwrotnie proporcjonalnie - każda dodatkowa współbieżność po stronie klienta przekłada się na proporcjonalne przyspieszenie.\nod limit=8 wzwyż czas przestaje maleć - utyka w okolicach 5 s i tam zostaje, niezależnie od tego, czy klient próbuje 16, 40 czy 100 jednoczesnych żądań.\n\nLiczba 8 nie jest tu przypadkiem. Tyle pozwala SERVER_SEM po stronie serwera. Dla limit ≤ 8 to klient jest „wąskim gardłem” - serwer ma miejsce dla wszystkich, czekanie wynika z tego, że klient nie wysyła więcej. Dla limit &gt; 8 to serwer jest wąskim gardłem - klient wysyła 16 żądań, serwer przyjmuje 8, pozostałe 8 czeka w kolejce serwerowej i klient nic z tym nie zrobi.\n\n\n\n\n\n\nWarningTwój Semaphore to twoja decyzja, nie cudzy limit\n\n\n\nSemaphore(16) w kliencie nie sprawia, że serwer obsłuży 16 jednoczesnych żądań. Sprawia tylko, że klient wysyła 16. Decyzja, ile faktycznie obsłużyć, należy do serwera - i bywa wyrażana subtelnie: opóźnieniem, kodem 429, blokadą.\nW praktyce: dobieraj Semaphore niżej niż twoje podejrzenia o pojemność serwera, nie wyżej. Marża bezpieczeństwa kosztuje sekundy; jej brak kosztuje blokadę IP.\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nCzy twoja tabelka pokazuje kolano w okolicach limit=8? Jeśli kolano jest gdzie indziej - sprawdź, czy w app.py rzeczywiście jest SERVER_SEM = threading.Semaphore(8).\nDlaczego limit=2 i limit=4 dają liniowe przyspieszenie, a limit=16 i limit=40 daje to samo co limit=8? Sformułuj odpowiedź własnymi słowami, używając słów „klient”, „serwer”, „kolejka”.\nW realnym scrapingu nie widzisz SERVER_SEM w kodzie cudzego serwera. Jak praktycznie wyznaczyć dobry limit? (Wskazówka: zacznij od małej liczby i zwiększaj, dopóki czas maleje - moment, w którym przestaje maleć, jest twoim szczytem.)",
+    "objectID": "index.html#laboratoria",
+    "href": "index.html#laboratoria",
+    "title": "Automatyczne pozyskiwanie danych",
+    "section": "3 Laboratoria",
+    "text": "3 Laboratoria\n\nLaboratorium 0: Python — odświeżenie podstaw\nLaboratorium 1: HTTP i klienci HTTP\nLaboratorium 2: Nawigacja po API — stronicowanie, pipeline, retry\nLaboratorium 3: Tworzenie serwera HTTP w Flask\nLaboratorium 4: Paginacja HTML i prosty crawler\nLaboratorium 5: Parsowanie HTML — BeautifulSoup i selektory CSS\nLaboratorium 6: Parsowanie HTML — XPath i lxml\nLaboratorium 7: Serwer z sesjami i logowaniem\nLaboratorium 8: Klient z sesją — requests.Session\nLaboratorium 9: Async od zera\nLaboratorium 10: Async HTTP w praktyce\nLaboratorium 11: Pierwszy spider Scrapy",
     "crumbs": [
-      "Laboratoria",
-      "Lab 10: Async HTTP w praktyce"
+      "Automatyczne pozyskiwanie danych"
     ]
   },
   {
-    "objectID": "laby/lab_10.html#krok-a-return_exceptionstrue",
-    "href": "laby/lab_10.html#krok-a-return_exceptionstrue",
-    "title": "Lab 10: Async HTTP w praktyce",
-    "section": "9.1 Krok A: return_exceptions=True",
-    "text": "9.1 Krok A: return_exceptions=True\nUtwórz plik cw2a.py:\nimport asyncio\nimport time\n\nimport httpx\n\nBASE = \"http://127.0.0.1:5000\"\nN = 20\nSTART = None\n\n\nasync def fetch_page(client, page):\n    r = await client.get(f\"{BASE}/flaky/{page}\")\n    r.raise_for_status()\n    return r.json()\n\n\nasync def main():\n    async with httpx.AsyncClient() as client:\n        coros = [fetch_page(client, p) for p in range(N)]\n        # 1. Wywołaj asyncio.gather z parametrem return_exceptions=True.\n        #    Dzięki temu gather nie przerwie się na wyjątkach -\n        #    zwróci je w liście wyników na odpowiadających pozycjach.\n        # --- Twój kod ---\n        return ...\n\n\nSTART = time.perf_counter()\nwyniki = asyncio.run(main())\nelapsed = time.perf_counter() - START\n\n# 2. Rozdziel wyniki na sukcesy i porażki.\n#    Wyniki to lista długości N. Element na pozycji i odpowiada żądaniu o page=i.\n#    Jeśli element jest instancją Exception - to była porażka.\n#    W przeciwnym razie - sukces (dict z polami page, items).\nsukcesy = ...    # --- Twój kod ---\nporazki = ...    # --- Twój kod ---\n\n# 3. Wypisz raport:\n#    - łączny czas,\n#    - liczbę sukcesów i liczbę porażek,\n#    - dla każdej porażki: numer strony i typ wyjątku.\n# --- Twój kod ---\nUruchom. Spodziewany wynik:\nCzas: 1.05s   sukcesy: 14   porażki: 6\nPorażka page=2 : HTTPStatusError\nPorażka page=5 : HTTPStatusError\nPorażka page=11: HTTPStatusError\n...\nKonkretne liczby (14 vs 6) będą się różnić - są losowe. Ważne, że wszystkie 20 żądań doszło do skutku i mamy zarówno udane wyniki, jak i informację, czego nie udało się pobrać.\n\n\n\n\n\n\nTipreturn_exceptions=True - mocne i słabe strony\n\n\n\nPlusy:\n\nminimalna zmiana w stosunku do naiwnego gather. Jeden parametr i pętla rozdzielająca wyniki.\nzachowuje korespondencję pozycyjną - element na pozycji i odpowiada żądaniu i. Łatwo połączyć wyniki z wejściowymi parametrami.\n\nMinusy\n\ntyp elementów listy jest zmienny - albo dict, albo Exception. Każdy kod, który chce z tego korzystać, musi sprawdzić isinstance.\ntrudno przekazać dodatkową informację o tym, co dokładnie zawiodło. Wyjątek niesie tylko stack trace; jeśli chcesz wiedzieć, której strony dotyczył, musisz patrzeć na pozycję na liście.",
+    "objectID": "index.html#zaliczenie",
+    "href": "index.html#zaliczenie",
+    "title": "Automatyczne pozyskiwanie danych",
+    "section": "4 Zaliczenie",
+    "text": "4 Zaliczenie\n\nWykład: Test pisemny stacjonarny. Brak dostępu do materiałów i elektroniki.\nĆwiczenia: Projekt/zadanie domowe z indywidualną obroną ustną.",
     "crumbs": [
-      "Laboratoria",
-      "Lab 10: Async HTTP w praktyce"
+      "Automatyczne pozyskiwanie danych"
     ]
   },
   {
-    "objectID": "laby/lab_10.html#krok-b-tryexcept-w-korutynie",
-    "href": "laby/lab_10.html#krok-b-tryexcept-w-korutynie",
-    "title": "Lab 10: Async HTTP w praktyce",
-    "section": "9.2 Krok B: try/except w korutynie",
-    "text": "9.2 Krok B: try/except w korutynie\nDruga strategia: ucz korutynę zwracać dict z polem \"status\", niezależnie od tego, czy żądanie się udało.\nUtwórz plik cw2b.py:\nimport asyncio\nimport time\n\nimport httpx\n\nBASE = \"http://127.0.0.1:5000\"\nN = 20\nSTART = None\n\n\nasync def fetch_page(client, page):\n    \"\"\"Zawsze zwraca dict. Nigdy nie rzuca wyjątku.\"\"\"\n    # 1. Wewnątrz try wykonaj GET na /flaky/&lt;page&gt;, sprawdź status,\n    #    zwróć słownik o kształcie:\n    #      {\"status\": \"ok\", \"page\": page, \"data\": r.json()}\n    # 2. W except httpx.HTTPStatusError zwróć słownik:\n    #      {\"status\": \"err\", \"page\": page, \"error\": \"HTTP_\" + str(e.response.status_code)}\n    #    (Inne typy błędów też można łapać - np. httpx.RequestError - na tę chwilę\n    #    /flaky rzuca tylko HTTPStatusError.)\n    # --- Twój kod ---\n    ...\n\n\nasync def main():\n    async with httpx.AsyncClient() as client:\n        coros = [fetch_page(client, p) for p in range(N)]\n        return await asyncio.gather(*coros)\n\n\nSTART = time.perf_counter()\nwyniki = asyncio.run(main())\nelapsed = time.perf_counter() - START\n\n# 3. Rozdziel wyniki przez kolejną zwykłą iterację - już bez isinstance,\n#    bo wszystkie elementy to dict-y. Filtrujesz po kluczu \"status\":\nsukcesy = [r for r in wyniki if r[\"status\"] == \"ok\"]\nporazki = [r for r in wyniki if r[\"status\"] == \"err\"]\n\nprint(f\"Czas: {elapsed:.2f}s   sukcesy: {len(sukcesy)}   porażki: {len(porazki)}\")\nfor p in porazki:\n    print(f\"  page={p['page']:2d}  {p['error']}\")\nUruchom. Wynik jest tej samej postaci co w cw2a - inne dokładne liczby, ten sam kształt:\nCzas: 1.04s   sukcesy: 13   porażki: 7\n  page= 1  HTTP_500\n  page= 4  HTTP_500\n  ...\n\n\n\n\n\n\nTiptry/except w korutynie - mocne i słabe strony\n\n\n\nPlusy:\n\nwszystkie wyniki są tego samego typu. Kod, który je przetwarza, nie musi się rozglądać za wyjątkami.\nkorutyna ma kontekst (parametry wywołania), więc może wpisać do wyniku rzeczowe informacje - numer strony, URL, typ błędu, kod statusu. Wyjątek sam z siebie tego nie zawiera.\nłatwo dodać logikę pośrednią - np. retry przed zwróceniem porażki, ograniczenie tekstu błędu, normalizację formatu.\n\nMinus: korutyna musi wiedzieć, że ma „nie psuć”. Łatwo zapomnieć i puścić nowy typ wyjątku, którego nie złapie nasz except. Wtedy gather go znowu propaguje - i wracamy do Demonstracji 3.\n\n\n\n\n\n\n\n\nNoteKiedy co\n\n\n\nReguła praktyczna z tego labu:\n\nreturn_exceptions=True - prototyp, eksperymentowanie, jednorazowe skrypty. Krótszy kod.\ntry/except w korutynie - kod produkcyjny, długie pipelines, wiele etapów przetwarzania. Lepsza struktura wyników.\n\nW Ćwiczeniu 5 używamy wariantu drugiego - bo nasz pipeline ma raport końcowy z konkretnymi numerami stron, kategoriami błędów itd. Wymagałoby to dwukrotnie tyle kodu z return_exceptions=True.\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nCzy w obu wariantach cw2a i cw2b liczba sukcesów + liczba porażek to dokładnie N = 20? Powinno tak być.\nW cw2b - co się stanie, gdy serwer dorzuci nowy typ błędu, którego twój except nie łapie (np. httpx.RequestError przy zerwanym połączeniu)? Wypróbuj: w app.py zmień jeden z endpointów na return jsonify({\"error\": \"x\"}), 503, dodaj do fetch_page except httpx.HTTPStatusError i sprawdź, czy korutyna nadal nie wpada w nieprzewidziany wyjątek.\nSpróbuj rozszerzyć cw2b o pole \"latency\" - mierzony w korutynie czas wykonania pojedynczego żądania. Sukcesy i porażki powinny mieć to pole. Czy znacznie zmieniłeś strukturę kodu? (Powinno być proste - try/except w korutynie ma cały lokalny kontekst do dyspozycji.)",
+    "objectID": "laby/lab_1.html",
+    "href": "laby/lab_1.html",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "",
+    "text": "Zakres materiału:\n\nWysyłanie żądań HTTP do publicznego API i odbieranie odpowiedzi,\nRozpoznawanie w odpowiedzi kodu statusu, nagłówków i ciała (JSON),\nDiagnostyka HTTP z poziomu wiersza poleceń (curl),\nKorzystanie z interaktywnej dokumentacji API (Swagger),\nPoruszanie się po strukturze JSON:API: listy, obiekty, pola data, attributes, links,\nPobranie realnego pliku danych z API i zapis wyników do JSON.\n\nNarzędzia: Python (requests), curl, przeglądarka.",
     "crumbs": [
       "Laboratoria",
-      "Lab 10: Async HTTP w praktyce"
+      "Lab 1: Klienci HTTP (curl, requests)"
     ]
   },
   {
-    "objectID": "laby/lab_10.html#ćwiczenie-a-krzywa-wydajności",
-    "href": "laby/lab_10.html#ćwiczenie-a-krzywa-wydajności",
-    "title": "Lab 10: Async HTTP w praktyce",
-    "section": "13.1 Ćwiczenie A: krzywa wydajności",
-    "text": "13.1 Ćwiczenie A: krzywa wydajności\nNapisz skrypt cwA_krzywa.py, który:\n\nDla N = 100 żądań do /data mierzy czas wykonania przy LIMIT ∈ {1, 2, 5, 10, 20, 50, 100}.\nWypisuje tabelkę: limit | czas | przyspieszenie vs limit=1.\nKomentuje wynikową krzywą jednym zdaniem - od którego momentu dalsze zwiększanie LIMIT nie daje przyspieszenia, i dlaczego.\n\nPowtórz to samo dla /limited. Jakie są dwie różnice w kształcie krzywej?",
+    "objectID": "laby/lab_1.html#portal-i-api",
+    "href": "laby/lab_1.html#portal-i-api",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "2.1 Portal i API",
+    "text": "2.1 Portal i API\ndane.gov.pl to polski portal otwartych danych publicznych. Publikuje zbiory danych (datasety) udostępniane przez instytucje państwowe — od jakości powietrza, przez rejestry szkół, po rozkłady jazdy.\nPortal udostępnia API (Application Programming Interface) — interfejs, przez który program komputerowy może pobierać te same dane, które widzisz na stronie, ale w formacie nadającym się do automatycznego przetwarzania (JSON zamiast HTML).\nAdres bazowy API: https://api.dane.gov.pl/1.4\nNumer 1.4 to wersja API. Gdyby się zmieniła, wystarczy podmienić go w jednym miejscu.",
     "crumbs": [
       "Laboratoria",
-      "Lab 10: Async HTTP w praktyce"
+      "Lab 1: Klienci HTTP (curl, requests)"
     ]
   },
   {
-    "objectID": "laby/lab_10.html#ćwiczenie-b-async-retry-z-backoffem",
-    "href": "laby/lab_10.html#ćwiczenie-b-async-retry-z-backoffem",
-    "title": "Lab 10: Async HTTP w praktyce",
-    "section": "13.2 Ćwiczenie B: async retry z backoffem",
-    "text": "13.2 Ćwiczenie B: async retry z backoffem\nW Lab 2 napisałeś fetch_with_retry w wersji synchronicznej - z requests, time.sleep i pętlą for attempt in range(max_attempts). Przenieś ten sam wzorzec do asyncio.\nNapisz korutynę fetch_with_retry_async(client, url, max_attempts=3, base_delay=0.5), która:\n\nPróbuje pobrać url przez client.\nPrzy błędzie 5xx lub timeoucie ponawia próbę z opóźnieniem base_delay * 2 ** attempt (await asyncio.sleep, nie time.sleep!).\nPrzy błędzie 4xx (poza 429) nie ponawia - to są błędy klienta, nie poprawi ich powtórka.\nPo wyczerpaniu prób zwraca strukturalny błąd jak w Ćw 5.\n\nTest: pobierz 50 razy /flaky z Semaphore(8), TIMEOUT=2.0, max_attempts=3. Powinno udać się prawie wszystko - prawdopodobieństwo, że trzy kolejne próby z rzędu padną, to \\(0.3^3 \\approx 2.7\\%\\), czyli statystycznie 1-2 trwałe porażki na 50.",
+    "objectID": "laby/lab_1.html#mapa-zasobów-api",
+    "href": "laby/lab_1.html#mapa-zasobów-api",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "2.2 Mapa zasobów API",
+    "text": "2.2 Mapa zasobów API\nAPI dane.gov.pl organizuje dane w hierarchię, którą najłatwiej zrozumieć jako zagnieżdżone kolekcje:\n/datasets                        ← kolekcja: lista wszystkich zbiorów danych\n/datasets/{id}                   ← element: szczegóły jednego zbioru\n/datasets/{id}/resources         ← kolekcja zagnieżdżona: zasoby (pliki) w zbiorze\n/datasets/{id}/resources/{rid}   ← element: metadane jednego zasobu\nPrzykładowo:\n\nGET /1.4/datasets?page=1&per_page=5 — pobierz pierwszych 5 zbiorów (kolekcja, stronicowana),\nGET /1.4/datasets/830 — pobierz szczegóły zbioru o id = 830,\nGET /1.4/datasets/830/resources — pobierz listę zasobów zbioru 830.",
     "crumbs": [
       "Laboratoria",
-      "Lab 10: Async HTTP w praktyce"
+      "Lab 1: Klienci HTTP (curl, requests)"
     ]
   },
   {
-    "objectID": "laby/lab_10.html#ćwiczenie-c-async-pipeline-na-realnym-api",
-    "href": "laby/lab_10.html#ćwiczenie-c-async-pipeline-na-realnym-api",
-    "title": "Lab 10: Async HTTP w praktyce",
-    "section": "13.3 Ćwiczenie C: async pipeline na realnym API",
-    "text": "13.3 Ćwiczenie C: async pipeline na realnym API\nWróć do Labu 2 i przepisz fetch_all_datasets w wersji async, używając httpx.AsyncClient zamiast requests. Przygotuj się na trzy decyzje:\n\nSemaphore. Dane są publiczne, ale serwer (api.dane.gov.pl) jest produkcyjny - nie nasz. Zacznij od Semaphore(5). Wyżej nie idź bez bardzo dobrego powodu.\nTimeout. Realny serwer bywa wolniejszy niż lokalny - daj TIMEOUT = 10.0 jako wyjściowe ustawienie.\nStronicowanie. W Labie 2 stronicowanie było sekwencyjne („pobierz stronę, zerknij na links.next, pobierz następną”). W async to się psuje: nie wiemy, ilu stron jest, dopóki nie pobierzemy pierwszej. Strategia mieszana: pobierz stronę 1 sekwencyjnie, sprawdź meta.total, oblicz liczbę stron, pozostałe pobierz przez gather.\n\nPorównaj czas wersji sync (Lab 2) z async. Spodziewaj się przyspieszenia proporcjonalnego do liczby stron (Semaphore może ograniczyć - to celowe, nie zwiększaj).\nTo jest jedyne ćwiczenie tego labu, które wychodzi poza lokalny serwer. Argumentacja: API dane.gov.pl jest publiczne, znane z Labu 1-2 i wytrzymuje rozsądną liczbę zapytań. Semaphore(5) jest tu gwarantem grzeczności.",
+    "objectID": "laby/lab_1.html#format-odpowiedzi-jsonapi",
+    "href": "laby/lab_1.html#format-odpowiedzi-jsonapi",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "2.3 Format odpowiedzi: JSON:API",
+    "text": "2.3 Format odpowiedzi: JSON:API\nAPI dane.gov.pl używa standardu JSON:API (specyfikacja: jsonapi.org). W praktyce oznacza to, że odpowiedzi mają stałą strukturę:\n{\n  \"data\": [\n    {\n      \"id\": \"830\",\n      \"type\": \"dataset\",\n      \"attributes\": {\n        \"title\": \"Wykaz szkół i placówek oświatowych\",\n        \"notes\": \"Rejestr Szkół i Placówek Oświatowych ...\",\n        \"category\": \"Education\",\n        \"modified\": \"2025-01-15T10:32:00Z\"\n      },\n      \"relationships\": { ... },\n      \"links\": {\n        \"self\": \"https://api.dane.gov.pl/1.4/datasets/830\"\n      }\n    },\n    ...\n  ],\n  \"links\": {\n    \"self\":  \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=5\",\n    \"next\":  \"https://api.dane.gov.pl/1.4/datasets?page=2&per_page=5\",\n    \"last\":  \"https://api.dane.gov.pl/1.4/datasets?page=...\"\n  },\n  \"meta\": {\n    \"count\": 12345\n  }\n}\nCo warto zapamiętać:\n\ndata — lista (lub pojedynczy obiekt) z wynikami; to jest główna część odpowiedzi,\nid i type — identyfikator i typ zasobu,\nattributes — słownik z właściwymi danymi (tytuł, opis, kategoria itd.),\nlinks — adresy do nawigacji (stronicowanie, powiązane zasoby),\nmeta — metadane (np. łączna liczba wyników).\n\nNagłówek Accept: application/vnd.api+json informuje serwer, że klient oczekuje odpowiedzi w formacie JSON:API. Jeśli go nie podasz, serwer dane.gov.pl i tak zwróci JSON — ale dobrą praktyką jest podawać go jawnie.",
     "crumbs": [
       "Laboratoria",
-      "Lab 10: Async HTTP w praktyce"
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#dokumentacja-interaktywna-swagger",
+    "href": "laby/lab_1.html#dokumentacja-interaktywna-swagger",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "2.4 Dokumentacja interaktywna (Swagger)",
+    "text": "2.4 Dokumentacja interaktywna (Swagger)\nAPI dane.gov.pl ma dokumentację Swagger pod adresem:\n\nhttps://api.dane.gov.pl/doc\n\nSwagger UI to interaktywna strona, na której możesz:\n\nprzeglądać listę endpointów (pogrupowanych tematycznie),\nsprawdzić jakie parametry przyjmuje dany endpoint,\nwypróbować zapytanie bezpośrednio w przeglądarce (przycisk Try it out → Execute).\n\n\n2.4.1 Czytanie Swaggera\nOtwórz w przeglądarce https://api.dane.gov.pl/doc i wykonaj po kolei:\n\nZnajdź sekcję dotyczącą Datasets.\nRozwiń endpoint GET /1.4/datasets.\nPrzejrzyj listę parametrów. Zwróć uwagę na:\n\npage — numer strony,\nper_page — liczba wyników na stronę,\nq — fraza wyszukiwania,\nsort — kryterium sortowania.\n\nKliknij Try it out.\nUstaw per_page na 2, wyczyść pozostałe pola, jeśli Swagger coś w nich dopisał automatycznie (zobacz uwagę poniżej).\nKliknij Execute.\nW sekcji Response body zobaczysz odpowiedź JSON. Zwróć uwagę na strukturę data → [{ id, type, attributes }].\nW sekcji Curl Swagger pokaże polecenie curl:\n\njeśli jest bardzo długie (z parametrami typu id[gt], id[lt], title[...], description[...] itd.), potraktuj je jako „szablon” i usuń z URL-a wszystkie te automatycznie dodane filtry, zostawiając tylko to, co ustawiłeś ręcznie (np. page i per_page).\n\n\n\n\n\n\n\n\nWarningUwaga dotycząca Swaggera\n\n\n\nSwagger często wypełnia „pusty formularz” przykładowymi wartościami we wszystkich polach naraz (zwłaszcza tam, gdzie parametr jest obiektem filtrów typu term/terms/gt/lt/gte/lte/...). To jest artefakt UI, nie wymaganie API. W praktyce zostawiasz tylko te pola, których faktycznie chcesz użyć (zwykle: page, per_page; ewentualnie jeden operator na pole).\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy widzisz pole data z listą obiektów? Czy potrafisz wskazać id i title pierwszego datasetu? Zapisz sobie jedno id — przyda się za chwilę.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#przygotowanie",
+    "href": "laby/lab_1.html#przygotowanie",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.1 Przygotowanie",
+    "text": "3.1 Przygotowanie\nSprawdź, czy masz curl (w terminalu / PowerShell):\ncurl --version\n\n\n\n\n\n\nWarningUwaga dotycząca Windows\n\n\n\nJeśli pracujesz w PowerShell, wpisz curl.exe zamiast curl. Samo curl w PowerShell bywa aliasem do Invoke-WebRequest — zupełnie innego programu. Jeśli widzisz błąd wspominający o Invoke-WebRequest, to właśnie ten przypadek.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#nagłówki-ciało-odpowiedzi",
+    "href": "laby/lab_1.html#nagłówki-ciało-odpowiedzi",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.2 Nagłówki + ciało odpowiedzi",
+    "text": "3.2 Nagłówki + ciało odpowiedzi\nFlaga -i wyświetla nagłówki odpowiedzi razem z ciałem:\ncurl -i \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2\"\nNa ekranie zobaczysz coś w rodzaju:\nHTTP/2 200\ncontent-type: application/vnd.api+json\n...\n\n{\"data\":[{\"id\":\"...\", ...}], ...}\n\n\n\n\n\n\nNote\n\n\n\nWidzisz linię statusu (HTTP/2 200), nagłówki odpowiedzi (w tym content-type), pustą linię, a potem ciało odpowiedzi (JSON). To jest dokładnie struktura odpowiedzi HTTP z wykładu.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#tryb-diagnostyczny",
+    "href": "laby/lab_1.html#tryb-diagnostyczny",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.3 Tryb diagnostyczny",
+    "text": "3.3 Tryb diagnostyczny\nFlaga -v (verbose) pokazuje też żądanie, które wysłał twój klient:\ncurl -v \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\"\nW trybie -v curl oznacza różne typy linii prefiksami:\n\nLinie zaczynające się od * to informacje diagnostyczne klienta (np. rozwiązywanie DNS, TLS handshake).\nLinie zaczynające się od &gt; to żądanie wysyłane przez ciebie (linia GET ... oraz nagłówki żądania).\nLinie zaczynające się od &lt; to odpowiedź serwera (status i nagłówki odpowiedzi).\n\nUwaga: ciało odpowiedzi (np. JSON) pojawia się jako zwykły tekst bez prefiksów — jest wypisywane na standardowe wyjście, podczas gdy log -v idzie na standardowy błąd.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#ćwiczenie-odczytywanie-surowego-http",
+    "href": "laby/lab_1.html#ćwiczenie-odczytywanie-surowego-http",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.4 Ćwiczenie: odczytywanie surowego HTTP",
+    "text": "3.4 Ćwiczenie: odczytywanie surowego HTTP\nWykonaj polecenie:\ncurl -v \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\" 2&gt;&1 | head -30\n(2&gt;&1 łączy oba strumienie, żeby head mógł ograniczyć wyjście.)\nOdpowiedz na pytania:\n\nJaka metoda HTTP została użyta? (szukaj w liniach &gt;)\nJaki nagłówek Host wysłał twój klient?\nJaki kod statusu zwrócił serwer? (szukaj w liniach &lt;)\nJaki content-type ma odpowiedź?",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#head-same-nagłówki-bez-ciała",
+    "href": "laby/lab_1.html#head-same-nagłówki-bez-ciała",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.5 HEAD — same nagłówki, bez ciała",
+    "text": "3.5 HEAD — same nagłówki, bez ciała\nFlaga -I wysyła żądanie HEAD — serwer zwraca tylko nagłówki, bez ciała odpowiedzi. Przydatne, gdy chcesz sprawdzić typ lub rozmiar zasobu przed jego pobraniem.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#ćwiczenie-żądanie-head",
+    "href": "laby/lab_1.html#ćwiczenie-żądanie-head",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.6 Ćwiczenie: żądanie HEAD",
+    "text": "3.6 Ćwiczenie: żądanie HEAD\nSprawdź to żądanie. Czy wszystko jest OK?\ncurl -I \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=1\"",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#ćwiczenie-head-vs-get",
+    "href": "laby/lab_1.html#ćwiczenie-head-vs-get",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.7 Ćwiczenie: HEAD vs GET",
+    "text": "3.7 Ćwiczenie: HEAD vs GET\nWykonaj dwa polecenia i porównaj wyniki:\ncurl -I \"https://httpbin.org/json\"\ncurl -i \"https://httpbin.org/json\"\nOdpowiedz:\n\nCzy kod statusu jest taki sam w obu przypadkach?\nCzy content-type jest taki sam?\nKtóre polecenie nie zwróciło ciała odpowiedzi?\nW jakiej sytuacji HEAD byłby przydatny?",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#formatowanie-odpowiedzi-json",
+    "href": "laby/lab_1.html#formatowanie-odpowiedzi-json",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.8 Formatowanie odpowiedzi JSON",
+    "text": "3.8 Formatowanie odpowiedzi JSON\ncurl wypisuje JSON w jednej linii — nieczytelnie. Pipe przez python3 -m json.tool formatuje z wcięciami:\ncurl -s \"https://api.dane.gov.pl/1.4/datasets?page=1&per_page=2\" | python3 -m json.tool | head -40\nFlaga -s wycisza pasek postępu.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#ćwiczenie-parametry-zapytania-i-nagłówki",
+    "href": "laby/lab_1.html#ćwiczenie-parametry-zapytania-i-nagłówki",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "3.9 Ćwiczenie: parametry zapytania i nagłówki",
+    "text": "3.9 Ćwiczenie: parametry zapytania i nagłówki\nWykonaj żądanie z parametrem wyszukiwania i nagłówkiem Accept:\ncurl -s -H \"Accept: application/vnd.api+json\" \\\n  \"https://api.dane.gov.pl/1.4/datasets?q=transport&per_page=3\" \\\n  | python3 -m json.tool | head -30\n\nIle datasetów zwrócił serwer? (policz obiekty w data)\nZmień frazę transport na inną (np. szkoły, powietrze). Czy wyniki się zmieniły?\nUsuń flagę -s i wykonaj ponownie. Co się zmieniło w wyjściu?",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#instalacja-jeśli-potrzeba",
+    "href": "laby/lab_1.html#instalacja-jeśli-potrzeba",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "4.1 Instalacja (jeśli potrzeba)",
+    "text": "4.1 Instalacja (jeśli potrzeba)\nBiblioteka requests jest standardem do wysyłania zapytań HTTP w Pythonie, nie jest jednak częścią biblioteki standardowej, więc może wymagać instalacji:\npip install requests",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#obiekt-response-przypomnienie",
+    "href": "laby/lab_1.html#obiekt-response-przypomnienie",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "4.2 Obiekt Response — przypomnienie",
+    "text": "4.2 Obiekt Response — przypomnienie\nNa wykładzie poznaliśmy bibliotekę requests. Wykonajmy jedno żądanie, żeby przypomnieć kluczowe atrybuty obiektu Response:\nimport requests\n\nr = requests.get(\"https://example.com\", timeout=10)\n\nprint(\"Status:\", r.status_code)        # int, np. 200\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\nprint(\"Treść (100 znaków):\", r.text[:100])\nPełny zestaw atrybutów, z których będziemy korzystać:\n\nr.status_code — kod statusu (int),\nr.headers — słownik nagłówków odpowiedzi,\nr.text — ciało jako tekst (str),\nr.content — ciało jako bajty (bytes),\nr.json() — ciało sparsowane z JSON do dict/list,\nr.url — pełny URL po dołączeniu parametrów.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#httpbin.org-echo-i-symulacja-błędów",
+    "href": "laby/lab_1.html#httpbin.org-echo-i-symulacja-błędów",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "4.3 httpbin.org — echo i symulacja błędów",
+    "text": "4.3 httpbin.org — echo i symulacja błędów\nhttpbin.org to serwis testowy, który „odbija” twoje żądanie — pokazuje, co serwer otrzymał. Przydatny do nauki i debugowania.\nEcho żądania z parametrami i nagłówkami:\nr = requests.get(\n    \"https://httpbin.org/get\",\n    params={\"q\": \"python\", \"page\": 1},\n    headers={\"Accept\": \"application/json\", \"User-Agent\": \"MojSkrypt/1.0\"},\n    timeout=10,\n)\n\nprint(\"Pełny URL:\", r.url)\necho = r.json()\nprint(\"Serwer widzi nagłówki:\", echo[\"headers\"])\nprint(\"Serwer widzi parametry:\", echo[\"args\"])\nZwróć uwagę: requests sam zakoduje parametry i doda ?...&... do URL.\nSymulacja kodów błędów:\nhttpbin potrafi zwrócić dowolny kod statusu — przydatne, żeby przetestować obsługę błędów bez czekania na „prawdziwy” błąd:\nfor code in [200, 301, 404, 500]:\n    r = requests.get(f\"https://httpbin.org/status/{code}\", allow_redirects=False, timeout=10)\n    print(f\"  Żądany kod: {code}, otrzymany: {r.status_code}\")\n\n\n\n\n\n\nTipWażne\n\n\n\nr.json() rzuci wyjątek, jeśli ciało odpowiedzi nie jest poprawnym JSON-em (np. gdy serwer zwrócił HTML ze stroną błędu). Dlatego przed parsowaniem warto sprawdzić r.status_code lub użyć r.raise_for_status().",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#bezpieczny-wzorzec-sprawdzaj-przed-parsowaniem",
+    "href": "laby/lab_1.html#bezpieczny-wzorzec-sprawdzaj-przed-parsowaniem",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "4.4 Bezpieczny wzorzec: sprawdzaj przed parsowaniem",
+    "text": "4.4 Bezpieczny wzorzec: sprawdzaj przed parsowaniem\nr = requests.get(\"https://httpbin.org/json\", timeout=10)\nr.raise_for_status()  # rzuci wyjątek przy 4xx / 5xx\ndata = r.json()\nMetoda raise_for_status() zamienia kody błędów na wyjątek Pythona — dzięki temu nie próbujesz parsować odpowiedzi z błędem.\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nWykonaj requests.get(\"https://httpbin.org/status/418\"). Jaki kod statusu zwrócił serwer? Co się stanie, gdy na tym obiekcie wywołasz raise_for_status()?",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#przygotowanie-katalog-i-funkcja-zapisu",
+    "href": "laby/lab_1.html#przygotowanie-katalog-i-funkcja-zapisu",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "5.1 Przygotowanie: katalog i funkcja zapisu",
+    "text": "5.1 Przygotowanie: katalog i funkcja zapisu\nUtwórz nowy skrypt (np. lab1_api.py). Na początku przygotuj katalog na odpowiedzi i pomocniczą funkcję:\nimport json\nimport requests\nfrom pathlib import Path\n\nAPI = \"https://api.dane.gov.pl/1.4\"\nOUT = Path(\"lab1_output\")\nOUT.mkdir(exist_ok=True)\n\n\ndef save_response(data, filename):\n    \"\"\"Zapisuje odpowiedź JSON do pliku i wypisuje ścieżkę.\"\"\"\n    path = OUT / filename\n    path.write_text(\n        json.dumps(data, ensure_ascii=False, indent=2),\n        encoding=\"utf-8\",\n    )\n    print(f\"Zapisano: {path}\")\nTo jest wzorzec z Lab 0 (json.dumps + pathlib) — teraz używamy go na żywych danych.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#demonstracja-lista-datasetów",
+    "href": "laby/lab_1.html#demonstracja-lista-datasetów",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "5.2 Demonstracja: lista datasetów",
+    "text": "5.2 Demonstracja: lista datasetów\nPobierz pierwszą stronę kolekcji i zapisz do pliku:\nr = requests.get(\n    f\"{API}/datasets\",\n    params={\"page\": 1, \"per_page\": 5},\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\nr.raise_for_status()\n\nsave_response(r.json(), \"datasets_page1.json\")\nUruchom skrypt, a następnie otwórz plik lab1_output/datasets_page1.json w przeglądarce (Firefox i Chrome automatycznie formatują JSON).",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#co-zobaczyć-w-pliku",
+    "href": "laby/lab_1.html#co-zobaczyć-w-pliku",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "5.3 Co zobaczyć w pliku",
+    "text": "5.3 Co zobaczyć w pliku\nPlik ma kilkaset linii. Nie czytaj go całego — szukaj struktury:\nPoziom główny — trzy klucze:\n\n\"data\" — lista obiektów (datasetów). To główna zawartość odpowiedzi.\n\"links\" — adresy do nawigacji. Klucz \"next\" zawiera URL następnej strony wyników. To jest mechanizm stronicowania, którego użyjemy na Lab 2.\n\"meta\" — metadane. Klucz \"count\" mówi, ile jest datasetów łącznie (nie na tej stronie, lecz w całym API).\n\nPojedynczy dataset (element listy \"data\") — zwróć uwagę na:\n\n\"id\" — identyfikator, którego użyjesz w kolejnym zapytaniu,\n\"type\" — zawsze \"dataset\",\n\"attributes\" — słownik z właściwymi danymi: \"title\", \"notes\", \"category\", \"modified\" itd.,\n\"links\" → \"self\" — URL tego konkretnego datasetu.\n\nZapisz sobie id jednego datasetu, który wydaje ci się ciekawy.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#samodzielna-eksploracja-element-i-podzasoby",
+    "href": "laby/lab_1.html#samodzielna-eksploracja-element-i-podzasoby",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "5.4 Samodzielna eksploracja: element i podzasoby",
+    "text": "5.4 Samodzielna eksploracja: element i podzasoby\nMasz id wybranego datasetu. Teraz przejdź dwa kolejne poziomy hierarchii API — dokładnie te, które widziałeś w sekcji „Mapa zasobów API”:\n1. Szczegóły datasetu — endpoint /datasets/{id}\nPobierz szczegóły i zapisz do pliku (np. dataset_{id}.json). Otwórz plik i zwróć uwagę na kluczową różnicę: \"data\" jest teraz słownikiem, nie listą. Dla kolekcji API zwraca listę, dla pojedynczego elementu — obiekt.\n2. Zasoby datasetu — endpoint /datasets/{id}/resources\nPobierz listę zasobów (plików) i zapisz do osobnego pliku. W każdym zasobie znajdź w \"attributes\" pola: \"title\", \"format\", \"download_url\". Jeśli lista zasobów jest pusta — wybierz inny dataset i powtórz.\n\n\n\n\n\n\nTipWskazówka\n\n\n\nWzorzec kodu jest identyczny jak w demonstracji powyżej — zmienia się tylko URL i nazwa pliku wyjściowego. Użyj save_response().\n\n\n3. Podsumowanie na konsoli\nGdy masz już zapisane pliki, wczytaj plik z zasobami i wypisz podsumowanie:\nresources = json.loads(\n    (OUT / \"resources_TWOJE_ID.json\").read_text(encoding=\"utf-8\")\n)\n\nfor res in resources[\"data\"]:\n    attrs = res[\"attributes\"]\n    print(f\"  [{res['id']}] {attrs.get('title', '(bez tytułu)')}\")\n    print(f\"       format: {attrs.get('format', '?')}\")\nTen fragment pokazuje ważny wzorzec: dane zapisane na dysk można wczytać i przetwarzać bez ponownego odpytywania API. To jest kluczowa umiejętność: API → plik → analiza. Dzięki temu nie obciążasz serwera wielokrotnymi zapytaniami, a jednocześnie masz",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#błąd-404-nieistniejący-zasób",
+    "href": "laby/lab_1.html#błąd-404-nieistniejący-zasób",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "6.1 Błąd 404: nieistniejący zasób",
+    "text": "6.1 Błąd 404: nieistniejący zasób\nr = requests.get(\n    f\"{API}/datasets/999999999\",\n    headers={\"Accept\": \"application/vnd.api+json\"},\n    timeout=10,\n)\n\nprint(\"Status:\", r.status_code)\nprint(\"Content-Type:\", r.headers.get(\"Content-Type\"))\nprint(\"Treść:\", r.text[:300])\nSerwer powinien zwrócić 404. Zwróć uwagę, że odpowiedź nadal ma ciało — serwer wysyła komunikat o błędzie (zwykle w JSON).",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#co-robi-raise_for_status-przy-404",
+    "href": "laby/lab_1.html#co-robi-raise_for_status-przy-404",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "6.2 Co robi raise_for_status() przy 404?",
+    "text": "6.2 Co robi raise_for_status() przy 404?\ntry:\n    r.raise_for_status()\nexcept requests.exceptions.HTTPError as e:\n    print(\"Wyjątek:\", e)",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#timeout",
+    "href": "laby/lab_1.html#timeout",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "6.3 Timeout",
+    "text": "6.3 Timeout\ntry:\n    r = requests.get(f\"{API}/datasets\", params={\"page\": 1}, timeout=0.001)\nexcept requests.exceptions.Timeout:\n    print(\"Przekroczono limit czasu!\")\nexcept requests.exceptions.RequestException as e:\n    print(\"Inny błąd:\", e)\nUstawiamy absurdalnie krótki timeout (0.001 s), żeby wymusić błąd. W praktyce sensowna wartość to 5–30 sekund.\n\n\n\n\n\n\nTipWzorzec minimalny do zapamiętania\n\n\n\ntry:\n    r = requests.get(url, timeout=10)\n    r.raise_for_status()\n    data = r.json()\nexcept requests.exceptions.Timeout:\n    print(\"Timeout\")\nexcept requests.exceptions.HTTPError as e:\n    print(\"Błąd HTTP:\", e)\nexcept requests.exceptions.RequestException as e:\n    print(\"Błąd połączenia:\", e)\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\nCzy umiesz rozróżnić trzy sytuacje: odpowiedź 200 (sukces), odpowiedź 404 (błąd serwera w sensie „nie znaleziono”), wyjątek Timeout (brak odpowiedzi)? To jest kluczowe w automatyzacji.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#zadanie-a-wyszukiwanie-datasetów",
+    "href": "laby/lab_1.html#zadanie-a-wyszukiwanie-datasetów",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "7.1 Zadanie A: wyszukiwanie datasetów",
+    "text": "7.1 Zadanie A: wyszukiwanie datasetów\nW dokumentacji Swagger (https://api.dane.gov.pl/doc) znajdź parametr, który pozwala wyszukiwać datasety po frazie (słowie kluczowym).\n\nWykonaj wyszukiwanie po wybranym słowie (np. \"transport\", \"szkoły\", \"powietrze\").\nWypisz id i title wyników.\nWybierz jeden dataset z wyników i pobierz jego szczegóły (/datasets/{id}).\nPobierz listę zasobów tego datasetu (/datasets/{id}/resources).\nWypisz tytuły i formaty zasobów.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#zadanie-b-porównanie-dwóch-stron-wyników",
+    "href": "laby/lab_1.html#zadanie-b-porównanie-dwóch-stron-wyników",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "7.2 Zadanie B: porównanie dwóch stron wyników",
+    "text": "7.2 Zadanie B: porównanie dwóch stron wyników\n\nPobierz stronę 1 i stronę 2 listy datasetów (np. per_page=5).\nWypisz id datasetów z obu stron.\nSprawdź (programowo lub ręcznie), że zbiory id się nie pokrywają.\nWypisz adres next z linków pierwszej strony i porównaj go z URL-em, który sam skonstruowałeś dla strony 2.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_1.html#zadanie-c-dodatkowe-metadane-zasobów-w-csv",
+    "href": "laby/lab_1.html#zadanie-c-dodatkowe-metadane-zasobów-w-csv",
+    "title": "Lab 1: Klienci HTTP (curl, requests)",
+    "section": "7.3 Zadanie C (dodatkowe): metadane zasobów w CSV",
+    "text": "7.3 Zadanie C (dodatkowe): metadane zasobów w CSV\nAPI dane.gov.pl pozwala pobrać metadane zasobów danego datasetu jako CSV:\nGET /1.4/datasets/{id}/resources/metadata.csv?lang=en\n\nPobierz ten plik za pomocą requests (uwaga: to nie jest JSON, tylko CSV — użyj r.text zamiast r.json()).\nZapisz odpowiedź do pliku .csv.\nWczytaj plik do pandas.DataFrame i wypisz nazwy kolumn.\nZnajdź kolumnę Download URL — zawiera adresy do pobrania realnych plików danych.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 1: Klienci HTTP (curl, requests)"
+    ]
+  },
+  {
+    "objectID": "laby/lab_11.html",
+    "href": "laby/lab_11.html",
+    "title": "Lab 11: Pierwszy spider Scrapy",
+    "section": "",
+    "text": "Na Labie 10 zakończyliśmy „programatyczny tor”: ręcznie składaliśmy kontrolę współbieżności, timeouty, obsługę błędów i zapis wyników. Dziś oddajemy tę infrastrukturę frameworkowi. Przepiszemy crawlery, które już znasz (miasta z Lab 4, bookshop z Lab 5–6), na spidery Scrapy — ten sam serwer, ten sam wynik, znacznie mniej kodu.\nZakres materiału:\n\nstruktura projektu Scrapy — scrapy startproject, scrapy genspider, role plików,\nscrapy shell — interaktywna eksploracja selektorów przed napisaniem spidera,\nspider: start_urls, metoda parse, yield dict,\npaginacja przez response.follow(next_page, callback=self.parse),\nwzorzec lista → detal: dwa callbacki (parse podąża za linkami, parse_book wyciąga dane),\nselektory Scrapy: response.css() i response.xpath(), .get() / .getall(), ::text, ::attr(),\neksport: scrapy crawl ... -o plik.json (oraz .csv, .jsonl),\nporównanie ręcznego crawlera z wersją w Scrapy.\n\nNarzędzia: Python (Scrapy, Flask), VSCode.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 11: Pierwszy spider Scrapy"
+    ]
+  },
+  {
+    "objectID": "laby/lab_11.html#porównanie",
+    "href": "laby/lab_11.html#porównanie",
+    "title": "Lab 11: Pierwszy spider Scrapy",
+    "section": "6.1 Porównanie",
+    "text": "6.1 Porównanie\nZestaw parse (kilkanaście linii) z funkcją crawl_catalog z Lab 4. Policz, co zniknęło: pętla while, requests.get z raise_for_status, ręczne budowanie pełnego URL-a, warunek końca, json.dump, importy requests/re/json. Zostało: selektory i response.follow. To jest miara tego, co Scrapy bierze na siebie.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 11: Pierwszy spider Scrapy"
+    ]
+  },
+  {
+    "objectID": "laby/lab_11.html#uruchomienie-serwera-bookshop",
+    "href": "laby/lab_11.html#uruchomienie-serwera-bookshop",
+    "title": "Lab 11: Pierwszy spider Scrapy",
+    "section": "7.1 Uruchomienie serwera bookshop",
+    "text": "7.1 Uruchomienie serwera bookshop\nZatrzymaj serwer miast (Ctrl+C w Terminalu 1). Sklonuj i uruchom bookshop:\ngit clone https://github.com/rodakt/bookshop.git\ncd bookshop\nflask run --debug -p 5000\nOtwórz http://127.0.0.1:5000/books w przeglądarce, kliknij w tytuł — przejdziesz na stronę detali. Klasy CSS znasz z Lab 5: .book, h2.title, .author, .price, a.book-link, a.next-page; na detalach h1.title, .description, .stock.\n\n\n\n\n\n\nTipSprawdź selektory w shellu\n\n\n\nZanim napiszesz spidera, otwórz scrapy shell \"http://127.0.0.1:5000/books\" i przetestuj: response.css(\"a.book-link::attr(href)\").getall(), response.css(\"a.next-page::attr(href)\").get(). Potem shell na stronie detali, np. response.css(\"h1.title::text\").get().",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 11: Pierwszy spider Scrapy"
+    ]
+  },
+  {
+    "objectID": "laby/lab_11.html#zadanie",
+    "href": "laby/lab_11.html#zadanie",
+    "title": "Lab 11: Pierwszy spider Scrapy",
+    "section": "7.2 Zadanie",
+    "text": "7.2 Zadanie\nWygeneruj spidera:\nscrapy genspider books 127.0.0.1\nOtwórz apd/spiders/books.py i uzupełnij szkielet:\nimport scrapy\n\n\nclass BooksSpider(scrapy.Spider):\n    name = \"books\"\n    allowed_domains = [\"127.0.0.1\"]\n    start_urls = [\"http://127.0.0.1:5000/books\"]\n\n    def parse(self, response):\n        # 1. Dla każdego linku do książki (a.book-link) podążaj na stronę\n        #    detali z callbackiem self.parse_book.\n        #    Wskazówka: response.follow przyjmuje selektor &lt;a&gt; wprost —\n        #    sam wyciągnie z niego href.\n        # --- Twój kod ---\n\n        # 2. Znajdź link do następnej strony (a.next-page). Jeśli istnieje —\n        #    podążaj za nim z callbackiem self.parse (ta sama metoda,\n        #    kolejna strona listingu).\n        # --- Twój kod ---\n\n    def parse_book(self, response):\n        # 3. Ze strony detali wyciągnij i wygeneruj słownik:\n        #    title (h1.title), author, description, price, stock.\n        #    Użyj response.css(...) z ::text i .get().\n        # --- Twój kod ---\n        pass\nUruchom i wyeksportuj (z wnętrza apd/):\nscrapy crawl books -O bookshop.json\n\n\n\n\n\n\nTipSelektor jako argument response.follow\n\n\n\nresponse.follow(link, callback=...) przyjmuje nie tylko string z URL-em, ale też obiekt &lt;a&gt; — Scrapy sam wyciągnie href. Dzięki temu krok 1 może wyglądać tak:\nfor link in response.css(\"a.book-link\"):\n    yield response.follow(link, callback=self.parse_book)\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nIle książek zebrał spider? Czy zgadza się z liczbą z bookshop.json z Lab 5?\nCzy każdy rekord ma pola title, author, description, price, stock?\nTest regresji: porównaj dane (posortowane po title) z bookshop.json z Lab 5. Powinny być identyczne — ta sama strona, inne narzędzie, ten sam wynik. Jeśli się różnią, gdzieś jest błąd w selektorze.\nCzy spider zatrzymał się sam (nie zapętlił)? Scrapy deduplikuje URL-e, więc nawet gdy ostatnia strona linkuje wstecz, nie pobierze jej ponownie.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 11: Pierwszy spider Scrapy"
+    ]
+  },
+  {
+    "objectID": "laby/lab_11.html#ćwiczenie-a-formaty-eksportu",
+    "href": "laby/lab_11.html#ćwiczenie-a-formaty-eksportu",
+    "title": "Lab 11: Pierwszy spider Scrapy",
+    "section": "8.1 Ćwiczenie A: formaty eksportu",
+    "text": "8.1 Ćwiczenie A: formaty eksportu\nUruchom spidera books z różnymi rozszerzeniami pliku wyjściowego:\nscrapy crawl books -O bookshop.csv\nscrapy crawl books -O bookshop.jsonl\nOtwórz oba pliki. Scrapy rozpoznaje format po rozszerzeniu: .csv to tabela (pierwszy wiersz to nazwy pól), .jsonl (JSON Lines) to jeden obiekt JSON na linię. Które ułatwia podgląd pojedynczego rekordu w edytorze, a które — wczytanie do arkusza?",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 11: Pierwszy spider Scrapy"
+    ]
+  },
+  {
+    "objectID": "laby/lab_11.html#ćwiczenie-b-spider-na-serwer-szczytów",
+    "href": "laby/lab_11.html#ćwiczenie-b-spider-na-serwer-szczytów",
+    "title": "Lab 11: Pierwszy spider Scrapy",
+    "section": "8.2 Ćwiczenie B: spider na serwer szczytów",
+    "text": "8.2 Ćwiczenie B: spider na serwer szczytów\nNa Labie 4 (Ćwiczenie 2) zbudowałeś serwer /peaks — katalog polskich szczytów z paginacją (klucze name, height, range). Uruchom go i napisz spidera peaks.\nPunkt wyjścia: skopiuj cities.py, zmień name, start_urls i selektory/klucze. Logika spidera — pętla po stronach przez response.follow, yield dict — jest identyczna. Zmieniasz tylko cel i nazwy pól. To ta sama zasada „jedna zmienna na raz”, którą widziałeś przy przejściu z miast na szczyty w Lab 4.\nWynik: peaks.json z 20 szczytami.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 11: Pierwszy spider Scrapy"
+    ]
+  },
+  {
+    "objectID": "laby/lab_11.html#ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell",
+    "href": "laby/lab_11.html#ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell",
+    "title": "Lab 11: Pierwszy spider Scrapy",
+    "section": "8.3 Ćwiczenie C (dodatkowe): zagadki w scrapy shell",
+    "text": "8.3 Ćwiczenie C (dodatkowe): zagadki w scrapy shell\nOtwórz shell na listingu bookshop:\nscrapy shell \"http://127.0.0.1:5000/books\"\nRozwiąż w jednej linii każde (echo „dziesięciu zapytań XPath” z Lab 6, tym razem mieszanką CSS i XPath):\n\nTytuły wszystkich książek na stronie (lista stringów).\nLiczba książek na stronie.\nWszystkie wartości href linków do detali (a.book-link).\nHref linku do następnej strony.\nCena książki „Pan Tadeusz” — dojdź do niej osią XPath od jej tytułu.\n\n\n\n\n\n\n\nTipCSS vs XPath w jednym response\n\n\n\nresponse.css(...) i response.xpath(...) działają na tym samym obiekcie — możesz nawet je łączyć (response.css(\"div.book\").xpath('./h2/text()')). Zadania 1–4 są wygodniejsze w CSS, zadanie 5 (nawigacja osią) — w XPath.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 11: Pierwszy spider Scrapy"
     ]
   },
   {
