@@ -29,6 +29,7 @@ Kurs przedstawia metody zautomatyzowanego pobierania i przetwarzania danych z si
 - [Laboratorium 8: Klient z sesją — `requests.Session`](laby/lab_8.md)
 - [Laboratorium 9: Async od zera](laby/lab_9.md)
 - [Laboratorium 10: Async HTTP w praktyce](laby/lab_10.md)
+- [Laboratorium 11: Pierwszy spider Scrapy](laby/lab_11.md)
 
 ## Zaliczenie
 
