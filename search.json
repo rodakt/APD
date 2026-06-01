@@ -1638,7 +1638,7 @@
     "href": "laby/lab_11.html",
     "title": "Lab 11: Pierwszy spider Scrapy",
     "section": "",
-    "text": "Na Labie 10 zakończyliśmy „programatyczny tor”: ręcznie składaliśmy kontrolę współbieżności, timeouty, obsługę błędów i zapis wyników. Dziś oddajemy tę infrastrukturę frameworkowi. Przepiszemy crawlery, które już znasz (miasta z Lab 4, bookshop z Lab 5–6), na spidery Scrapy — ten sam serwer, ten sam wynik, znacznie mniej kodu.\nZakres materiału:\n\nstruktura projektu Scrapy — scrapy startproject, scrapy genspider, role plików,\nscrapy shell — interaktywna eksploracja selektorów przed napisaniem spidera,\nspider: start_urls, metoda parse, yield dict,\npaginacja przez response.follow(next_page, callback=self.parse),\nwzorzec lista → detal: dwa callbacki (parse podąża za linkami, parse_book wyciąga dane),\nselektory Scrapy: response.css() i response.xpath(), .get() / .getall(), ::text, ::attr(),\neksport: scrapy crawl ... -o plik.json (oraz .csv, .jsonl),\nporównanie ręcznego crawlera z wersją w Scrapy.\n\nNarzędzia: Python (Scrapy, Flask), VSCode.",
+    "text": "Na Labie 10 zakończyliśmy „programatyczny tor”: ręcznie składaliśmy kontrolę współbieżności, timeouty, obsługę błędów i zapis wyników. Dziś oddajemy tę infrastrukturę frameworkowi. Przepiszemy crawlery, które już znasz, na spidery Scrapy — ten sam serwer, ten sam wynik, znacznie mniej kodu.\nZakres materiału:\n\nstruktura projektu Scrapy — scrapy startproject, scrapy genspider, role plików,\nscrapy shell — interaktywna eksploracja selektorów przed napisaniem spidera,\nspider: start_urls, metoda parse, yield dict,\npaginacja przez response.follow(next_page, callback=self.parse),\nwzorzec lista → detal: dwa callbacki,\npodążanie za pojedynczym linkiem w łańcuchu stron,\nselektory Scrapy: response.css() i response.xpath(), .get() / .getall(), ::text, ::attr(),\neksport: scrapy crawl ... -O plik.json (oraz .csv, .jsonl),\nporównanie ręcznego crawlera z wersją w Scrapy.\n\nNarzędzia: Python (Scrapy, Flask), VSCode.",
     "crumbs": [
       "Laboratoria",
       "Lab 11: Pierwszy spider Scrapy"
@@ -1660,7 +1660,7 @@
     "href": "laby/lab_11.html#uruchomienie-serwera-bookshop",
     "title": "Lab 11: Pierwszy spider Scrapy",
     "section": "7.1 Uruchomienie serwera bookshop",
-    "text": "7.1 Uruchomienie serwera bookshop\nZatrzymaj serwer miast (Ctrl+C w Terminalu 1). Sklonuj i uruchom bookshop:\ngit clone https://github.com/rodakt/bookshop.git\ncd bookshop\nflask run --debug -p 5000\nOtwórz http://127.0.0.1:5000/books w przeglądarce, kliknij w tytuł — przejdziesz na stronę detali. Klasy CSS znasz z Lab 5: .book, h2.title, .author, .price, a.book-link, a.next-page; na detalach h1.title, .description, .stock.\n\n\n\n\n\n\nTipSprawdź selektory w shellu\n\n\n\nZanim napiszesz spidera, otwórz scrapy shell \"http://127.0.0.1:5000/books\" i przetestuj: response.css(\"a.book-link::attr(href)\").getall(), response.css(\"a.next-page::attr(href)\").get(). Potem shell na stronie detali, np. response.css(\"h1.title::text\").get().",
+    "text": "7.1 Uruchomienie serwera bookshop\nZatrzymaj serwer miast (Ctrl+C w Terminalu 1). Sklonuj i uruchom bookshop:\ngit clone https://github.com/rodakt/bookshop.git\ncd bookshop\nflask run --debug -p 5000\nOtwórz http://127.0.0.1:5000/books w przeglądarce, kliknij w tytuł — przejdziesz na stronę detali. Klasy CSS znasz z Lab 5: na listingu .book, h2.title, .author, .price, a.book-link, a.next-page; na detalach h1.title, .description, .stock.",
     "crumbs": [
       "Laboratoria",
       "Lab 11: Pierwszy spider Scrapy"
@@ -1671,7 +1671,29 @@
     "href": "laby/lab_11.html#zadanie",
     "title": "Lab 11: Pierwszy spider Scrapy",
     "section": "7.2 Zadanie",
-    "text": "7.2 Zadanie\nWygeneruj spidera:\nscrapy genspider books 127.0.0.1\nOtwórz apd/spiders/books.py i uzupełnij szkielet:\nimport scrapy\n\n\nclass BooksSpider(scrapy.Spider):\n    name = \"books\"\n    allowed_domains = [\"127.0.0.1\"]\n    start_urls = [\"http://127.0.0.1:5000/books\"]\n\n    def parse(self, response):\n        # 1. Dla każdego linku do książki (a.book-link) podążaj na stronę\n        #    detali z callbackiem self.parse_book.\n        #    Wskazówka: response.follow przyjmuje selektor &lt;a&gt; wprost —\n        #    sam wyciągnie z niego href.\n        # --- Twój kod ---\n\n        # 2. Znajdź link do następnej strony (a.next-page). Jeśli istnieje —\n        #    podążaj za nim z callbackiem self.parse (ta sama metoda,\n        #    kolejna strona listingu).\n        # --- Twój kod ---\n\n    def parse_book(self, response):\n        # 3. Ze strony detali wyciągnij i wygeneruj słownik:\n        #    title (h1.title), author, description, price, stock.\n        #    Użyj response.css(...) z ::text i .get().\n        # --- Twój kod ---\n        pass\nUruchom i wyeksportuj (z wnętrza apd/):\nscrapy crawl books -O bookshop.json\n\n\n\n\n\n\nTipSelektor jako argument response.follow\n\n\n\nresponse.follow(link, callback=...) przyjmuje nie tylko string z URL-em, ale też obiekt &lt;a&gt; — Scrapy sam wyciągnie href. Dzięki temu krok 1 może wyglądać tak:\nfor link in response.css(\"a.book-link\"):\n    yield response.follow(link, callback=self.parse_book)\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nIle książek zebrał spider? Czy zgadza się z liczbą z bookshop.json z Lab 5?\nCzy każdy rekord ma pola title, author, description, price, stock?\nTest regresji: porównaj dane (posortowane po title) z bookshop.json z Lab 5. Powinny być identyczne — ta sama strona, inne narzędzie, ten sam wynik. Jeśli się różnią, gdzieś jest błąd w selektorze.\nCzy spider zatrzymał się sam (nie zapętlił)? Scrapy deduplikuje URL-e, więc nawet gdy ostatnia strona linkuje wstecz, nie pobierze jej ponownie.",
+    "text": "7.2 Zadanie\nWygeneruj spidera i napisz go od zera:\nscrapy genspider books 127.0.0.1\nWymagania:\n\nStart od http://127.0.0.1:5000/books.\nparse dla każdej książki na listingu podąża na jej stronę detali (callback wyciągający dane), a po linku a.next-page przechodzi na kolejną stronę listingu (callback self.parse).\nDrugi callback generuje słownik z polami: title, author, description, price, stock.\nEksport do bookshop.json.\n\nscrapy crawl books -O bookshop.json\n\n\n\n\n\n\nTipEksploruj selektory w shellu\n\n\n\nZanim napiszesz spidera, otwórz scrapy shell \"http://127.0.0.1:5000/books\" i sprawdź: response.css(\"a.book-link::attr(href)\").getall(), response.css(\"a.next-page::attr(href)\").get(). Potem shell na stronie detali: response.css(\"h1.title::text\").get() itd. response.follow przyjmuje także obiekt &lt;a&gt; wprost — wyciągnie z niego href sam.\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nIle książek zebrał spider? Czy zgadza się z liczbą z bookshop.json z Lab 5?\nCzy każdy rekord ma pola title, author, description, price, stock?\nTest regresji: porównaj dane (posortowane po title) z bookshop.json z Lab 5/6. Powinny być identyczne — ta sama strona, inne narzędzie, ten sam wynik. Jeśli się różnią, gdzieś jest błąd w selektorze.\nCzy spider zatrzymał się sam (nie zapętlił)? Scrapy deduplikuje URL-e, więc nawet gdy ostatnia strona linkuje wstecz, nie pobierze jej ponownie.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 11: Pierwszy spider Scrapy"
+    ]
+  },
+  {
+    "objectID": "laby/lab_11.html#serwer",
+    "href": "laby/lab_11.html#serwer",
+    "title": "Lab 11: Pierwszy spider Scrapy",
+    "section": "8.1 Serwer",
+    "text": "8.1 Serwer\nZatrzymaj poprzedni serwer (Ctrl+C). W lab11/ utwórz collatz_app.py (kod z Wykładu 2):\nfrom flask import Flask\n\napp = Flask(__name__)\n\n\n@app.route(\"/collatz/&lt;int:n&gt;\")\ndef collatz(n):\n    if n == 1:\n        return \"\"\"\n        &lt;html&gt;&lt;body&gt;\n            &lt;h1&gt;1&lt;/h1&gt;\n            &lt;p&gt;Koniec ciągu!&lt;/p&gt;\n            &lt;a href=\"/collatz/7\"&gt;Rozpocznij od 7&lt;/a&gt;\n        &lt;/body&gt;&lt;/html&gt;\n        \"\"\"\n\n    if n % 2 == 0:\n        next_n = n // 2\n    else:\n        next_n = 3 * n + 1\n\n    return f\"\"\"\n    &lt;html&gt;&lt;body&gt;\n        &lt;h1&gt;{n}&lt;/h1&gt;\n        &lt;p&gt;Następna liczba: {next_n}&lt;/p&gt;\n        &lt;a href=\"/collatz/{next_n}\"&gt;Przejdź do {next_n}&lt;/a&gt;\n        &lt;br&gt;\n        &lt;a href=\"/collatz/1\"&gt;Idź do 1 (koniec)&lt;/a&gt;\n    &lt;/body&gt;&lt;/html&gt;\n    \"\"\"\nUruchom go w Terminalu 1:\nflask --app collatz_app run --debug -p 5000\nSprawdź w przeglądarce http://127.0.0.1:5000/collatz/27 — przeklikaj kilka kroków „Przejdź do …“.",
+    "crumbs": [
+      "Laboratoria",
+      "Lab 11: Pierwszy spider Scrapy"
+    ]
+  },
+  {
+    "objectID": "laby/lab_11.html#zadanie-1",
+    "href": "laby/lab_11.html#zadanie-1",
+    "title": "Lab 11: Pierwszy spider Scrapy",
+    "section": "8.2 Zadanie",
+    "text": "8.2 Zadanie\nWygeneruj spidera collatz i napisz go samodzielnie:\nscrapy genspider collatz 127.0.0.1\nWymagania:\n\nStart od http://127.0.0.1:5000/collatz/27.\nNa każdej stronie wygeneruj {\"n\": &lt;liczba z nagłówka h1&gt;}.\nPodążaj za linkiem do następnej liczby. Gdy go nie ma — koniec.\nEksport do collatz_27.json.\n\nscrapy crawl collatz -O collatz_27.json\n\n\n\n\n\n\nWarningNa stronie są DWA linki /collatz/...\n\n\n\nKażda strona ma „Przejdź do {next_n}” oraz „Idź do 1 (koniec)“. Naiwne response.css(\"a::attr(href)\").get() może złapać niewłaściwy — spider skoczyłby prosto do /collatz/1 i crawl skończyłby się po jednym kroku. Wybierz link precyzyjnie. Na stronie końcowej (n = 1) jest tylko „Rozpocznij od 7” — i właśnie za nim nie chcesz podążać, inaczej spider wpadnie w nieskończoną pętlę 7 → … → 1 → 7. (Z n = 27 ciąg ma 112 kroków — tyle rekordów powinno być w pliku.)\n\n\n\n\n\n\n\n\nTipDlaczego Collatz nie zrównolegli się jak miasta\n\n\n\nPrzy miastach Scrapy pobierał strony współbieżnie — wszystkie linki „Następna” wpadały do kolejki niemal naraz. Collatz jest inny: nie znasz następnego URL-a, póki nie pobierzesz bieżącej strony. To zależność sekwencyjna — kolejka nigdy nie ma więcej niż jednego oczekującego żądania, więc współbieżność Scrapy nic tu nie przyspiesza. Framework daje moc, ale nie wyczaruje jej z łańcucha, w którym każdy krok zależy od poprzedniego.\n\n\n\n\n\n\n\n\nNoteCheckpoint\n\n\n\n\nCzy collatz_27.json ma 112 rekordów? Czy zaczyna się od 27, a kończy na 1?\nCzy spider zatrzymał się sam, czy musiałeś go ubić (Ctrl+C)? Jeśli to drugie — najpewniej podążasz za linkiem „Rozpocznij od 7” ze strony końcowej.\nPorównaj z collatz_27.json z Lab 4 — ten sam ciąg? Tu kolejność powinna być zachowana (w odróżnieniu od miast) — wyjaśnij dlaczego.",
     "crumbs": [
       "Laboratoria",
       "Lab 11: Pierwszy spider Scrapy"
@@ -1681,19 +1703,19 @@
     "objectID": "laby/lab_11.html#ćwiczenie-a-formaty-eksportu",
     "href": "laby/lab_11.html#ćwiczenie-a-formaty-eksportu",
     "title": "Lab 11: Pierwszy spider Scrapy",
-    "section": "8.1 Ćwiczenie A: formaty eksportu",
-    "text": "8.1 Ćwiczenie A: formaty eksportu\nUruchom spidera books z różnymi rozszerzeniami pliku wyjściowego:\nscrapy crawl books -O bookshop.csv\nscrapy crawl books -O bookshop.jsonl\nOtwórz oba pliki. Scrapy rozpoznaje format po rozszerzeniu: .csv to tabela (pierwszy wiersz to nazwy pól), .jsonl (JSON Lines) to jeden obiekt JSON na linię. Które ułatwia podgląd pojedynczego rekordu w edytorze, a które — wczytanie do arkusza?",
+    "section": "9.1 Ćwiczenie A: formaty eksportu",
+    "text": "9.1 Ćwiczenie A: formaty eksportu\nUruchom spidera books z różnymi rozszerzeniami pliku wyjściowego:\nscrapy crawl books -O bookshop.csv\nscrapy crawl books -O bookshop.jsonl\nOtwórz oba pliki. Scrapy rozpoznaje format po rozszerzeniu: .csv to tabela (pierwszy wiersz to nazwy pól), .jsonl (JSON Lines) to jeden obiekt JSON na linię. Które ułatwia podgląd pojedynczego rekordu w edytorze, a które — wczytanie do arkusza?",
     "crumbs": [
       "Laboratoria",
       "Lab 11: Pierwszy spider Scrapy"
     ]
   },
   {
-    "objectID": "laby/lab_11.html#ćwiczenie-b-spider-na-serwer-szczytów",
-    "href": "laby/lab_11.html#ćwiczenie-b-spider-na-serwer-szczytów",
+    "objectID": "laby/lab_11.html#ćwiczenie-b-opcjonalne-spider-na-serwer-szczytów",
+    "href": "laby/lab_11.html#ćwiczenie-b-opcjonalne-spider-na-serwer-szczytów",
     "title": "Lab 11: Pierwszy spider Scrapy",
-    "section": "8.2 Ćwiczenie B: spider na serwer szczytów",
-    "text": "8.2 Ćwiczenie B: spider na serwer szczytów\nNa Labie 4 (Ćwiczenie 2) zbudowałeś serwer /peaks — katalog polskich szczytów z paginacją (klucze name, height, range). Uruchom go i napisz spidera peaks.\nPunkt wyjścia: skopiuj cities.py, zmień name, start_urls i selektory/klucze. Logika spidera — pętla po stronach przez response.follow, yield dict — jest identyczna. Zmieniasz tylko cel i nazwy pól. To ta sama zasada „jedna zmienna na raz”, którą widziałeś przy przejściu z miast na szczyty w Lab 4.\nWynik: peaks.json z 20 szczytami.",
+    "section": "9.2 Ćwiczenie B (opcjonalne): spider na serwer szczytów",
+    "text": "9.2 Ćwiczenie B (opcjonalne): spider na serwer szczytów\nNa Labie 4 (Ćwiczenie 2) zbudowałeś serwer /peaks — katalog polskich szczytów z paginacją (klucze name, height, range). Uruchom go i napisz spidera peaks.\nTo samo zadanie co miasta, tylko inny cel i nazwy pól — logika spidera (paginacja przez response.follow, yield dict) jest identyczna. Punkt wyjścia: skopiuj cities.py, zmień name, start_urls, selektory i klucze. Wynik: peaks.json z 20 szczytami.",
     "crumbs": [
       "Laboratoria",
       "Lab 11: Pierwszy spider Scrapy"
@@ -1703,8 +1725,8 @@
     "objectID": "laby/lab_11.html#ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell",
     "href": "laby/lab_11.html#ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell",
     "title": "Lab 11: Pierwszy spider Scrapy",
-    "section": "8.3 Ćwiczenie C (dodatkowe): zagadki w scrapy shell",
-    "text": "8.3 Ćwiczenie C (dodatkowe): zagadki w scrapy shell\nOtwórz shell na listingu bookshop:\nscrapy shell \"http://127.0.0.1:5000/books\"\nRozwiąż w jednej linii każde (echo „dziesięciu zapytań XPath” z Lab 6, tym razem mieszanką CSS i XPath):\n\nTytuły wszystkich książek na stronie (lista stringów).\nLiczba książek na stronie.\nWszystkie wartości href linków do detali (a.book-link).\nHref linku do następnej strony.\nCena książki „Pan Tadeusz” — dojdź do niej osią XPath od jej tytułu.\n\n\n\n\n\n\n\nTipCSS vs XPath w jednym response\n\n\n\nresponse.css(...) i response.xpath(...) działają na tym samym obiekcie — możesz nawet je łączyć (response.css(\"div.book\").xpath('./h2/text()')). Zadania 1–4 są wygodniejsze w CSS, zadanie 5 (nawigacja osią) — w XPath.",
+    "section": "9.3 Ćwiczenie C (dodatkowe): zagadki w scrapy shell",
+    "text": "9.3 Ćwiczenie C (dodatkowe): zagadki w scrapy shell\nOtwórz shell na listingu bookshop:\nscrapy shell \"http://127.0.0.1:5000/books\"\nRozwiąż w jednej linii każde (echo „dziesięciu zapytań XPath” z Lab 6, tym razem mieszanką CSS i XPath):\n\nTytuły wszystkich książek na stronie (lista stringów).\nLiczba książek na stronie.\nWszystkie wartości href linków do detali (a.book-link).\nHref linku do następnej strony.\nCena książki „Pan Tadeusz” — dojdź do niej osią XPath od jej tytułu.\n\n\n\n\n\n\n\nTipCSS vs XPath w jednym response\n\n\n\nresponse.css(...) i response.xpath(...) działają na tym samym obiekcie — możesz je nawet łączyć (response.css(\"div.book\").xpath('./h2/text()')). Zadania 1–4 są wygodniejsze w CSS, zadanie 5 (nawigacja osią) — w XPath.",
     "crumbs": [
       "Laboratoria",
       "Lab 11: Pierwszy spider Scrapy"

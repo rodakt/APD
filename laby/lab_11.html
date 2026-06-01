@@ -310,13 +310,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#uruchomienie-serwera-bookshop" id="toc-uruchomienie-serwera-bookshop" class="nav-link" data-scroll-target="#uruchomienie-serwera-bookshop"><span class="header-section-number">7.1</span> Uruchomienie serwera bookshop</a></li>
   <li><a href="#zadanie" id="toc-zadanie" class="nav-link" data-scroll-target="#zadanie"><span class="header-section-number">7.2</span> Zadanie</a></li>
   </ul></li>
-  <li><a href="#ćwiczenia-samodzielne" id="toc-ćwiczenia-samodzielne" class="nav-link" data-scroll-target="#ćwiczenia-samodzielne"><span class="header-section-number">8</span> Ćwiczenia samodzielne</a>
+  <li><a href="#ćwiczenie-2-spider-collatza-łańcuch" id="toc-ćwiczenie-2-spider-collatza-łańcuch" class="nav-link" data-scroll-target="#ćwiczenie-2-spider-collatza-łańcuch"><span class="header-section-number">8</span> Ćwiczenie 2: spider Collatza — łańcuch</a>
   <ul class="collapse">
-  <li><a href="#ćwiczenie-a-formaty-eksportu" id="toc-ćwiczenie-a-formaty-eksportu" class="nav-link" data-scroll-target="#ćwiczenie-a-formaty-eksportu"><span class="header-section-number">8.1</span> Ćwiczenie A: formaty eksportu</a></li>
-  <li><a href="#ćwiczenie-b-spider-na-serwer-szczytów" id="toc-ćwiczenie-b-spider-na-serwer-szczytów" class="nav-link" data-scroll-target="#ćwiczenie-b-spider-na-serwer-szczytów"><span class="header-section-number">8.2</span> Ćwiczenie B: spider na serwer szczytów</a></li>
-  <li><a href="#ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell" id="toc-ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell" class="nav-link" data-scroll-target="#ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell"><span class="header-section-number">8.3</span> Ćwiczenie C (dodatkowe): zagadki w <code>scrapy shell</code></a></li>
+  <li><a href="#serwer" id="toc-serwer" class="nav-link" data-scroll-target="#serwer"><span class="header-section-number">8.1</span> Serwer</a></li>
+  <li><a href="#zadanie-1" id="toc-zadanie-1" class="nav-link" data-scroll-target="#zadanie-1"><span class="header-section-number">8.2</span> Zadanie</a></li>
   </ul></li>
-  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">9</span> Podsumowanie</a></li>
+  <li><a href="#ćwiczenia-samodzielne" id="toc-ćwiczenia-samodzielne" class="nav-link" data-scroll-target="#ćwiczenia-samodzielne"><span class="header-section-number">9</span> Ćwiczenia samodzielne</a>
+  <ul class="collapse">
+  <li><a href="#ćwiczenie-a-formaty-eksportu" id="toc-ćwiczenie-a-formaty-eksportu" class="nav-link" data-scroll-target="#ćwiczenie-a-formaty-eksportu"><span class="header-section-number">9.1</span> Ćwiczenie A: formaty eksportu</a></li>
+  <li><a href="#ćwiczenie-b-opcjonalne-spider-na-serwer-szczytów" id="toc-ćwiczenie-b-opcjonalne-spider-na-serwer-szczytów" class="nav-link" data-scroll-target="#ćwiczenie-b-opcjonalne-spider-na-serwer-szczytów"><span class="header-section-number">9.2</span> Ćwiczenie B (opcjonalne): spider na serwer szczytów</a></li>
+  <li><a href="#ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell" id="toc-ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell" class="nav-link" data-scroll-target="#ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell"><span class="header-section-number">9.3</span> Ćwiczenie C (dodatkowe): zagadki w <code>scrapy shell</code></a></li>
+  </ul></li>
+  <li><a href="#podsumowanie" id="toc-podsumowanie" class="nav-link" data-scroll-target="#podsumowanie"><span class="header-section-number">10</span> Podsumowanie</a></li>
   </ul>
 </nav>
     </div>
@@ -351,16 +356,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="cel" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Cel</h1>
-<p>Na Labie 10 zakończyliśmy „programatyczny tor”: ręcznie składaliśmy kontrolę współbieżności, timeouty, obsługę błędów i zapis wyników. Dziś oddajemy tę infrastrukturę frameworkowi. Przepiszemy crawlery, które już znasz (miasta z Lab 4, bookshop z Lab 5–6), na spidery Scrapy — ten sam serwer, ten sam wynik, znacznie mniej kodu.</p>
+<p>Na Labie 10 zakończyliśmy „programatyczny tor”: ręcznie składaliśmy kontrolę współbieżności, timeouty, obsługę błędów i zapis wyników. Dziś oddajemy tę infrastrukturę frameworkowi. Przepiszemy crawlery, które już znasz, na spidery Scrapy — ten sam serwer, ten sam wynik, znacznie mniej kodu.</p>
 <p>Zakres materiału:</p>
 <ul>
 <li>struktura projektu Scrapy — <code>scrapy startproject</code>, <code>scrapy genspider</code>, role plików,</li>
 <li><code>scrapy shell</code> — interaktywna eksploracja selektorów przed napisaniem spidera,</li>
 <li>spider: <code>start_urls</code>, metoda <code>parse</code>, <code>yield dict</code>,</li>
 <li>paginacja przez <code>response.follow(next_page, callback=self.parse)</code>,</li>
-<li>wzorzec lista → detal: dwa callbacki (<code>parse</code> podąża za linkami, <code>parse_book</code> wyciąga dane),</li>
+<li>wzorzec lista → detal: dwa callbacki,</li>
+<li>podążanie za pojedynczym linkiem w łańcuchu stron,</li>
 <li>selektory Scrapy: <code>response.css()</code> i <code>response.xpath()</code>, <code>.get()</code> / <code>.getall()</code>, <code>::text</code>, <code>::attr()</code>,</li>
-<li>eksport: <code>scrapy crawl ... -o plik.json</code> (oraz <code>.csv</code>, <code>.jsonl</code>),</li>
+<li>eksport: <code>scrapy crawl ... -O plik.json</code> (oraz <code>.csv</code>, <code>.jsonl</code>),</li>
 <li>porównanie ręcznego crawlera z wersją w Scrapy.</li>
 </ul>
 <p>Narzędzia: Python (Scrapy, Flask), VSCode.</p>
@@ -368,7 +374,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="przygotowanie" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Przygotowanie</h1>
-<p>Środowisko jak na poprzednich labach: VSCode, dwa terminale (serwer w <strong>Terminalu 1</strong>, klient/Scrapy w <strong>Terminalu 2</strong>).</p>
+<p>Środowisko jak na poprzednich labach: VSCode, dwa terminale (serwer w <strong>Terminalu 1</strong>, Scrapy w <strong>Terminalu 2</strong>).</p>
 <p>Utwórz folder roboczy <code>lab11/</code> i otwórz go w VSCode.</p>
 <p>Zainstaluj Scrapy:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install scrapy</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -387,12 +393,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Scrapy to pierwszy nowy pakiet od kilku labów. Jeśli pracownia resetuje pakiety między sesjami (GoBack), zainstaluj go ponownie na początku zajęć. <code>flask</code> znasz z wcześniejszych labów.</p>
 </div>
 </div>
-<p>Będą nam potrzebne dwa znane serwery:</p>
+<p>Będą nam potrzebne trzy znane serwery — wszystkie z wcześniejszych zajęć:</p>
 <ul>
-<li><strong>serwer miast</strong> — <code>app.py</code> z Lab 4 (katalog miast z paginacją),</li>
-<li><strong>serwer bookshop</strong> — repozytorium z Lab 5–6.</li>
+<li><strong>serwer miast</strong> — <code>app.py</code> z Lab 4 (katalog z paginacją),</li>
+<li><strong>serwer bookshop</strong> — repozytorium z Lab 5–6,</li>
+<li><strong>serwer Collatza</strong> — z Wykładu 2 (kod wklejony w Ćwiczeniu 2, jest krótki).</li>
 </ul>
-<p>Skopiuj <code>app.py</code> serwera miast z Lab 4 do <code>lab11/</code>. Bookshop sklonujemy później, gdy będzie potrzebny.</p>
+<p>Skopiuj <code>app.py</code> serwera miast z Lab 4 do <code>lab11/</code>. Pozostałe serwery uruchomimy, gdy będą potrzebne.</p>
 <hr>
 </section>
 <section id="wstęp-gdzie-jesteśmy" class="level1" data-number="3">
@@ -411,7 +418,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    json.dump(all_cities, f, ensure_ascii<span class="op">=</span><span class="va">False</span>, indent<span class="op">=</span><span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>W tym schemacie ręcznie obsługujesz: pętlę po stronach, <code>requests.get</code>, budowanie pełnych URL-i z relatywnych ścieżek, warunek końca, zapis do pliku. Na Labie 10 dorzuciliśmy do tego współbieżność, <code>Semaphore</code>, timeouty i obsługę błędów — kolejne dziesiątki linii infrastruktury.</p>
 <p>Scrapy przejmuje to wszystko. Ty piszesz <strong>tylko logikę specyficzną dla strony</strong>: które elementy wyciągnąć i za którymi linkami podążać. Resztą — kolejką URL-i, pobieraniem, współbieżnością, deduplikacją, eksportem — zajmuje się framework.</p>
-<p>Plan labu: najpierw projekt i <code>scrapy shell</code> (Demo 1–2), potem prowadzone przepisanie crawlera miast (Demo 3 — to samo zadanie co Lab 4), wreszcie samodzielny spider bookshop w układzie lista → detal (Ćwiczenie 1).</p>
+<p>Plan labu rośnie przez trzy kształty stron, które poznałeś ręcznie:</p>
+<ul>
+<li><strong>Demo</strong> — katalog z paginacją (miasta, Lab 4), prowadzona przepiska,</li>
+<li><strong>Ćwiczenie 1</strong> — lista → detal (bookshop, Lab 5–6), wzorzec z Wykładu 6, bez szkieletu,</li>
+<li><strong>Ćwiczenie 2</strong> — łańcuch (Collatz, Wykład 2 / Lab 4), nowy kształt, bez szkieletu.</li>
+</ul>
 <hr>
 </section>
 <section id="demonstracja-1-projekt-scrapy" class="level1" data-number="4">
@@ -534,12 +546,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Scrapy pobiera strony <strong>współbieżnie</strong> (jak async z Lab 9–10), więc miasta w <code>cities.json</code> mogą być w innej kolejności niż w pliku z Lab 4. To nie błąd. Porównuj dane jako zbiór (posortowane), nie linia po linii:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> json.load(<span class="bu">open</span>(<span class="st">"cities.json"</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>))</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> json.load(<span class="bu">open</span>(<span class="st">"../cities_lab4.json"</span>, encoding<span class="op">=</span><span class="st">"utf-8"</span>))  <span class="co"># plik z Lab 4</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>key <span class="op">=</span> <span class="kw">lambda</span> c: c[<span class="st">"name"</span>]</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">sorted</span>(a, key<span class="op">=</span>key) <span class="op">==</span> <span class="bu">sorted</span>(b, key<span class="op">=</span>key)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Scrapy pobiera strony <strong>współbieżnie</strong> (jak async z Lab 9–10), więc miasta w <code>cities.json</code> mogą być w innej kolejności niż w pliku z Lab 4. To nie błąd — przy paginacji wszystkie linki „Następna” trafiają do kolejki niemal naraz. Porównuj dane jako zbiór (posortowane), nie linia po linii.</p>
 </div>
 </div>
 <section id="porównanie" class="level2" data-number="6.1">
@@ -550,74 +557,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="ćwiczenie-1-spider-bookshop-lista-detal" class="level1" data-number="7">
 <h1 data-number="7"><span class="header-section-number">7</span> Ćwiczenie 1: spider bookshop — lista → detal</h1>
-<p>Crawler miast czytał wszystkie dane z jednej tabeli. Bookshop ma strukturę dwupoziomową: listing <code>/books</code> (tytuł, autor, cena, link) i strony detali <code>/book/&lt;id&gt;</code> (dodatkowo opis i stan magazynowy). Na Labie 5–6 obsłużyłeś to ręcznie — pętlą po stronach plus osobne <code>requests.get</code> na każdą stronę detali. W Scrapy ten wzorzec to <strong>dwa callbacki</strong>.</p>
+<p>Crawler miast czytał wszystkie dane z jednej tabeli. Bookshop ma strukturę dwupoziomową: listing <code>/books</code> (tytuł, autor, cena, link) i strony detali <code>/book/&lt;id&gt;</code> (dodatkowo opis i stan magazynowy). W Scrapy ten wzorzec to <strong>dwa callbacki</strong>: <code>parse</code> podąża za linkami (do detali i do następnej strony listingu), drugi callback wyciąga dane ze strony detali.</p>
+<p>Ten dokładnie wzorzec — z serwerem bookshop — był pokazany na <strong>Wykładzie 6</strong>. Tym razem piszesz spidera samodzielnie, bez szkieletu. Jeśli utkniesz, wróć do slajdów z wykładu i do <code>scrapy shell</code>.</p>
 <section id="uruchomienie-serwera-bookshop" class="level2" data-number="7.1">
 <h2 data-number="7.1" class="anchored" data-anchor-id="uruchomienie-serwera-bookshop"><span class="header-section-number">7.1</span> Uruchomienie serwera bookshop</h2>
 <p>Zatrzymaj serwer miast (<code>Ctrl+C</code> w Terminalu 1). Sklonuj i uruchom bookshop:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/rodakt/bookshop.git</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> bookshop</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="ex">flask</span> run <span class="at">--debug</span> <span class="at">-p</span> 5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Otwórz <code>http://127.0.0.1:5000/books</code> w przeglądarce, kliknij w tytuł — przejdziesz na stronę detali. Klasy CSS znasz z Lab 5: <code>.book</code>, <code>h2.title</code>, <code>.author</code>, <code>.price</code>, <code>a.book-link</code>, <code>a.next-page</code>; na detalach <code>h1.title</code>, <code>.description</code>, <code>.stock</code>.</p>
-<div class="callout callout-style-default callout-tip callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Sprawdź selektory w shellu
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Zanim napiszesz spidera, otwórz <code>scrapy shell "http://127.0.0.1:5000/books"</code> i przetestuj: <code>response.css("a.book-link::attr(href)").getall()</code>, <code>response.css("a.next-page::attr(href)").get()</code>. Potem shell na stronie detali, np. <code>response.css("h1.title::text").get()</code>.</p>
-</div>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/rodakt/bookshop.git</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> bookshop</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">flask</span> run <span class="at">--debug</span> <span class="at">-p</span> 5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Otwórz <code>http://127.0.0.1:5000/books</code> w przeglądarce, kliknij w tytuł — przejdziesz na stronę detali. Klasy CSS znasz z Lab 5: na listingu <code>.book</code>, <code>h2.title</code>, <code>.author</code>, <code>.price</code>, <code>a.book-link</code>, <code>a.next-page</code>; na detalach <code>h1.title</code>, <code>.description</code>, <code>.stock</code>.</p>
 </section>
 <section id="zadanie" class="level2" data-number="7.2">
 <h2 data-number="7.2" class="anchored" data-anchor-id="zadanie"><span class="header-section-number">7.2</span> Zadanie</h2>
-<p>Wygeneruj spidera:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> genspider books 127.0.0.1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Otwórz <code>apd/spiders/books.py</code> i uzupełnij szkielet:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scrapy</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BooksSpider(scrapy.Spider):</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> <span class="st">"books"</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    allowed_domains <span class="op">=</span> [<span class="st">"127.0.0.1"</span>]</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    start_urls <span class="op">=</span> [<span class="st">"http://127.0.0.1:5000/books"</span>]</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse(<span class="va">self</span>, response):</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 1. Dla każdego linku do książki (a.book-link) podążaj na stronę</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    detali z callbackiem self.parse_book.</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    Wskazówka: response.follow przyjmuje selektor &lt;a&gt; wprost —</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    sam wyciągnie z niego href.</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 2. Znajdź link do następnej strony (a.next-page). Jeśli istnieje —</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    podążaj za nim z callbackiem self.parse (ta sama metoda,</span></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    kolejna strona listingu).</span></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse_book(<span class="va">self</span>, response):</span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>        <span class="co"># 3. Ze strony detali wyciągnij i wygeneruj słownik:</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    title (h1.title), author, description, price, stock.</span></span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>        <span class="co">#    Użyj response.css(...) z ::text i .get().</span></span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Twój kod ---</span></span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Uruchom i wyeksportuj (z wnętrza <code>apd/</code>):</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl books <span class="at">-O</span> bookshop.json</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wygeneruj spidera i napisz go od zera:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> genspider books 127.0.0.1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wymagania:</p>
+<ol type="1">
+<li>Start od <code>http://127.0.0.1:5000/books</code>.</li>
+<li><code>parse</code> dla każdej książki na listingu podąża na jej stronę detali (callback wyciągający dane), a po linku <code>a.next-page</code> przechodzi na kolejną stronę listingu (callback <code>self.parse</code>).</li>
+<li>Drugi callback generuje słownik z polami: <code>title</code>, <code>author</code>, <code>description</code>, <code>price</code>, <code>stock</code>.</li>
+<li>Eksport do <code>bookshop.json</code>.</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl books <span class="at">-O</span> bookshop.json</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Tip</span>Selektor jako argument <code>response.follow</code>
+<span class="screen-reader-only">Tip</span>Eksploruj selektory w shellu
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><code>response.follow(link, callback=...)</code> przyjmuje nie tylko string z URL-em, ale też obiekt <code>&lt;a&gt;</code> — Scrapy sam wyciągnie <code>href</code>. Dzięki temu krok 1 może wyglądać tak:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> link <span class="kw">in</span> response.css(<span class="st">"a.book-link"</span>):</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">yield</span> response.follow(link, callback<span class="op">=</span><span class="va">self</span>.parse_book)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Zanim napiszesz spidera, otwórz <code>scrapy shell "http://127.0.0.1:5000/books"</code> i sprawdź: <code>response.css("a.book-link::attr(href)").getall()</code>, <code>response.css("a.next-page::attr(href)").get()</code>. Potem shell na stronie detali: <code>response.css("h1.title::text").get()</code> itd. <code>response.follow</code> przyjmuje także obiekt <code>&lt;a&gt;</code> wprost — wyciągnie z niego <code>href</code> sam.</p>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -633,7 +605,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li>Ile książek zebrał spider? Czy zgadza się z liczbą z <code>bookshop.json</code> z Lab 5?</li>
 <li>Czy każdy rekord ma pola <code>title</code>, <code>author</code>, <code>description</code>, <code>price</code>, <code>stock</code>?</li>
-<li><strong>Test regresji</strong>: porównaj dane (posortowane po <code>title</code>) z <code>bookshop.json</code> z Lab 5. Powinny być identyczne — ta sama strona, inne narzędzie, ten sam wynik. Jeśli się różnią, gdzieś jest błąd w selektorze.</li>
+<li><strong>Test regresji</strong>: porównaj dane (posortowane po <code>title</code>) z <code>bookshop.json</code> z Lab 5/6. Powinny być identyczne — ta sama strona, inne narzędzie, ten sam wynik. Jeśli się różnią, gdzieś jest błąd w selektorze.</li>
 <li>Czy spider zatrzymał się sam (nie zapętlił)? Scrapy deduplikuje URL-e, więc nawet gdy ostatnia strona linkuje wstecz, nie pobierze jej ponownie.</li>
 </ol>
 </div>
@@ -641,25 +613,122 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <hr>
 </section>
 </section>
-<section id="ćwiczenia-samodzielne" class="level1" data-number="8">
-<h1 data-number="8"><span class="header-section-number">8</span> Ćwiczenia samodzielne</h1>
-<section id="ćwiczenie-a-formaty-eksportu" class="level2" data-number="8.1">
-<h2 data-number="8.1" class="anchored" data-anchor-id="ćwiczenie-a-formaty-eksportu"><span class="header-section-number">8.1</span> Ćwiczenie A: formaty eksportu</h2>
+<section id="ćwiczenie-2-spider-collatza-łańcuch" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Ćwiczenie 2: spider Collatza — łańcuch</h1>
+<p>Miasta to katalog z paginacją, bookshop to lista → detal. Trzeci kształt: <strong>łańcuch</strong>. Serwer Collatza z Wykładu 2 generuje po jednej liczbie na stronę, a link prowadzi do następnej liczby w ciągu. Ręcznego crawlera dla niego pisałeś na Labie 4 (Ćwiczenie A). Teraz wersja w Scrapy — bez szkieletu.</p>
+<section id="serwer" class="level2" data-number="8.1">
+<h2 data-number="8.1" class="anchored" data-anchor-id="serwer"><span class="header-section-number">8.1</span> Serwer</h2>
+<p>Zatrzymaj poprzedni serwer (<code>Ctrl+C</code>). W <code>lab11/</code> utwórz <code>collatz_app.py</code> (kod z Wykładu 2):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">"/collatz/&lt;int:n&gt;"</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> collatz(n):</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="st">"""</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;html&gt;&lt;body&gt;</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="st">            &lt;h1&gt;1&lt;/h1&gt;</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="st">            &lt;p&gt;Koniec ciągu!&lt;/p&gt;</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="st">            &lt;a href="/collatz/7"&gt;Rozpocznij od 7&lt;/a&gt;</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="st">        &lt;/body&gt;&lt;/html&gt;</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="st">        """</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> n <span class="op">%</span> <span class="dv">2</span> <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>        next_n <span class="op">=</span> n <span class="op">//</span> <span class="dv">2</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>        next_n <span class="op">=</span> <span class="dv">3</span> <span class="op">*</span> n <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"""</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="ss">    &lt;html&gt;&lt;body&gt;</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;h1&gt;</span><span class="sc">{</span>n<span class="sc">}</span><span class="ss">&lt;/h1&gt;</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;p&gt;Następna liczba: </span><span class="sc">{</span>next_n<span class="sc">}</span><span class="ss">&lt;/p&gt;</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;a href="/collatz/</span><span class="sc">{</span>next_n<span class="sc">}</span><span class="ss">"&gt;Przejdź do </span><span class="sc">{</span>next_n<span class="sc">}</span><span class="ss">&lt;/a&gt;</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;br&gt;</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="ss">        &lt;a href="/collatz/1"&gt;Idź do 1 (koniec)&lt;/a&gt;</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="ss">    &lt;/body&gt;&lt;/html&gt;</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a><span class="ss">    """</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Uruchom go w <strong>Terminalu 1</strong>:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">flask</span> <span class="at">--app</span> collatz_app run <span class="at">--debug</span> <span class="at">-p</span> 5000</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Sprawdź w przeglądarce <code>http://127.0.0.1:5000/collatz/27</code> — przeklikaj kilka kroków „Przejdź do …“.</p>
+</section>
+<section id="zadanie-1" class="level2" data-number="8.2">
+<h2 data-number="8.2" class="anchored" data-anchor-id="zadanie-1"><span class="header-section-number">8.2</span> Zadanie</h2>
+<p>Wygeneruj spidera <code>collatz</code> i napisz go samodzielnie:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> genspider collatz 127.0.0.1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Wymagania:</p>
+<ol type="1">
+<li>Start od <code>http://127.0.0.1:5000/collatz/27</code>.</li>
+<li>Na każdej stronie wygeneruj <code>{"n": &lt;liczba z nagłówka h1&gt;}</code>.</li>
+<li>Podążaj za linkiem do następnej liczby. Gdy go nie ma — koniec.</li>
+<li>Eksport do <code>collatz_27.json</code>.</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl collatz <span class="at">-O</span> collatz_27.json</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Na stronie są DWA linki <code>/collatz/...</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Każda strona ma „Przejdź do {next_n}” <strong>oraz</strong> „Idź do 1 (koniec)“. Naiwne <code>response.css("a::attr(href)").get()</code> może złapać niewłaściwy — spider skoczyłby prosto do <code>/collatz/1</code> i crawl skończyłby się po jednym kroku. Wybierz link precyzyjnie. Na stronie końcowej (<code>n = 1</code>) jest tylko „Rozpocznij od 7” — i właśnie za nim <strong>nie</strong> chcesz podążać, inaczej spider wpadnie w nieskończoną pętlę 7 → … → 1 → 7. (Z <code>n = 27</code> ciąg ma 112 kroków — tyle rekordów powinno być w pliku.)</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Dlaczego Collatz nie zrównolegli się jak miasta
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Przy miastach Scrapy pobierał strony współbieżnie — wszystkie linki „Następna” wpadały do kolejki niemal naraz. Collatz jest inny: nie znasz następnego URL-a, póki nie pobierzesz bieżącej strony. To <strong>zależność sekwencyjna</strong> — kolejka nigdy nie ma więcej niż jednego oczekującego żądania, więc współbieżność Scrapy nic tu nie przyspiesza. Framework daje moc, ale nie wyczaruje jej z łańcucha, w którym każdy krok zależy od poprzedniego.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Checkpoint
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Czy <code>collatz_27.json</code> ma 112 rekordów? Czy zaczyna się od 27, a kończy na 1?</li>
+<li>Czy spider zatrzymał się sam, czy musiałeś go ubić (<code>Ctrl+C</code>)? Jeśli to drugie — najpewniej podążasz za linkiem „Rozpocznij od 7” ze strony końcowej.</li>
+<li>Porównaj z <code>collatz_27.json</code> z Lab 4 — ten sam ciąg? Tu kolejność <strong>powinna</strong> być zachowana (w odróżnieniu od miast) — wyjaśnij dlaczego.</li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="ćwiczenia-samodzielne" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Ćwiczenia samodzielne</h1>
+<section id="ćwiczenie-a-formaty-eksportu" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="ćwiczenie-a-formaty-eksportu"><span class="header-section-number">9.1</span> Ćwiczenie A: formaty eksportu</h2>
 <p>Uruchom spidera <code>books</code> z różnymi rozszerzeniami pliku wyjściowego:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl books <span class="at">-O</span> bookshop.csv</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl books <span class="at">-O</span> bookshop.jsonl</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl books <span class="at">-O</span> bookshop.csv</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> crawl books <span class="at">-O</span> bookshop.jsonl</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Otwórz oba pliki. Scrapy rozpoznaje format po rozszerzeniu: <code>.csv</code> to tabela (pierwszy wiersz to nazwy pól), <code>.jsonl</code> (JSON Lines) to jeden obiekt JSON na linię. Które ułatwia podgląd pojedynczego rekordu w edytorze, a które — wczytanie do arkusza?</p>
 </section>
-<section id="ćwiczenie-b-spider-na-serwer-szczytów" class="level2" data-number="8.2">
-<h2 data-number="8.2" class="anchored" data-anchor-id="ćwiczenie-b-spider-na-serwer-szczytów"><span class="header-section-number">8.2</span> Ćwiczenie B: spider na serwer szczytów</h2>
+<section id="ćwiczenie-b-opcjonalne-spider-na-serwer-szczytów" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="ćwiczenie-b-opcjonalne-spider-na-serwer-szczytów"><span class="header-section-number">9.2</span> Ćwiczenie B (opcjonalne): spider na serwer szczytów</h2>
 <p>Na Labie 4 (Ćwiczenie 2) zbudowałeś serwer <code>/peaks</code> — katalog polskich szczytów z paginacją (klucze <code>name</code>, <code>height</code>, <code>range</code>). Uruchom go i napisz spidera <code>peaks</code>.</p>
-<p>Punkt wyjścia: skopiuj <code>cities.py</code>, zmień <code>name</code>, <code>start_urls</code> i selektory/klucze. <strong>Logika spidera — pętla po stronach przez <code>response.follow</code>, <code>yield dict</code> — jest identyczna.</strong> Zmieniasz tylko cel i nazwy pól. To ta sama zasada „jedna zmienna na raz”, którą widziałeś przy przejściu z miast na szczyty w Lab 4.</p>
-<p>Wynik: <code>peaks.json</code> z 20 szczytami.</p>
+<p>To samo zadanie co miasta, tylko inny cel i nazwy pól — logika spidera (paginacja przez <code>response.follow</code>, <code>yield dict</code>) jest identyczna. Punkt wyjścia: skopiuj <code>cities.py</code>, zmień <code>name</code>, <code>start_urls</code>, selektory i klucze. Wynik: <code>peaks.json</code> z 20 szczytami.</p>
 </section>
-<section id="ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell" class="level2" data-number="8.3">
-<h2 data-number="8.3" class="anchored" data-anchor-id="ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell"><span class="header-section-number">8.3</span> Ćwiczenie C (dodatkowe): zagadki w <code>scrapy shell</code></h2>
+<section id="ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="ćwiczenie-c-dodatkowe-zagadki-w-scrapy-shell"><span class="header-section-number">9.3</span> Ćwiczenie C (dodatkowe): zagadki w <code>scrapy shell</code></h2>
 <p>Otwórz shell na listingu bookshop:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> shell <span class="st">"http://127.0.0.1:5000/books"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">scrapy</span> shell <span class="st">"http://127.0.0.1:5000/books"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Rozwiąż w jednej linii każde (echo „dziesięciu zapytań XPath” z Lab 6, tym razem mieszanką CSS i XPath):</p>
 <ol type="1">
 <li>Tytuły wszystkich książek na stronie (lista stringów).</li>
@@ -678,23 +747,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><code>response.css(...)</code> i <code>response.xpath(...)</code> działają na tym samym obiekcie — możesz nawet je łączyć (<code>response.css("div.book").xpath('./h2/text()')</code>). Zadania 1–4 są wygodniejsze w CSS, zadanie 5 (nawigacja osią) — w XPath.</p>
+<p><code>response.css(...)</code> i <code>response.xpath(...)</code> działają na tym samym obiekcie — możesz je nawet łączyć (<code>response.css("div.book").xpath('./h2/text()')</code>). Zadania 1–4 są wygodniejsze w CSS, zadanie 5 (nawigacja osią) — w XPath.</p>
 </div>
 </div>
 <hr>
 </section>
 </section>
-<section id="podsumowanie" class="level1" data-number="9">
-<h1 data-number="9"><span class="header-section-number">9</span> Podsumowanie</h1>
+<section id="podsumowanie" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Podsumowanie</h1>
 <p>W tym labie:</p>
 <ul>
-<li>utworzyłeś projekt Scrapy (<code>startproject</code>, <code>genspider</code>) i poznałeś role plików — na tym labie dotykaliśmy tylko <code>spiders/</code>,</li>
+<li>utworzyłeś projekt Scrapy (<code>startproject</code>, <code>genspider</code>) i poznałeś role plików — dotykaliśmy tylko <code>spiders/</code>,</li>
 <li>używałeś <code>scrapy shell</code> do sprawdzania selektorów na żywo, zanim trafiły do spidera,</li>
 <li>przepisałeś crawler miast z Lab 4 na spidera — to samo zadanie, ten sam wynik, kilkanaście linii zamiast pętli z ręcznym pobieraniem, budowaniem URL-i i zapisem,</li>
-<li>zobaczyłeś, że Scrapy pobiera strony współbieżnie, więc kolejność wyników nie odpowiada kolejności stron — dane porównujemy jako zbiór,</li>
-<li>napisałeś spidera bookshop w układzie <strong>lista → detal</strong>: <code>parse</code> podąża za linkami (do detali i do następnej strony), <code>parse_book</code> wyciąga pełne dane,</li>
+<li>napisałeś — bez szkieletu — spidera bookshop w układzie <strong>lista → detal</strong> (<code>parse</code> + drugi callback) oraz spidera Collatza dla <strong>łańcucha</strong> stron,</li>
+<li>zobaczyłeś, że Scrapy pobiera współbieżnie, więc paginacja miesza kolejność wyników, a łańcuch zależny (Collatz) i tak biegnie sekwencyjnie,</li>
 <li>eksportowałeś wyniki do JSON, CSV i JSON Lines jednym przełącznikiem <code>-O</code>.</li>
 </ul>
+<p>Trzy kształty stron, jeden wzorzec spidera:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Kształt</th>
+<th>Strona</th>
+<th>Nawigacja w <code>parse</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Katalog z paginacją</td>
+<td>miasta (Lab 4)</td>
+<td>jeden link „Następna” → <code>self.parse</code></td>
+</tr>
+<tr class="even">
+<td>Lista → detal</td>
+<td>bookshop (Lab 5–6)</td>
+<td>wiele linków → callback detalu <strong>+</strong> „Następna” → <code>self.parse</code></td>
+</tr>
+<tr class="odd">
+<td>Łańcuch</td>
+<td>Collatz (Wykład 2 / Lab 4)</td>
+<td>jeden link do następnej → <code>self.parse</code></td>
+</tr>
+</tbody>
+</table>
 <p>Mapa „ręcznie → Scrapy”, którą warto zapamiętać:</p>
 <table class="caption-top table">
 <colgroup>
