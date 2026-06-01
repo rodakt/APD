@@ -7,7 +7,7 @@ author: "Tomasz Rodak"
 
 # Cel
 
-Na Labie 10 zakończyliśmy „programatyczny tor": ręcznie składaliśmy kontrolę współbieżności, timeouty, obsługę błędów i zapis wyników. Dziś oddajemy tę infrastrukturę frameworkowi. Przepiszemy crawlery, które już znasz (miasta z Lab 4, bookshop z Lab 5–6), na spidery Scrapy — ten sam serwer, ten sam wynik, znacznie mniej kodu.
+Na Labie 10 zakończyliśmy „programatyczny tor": ręcznie składaliśmy kontrolę współbieżności, timeouty, obsługę błędów i zapis wyników. Dziś oddajemy tę infrastrukturę frameworkowi. Przepiszemy crawlery, które już znasz, na spidery Scrapy — ten sam serwer, ten sam wynik, znacznie mniej kodu.
 
 Zakres materiału:
 
@@ -15,9 +15,10 @@ Zakres materiału:
 * `scrapy shell` — interaktywna eksploracja selektorów przed napisaniem spidera,
 * spider: `start_urls`, metoda `parse`, `yield dict`,
 * paginacja przez `response.follow(next_page, callback=self.parse)`,
-* wzorzec lista → detal: dwa callbacki (`parse` podąża za linkami, `parse_book` wyciąga dane),
+* wzorzec lista → detal: dwa callbacki,
+* podążanie za pojedynczym linkiem w łańcuchu stron,
 * selektory Scrapy: `response.css()` i `response.xpath()`, `.get()` / `.getall()`, `::text`, `::attr()`,
-* eksport: `scrapy crawl ... -o plik.json` (oraz `.csv`, `.jsonl`),
+* eksport: `scrapy crawl ... -O plik.json` (oraz `.csv`, `.jsonl`),
 * porównanie ręcznego crawlera z wersją w Scrapy.
 
 Narzędzia: Python (Scrapy, Flask), VSCode.
@@ -26,7 +27,7 @@ Narzędzia: Python (Scrapy, Flask), VSCode.
 
 # Przygotowanie
 
-Środowisko jak na poprzednich labach: VSCode, dwa terminale (serwer w **Terminalu 1**, klient/Scrapy w **Terminalu 2**).
+Środowisko jak na poprzednich labach: VSCode, dwa terminale (serwer w **Terminalu 1**, Scrapy w **Terminalu 2**).
 
 Utwórz folder roboczy `lab11/` i otwórz go w VSCode.
 
@@ -47,12 +48,13 @@ scrapy version
 Scrapy to pierwszy nowy pakiet od kilku labów. Jeśli pracownia resetuje pakiety między sesjami (GoBack), zainstaluj go ponownie na początku zajęć. `flask` znasz z wcześniejszych labów.
 :::
 
-Będą nam potrzebne dwa znane serwery:
+Będą nam potrzebne trzy znane serwery — wszystkie z wcześniejszych zajęć:
 
-* **serwer miast** — `app.py` z Lab 4 (katalog miast z paginacją),
-* **serwer bookshop** — repozytorium z Lab 5–6.
+* **serwer miast** — `app.py` z Lab 4 (katalog z paginacją),
+* **serwer bookshop** — repozytorium z Lab 5–6,
+* **serwer Collatza** — z Wykładu 2 (kod wklejony w Ćwiczeniu 2, jest krótki).
 
-Skopiuj `app.py` serwera miast z Lab 4 do `lab11/`. Bookshop sklonujemy później, gdy będzie potrzebny.
+Skopiuj `app.py` serwera miast z Lab 4 do `lab11/`. Pozostałe serwery uruchomimy, gdy będą potrzebne.
 
 ---
 
@@ -78,7 +80,11 @@ W tym schemacie ręcznie obsługujesz: pętlę po stronach, `requests.get`, budo
 
 Scrapy przejmuje to wszystko. Ty piszesz **tylko logikę specyficzną dla strony**: które elementy wyciągnąć i za którymi linkami podążać. Resztą — kolejką URL-i, pobieraniem, współbieżnością, deduplikacją, eksportem — zajmuje się framework.
 
-Plan labu: najpierw projekt i `scrapy shell` (Demo 1–2), potem prowadzone przepisanie crawlera miast (Demo 3 — to samo zadanie co Lab 4), wreszcie samodzielny spider bookshop w układzie lista → detal (Ćwiczenie 1).
+Plan labu rośnie przez trzy kształty stron, które poznałeś ręcznie:
+
+* **Demo** — katalog z paginacją (miasta, Lab 4), prowadzona przepiska,
+* **Ćwiczenie 1** — lista → detal (bookshop, Lab 5–6), wzorzec z Wykładu 6, bez szkieletu,
+* **Ćwiczenie 2** — łańcuch (Collatz, Wykład 2 / Lab 4), nowy kształt, bez szkieletu.
 
 ---
 
@@ -207,15 +213,7 @@ Otwórz `cities.json`. Powinno być 30 miast — tyle, ile zebrał ręczny crawl
 
 ::: {.callout-note}
 ## Kolejność elementów ≠ kolejność stron
-Scrapy pobiera strony **współbieżnie** (jak async z Lab 9–10), więc miasta w `cities.json` mogą być w innej kolejności niż w pliku z Lab 4. To nie błąd. Porównuj dane jako zbiór (posortowane), nie linia po linii:
-
-```python
-import json
-a = json.load(open("cities.json", encoding="utf-8"))
-b = json.load(open("../cities_lab4.json", encoding="utf-8"))  # plik z Lab 4
-key = lambda c: c["name"]
-assert sorted(a, key=key) == sorted(b, key=key)
-```
+Scrapy pobiera strony **współbieżnie** (jak async z Lab 9–10), więc miasta w `cities.json` mogą być w innej kolejności niż w pliku z Lab 4. To nie błąd — przy paginacji wszystkie linki „Następna" trafiają do kolejki niemal naraz. Porównuj dane jako zbiór (posortowane), nie linia po linii.
 :::
 
 ## Porównanie
@@ -226,7 +224,9 @@ Zestaw `parse` (kilkanaście linii) z funkcją `crawl_catalog` z Lab 4. Policz, 
 
 # Ćwiczenie 1: spider bookshop — lista → detal
 
-Crawler miast czytał wszystkie dane z jednej tabeli. Bookshop ma strukturę dwupoziomową: listing `/books` (tytuł, autor, cena, link) i strony detali `/book/<id>` (dodatkowo opis i stan magazynowy). Na Labie 5–6 obsłużyłeś to ręcznie — pętlą po stronach plus osobne `requests.get` na każdą stronę detali. W Scrapy ten wzorzec to **dwa callbacki**.
+Crawler miast czytał wszystkie dane z jednej tabeli. Bookshop ma strukturę dwupoziomową: listing `/books` (tytuł, autor, cena, link) i strony detali `/book/<id>` (dodatkowo opis i stan magazynowy). W Scrapy ten wzorzec to **dwa callbacki**: `parse` podąża za linkami (do detali i do następnej strony listingu), drugi callback wyciąga dane ze strony detali.
+
+Ten dokładnie wzorzec — z serwerem bookshop — był pokazany na **Wykładzie 6**. Tym razem piszesz spidera samodzielnie, bez szkieletu. Jeśli utkniesz, wróć do slajdów z wykładu i do `scrapy shell`.
 
 ## Uruchomienie serwera bookshop
 
@@ -238,74 +238,125 @@ cd bookshop
 flask run --debug -p 5000
 ```
 
-Otwórz `http://127.0.0.1:5000/books` w przeglądarce, kliknij w tytuł — przejdziesz na stronę detali. Klasy CSS znasz z Lab 5: `.book`, `h2.title`, `.author`, `.price`, `a.book-link`, `a.next-page`; na detalach `h1.title`, `.description`, `.stock`.
-
-::: {.callout-tip}
-## Sprawdź selektory w shellu
-Zanim napiszesz spidera, otwórz `scrapy shell "http://127.0.0.1:5000/books"` i przetestuj: `response.css("a.book-link::attr(href)").getall()`, `response.css("a.next-page::attr(href)").get()`. Potem shell na stronie detali, np. `response.css("h1.title::text").get()`.
-:::
+Otwórz `http://127.0.0.1:5000/books` w przeglądarce, kliknij w tytuł — przejdziesz na stronę detali. Klasy CSS znasz z Lab 5: na listingu `.book`, `h2.title`, `.author`, `.price`, `a.book-link`, `a.next-page`; na detalach `h1.title`, `.description`, `.stock`.
 
 ## Zadanie
 
-Wygeneruj spidera:
+Wygeneruj spidera i napisz go od zera:
 
 ```bash
 scrapy genspider books 127.0.0.1
 ```
 
-Otwórz `apd/spiders/books.py` i uzupełnij szkielet:
+Wymagania:
 
-```python
-import scrapy
-
-
-class BooksSpider(scrapy.Spider):
-    name = "books"
-    allowed_domains = ["127.0.0.1"]
-    start_urls = ["http://127.0.0.1:5000/books"]
-
-    def parse(self, response):
-        # 1. Dla każdego linku do książki (a.book-link) podążaj na stronę
-        #    detali z callbackiem self.parse_book.
-        #    Wskazówka: response.follow przyjmuje selektor <a> wprost —
-        #    sam wyciągnie z niego href.
-        # --- Twój kod ---
-
-        # 2. Znajdź link do następnej strony (a.next-page). Jeśli istnieje —
-        #    podążaj za nim z callbackiem self.parse (ta sama metoda,
-        #    kolejna strona listingu).
-        # --- Twój kod ---
-
-    def parse_book(self, response):
-        # 3. Ze strony detali wyciągnij i wygeneruj słownik:
-        #    title (h1.title), author, description, price, stock.
-        #    Użyj response.css(...) z ::text i .get().
-        # --- Twój kod ---
-        pass
-```
-
-Uruchom i wyeksportuj (z wnętrza `apd/`):
+1. Start od `http://127.0.0.1:5000/books`.
+2. `parse` dla każdej książki na listingu podąża na jej stronę detali (callback wyciągający dane), a po linku `a.next-page` przechodzi na kolejną stronę listingu (callback `self.parse`).
+3. Drugi callback generuje słownik z polami: `title`, `author`, `description`, `price`, `stock`.
+4. Eksport do `bookshop.json`.
 
 ```bash
 scrapy crawl books -O bookshop.json
 ```
 
 ::: {.callout-tip}
-## Selektor jako argument `response.follow`
-`response.follow(link, callback=...)` przyjmuje nie tylko string z URL-em, ale też obiekt `<a>` — Scrapy sam wyciągnie `href`. Dzięki temu krok 1 może wyglądać tak:
-
-```python
-for link in response.css("a.book-link"):
-    yield response.follow(link, callback=self.parse_book)
-```
+## Eksploruj selektory w shellu
+Zanim napiszesz spidera, otwórz `scrapy shell "http://127.0.0.1:5000/books"` i sprawdź: `response.css("a.book-link::attr(href)").getall()`, `response.css("a.next-page::attr(href)").get()`. Potem shell na stronie detali: `response.css("h1.title::text").get()` itd. `response.follow` przyjmuje także obiekt `<a>` wprost — wyciągnie z niego `href` sam.
 :::
 
 ::: {.callout-note}
 ## Checkpoint
 1. Ile książek zebrał spider? Czy zgadza się z liczbą z `bookshop.json` z Lab 5?
 2. Czy każdy rekord ma pola `title`, `author`, `description`, `price`, `stock`?
-3. **Test regresji**: porównaj dane (posortowane po `title`) z `bookshop.json` z Lab 5. Powinny być identyczne — ta sama strona, inne narzędzie, ten sam wynik. Jeśli się różnią, gdzieś jest błąd w selektorze.
+3. **Test regresji**: porównaj dane (posortowane po `title`) z `bookshop.json` z Lab 5/6. Powinny być identyczne — ta sama strona, inne narzędzie, ten sam wynik. Jeśli się różnią, gdzieś jest błąd w selektorze.
 4. Czy spider zatrzymał się sam (nie zapętlił)? Scrapy deduplikuje URL-e, więc nawet gdy ostatnia strona linkuje wstecz, nie pobierze jej ponownie.
+:::
+
+---
+
+# Ćwiczenie 2: spider Collatza — łańcuch
+
+Miasta to katalog z paginacją, bookshop to lista → detal. Trzeci kształt: **łańcuch**. Serwer Collatza z Wykładu 2 generuje po jednej liczbie na stronę, a link prowadzi do następnej liczby w ciągu. Ręcznego crawlera dla niego pisałeś na Labie 4 (Ćwiczenie A). Teraz wersja w Scrapy — bez szkieletu.
+
+## Serwer
+
+Zatrzymaj poprzedni serwer (`Ctrl+C`). W `lab11/` utwórz `collatz_app.py` (kod z Wykładu 2):
+
+```python
+from flask import Flask
+
+app = Flask(__name__)
+
+
+@app.route("/collatz/<int:n>")
+def collatz(n):
+    if n == 1:
+        return """
+        <html><body>
+            <h1>1</h1>
+            <p>Koniec ciągu!</p>
+            <a href="/collatz/7">Rozpocznij od 7</a>
+        </body></html>
+        """
+
+    if n % 2 == 0:
+        next_n = n // 2
+    else:
+        next_n = 3 * n + 1
+
+    return f"""
+    <html><body>
+        <h1>{n}</h1>
+        <p>Następna liczba: {next_n}</p>
+        <a href="/collatz/{next_n}">Przejdź do {next_n}</a>
+        <br>
+        <a href="/collatz/1">Idź do 1 (koniec)</a>
+    </body></html>
+    """
+```
+
+Uruchom go w **Terminalu 1**:
+
+```bash
+flask --app collatz_app run --debug -p 5000
+```
+
+Sprawdź w przeglądarce `http://127.0.0.1:5000/collatz/27` — przeklikaj kilka kroków „Przejdź do …".
+
+## Zadanie
+
+Wygeneruj spidera `collatz` i napisz go samodzielnie:
+
+```bash
+scrapy genspider collatz 127.0.0.1
+```
+
+Wymagania:
+
+1. Start od `http://127.0.0.1:5000/collatz/27`.
+2. Na każdej stronie wygeneruj `{"n": <liczba z nagłówka h1>}`.
+3. Podążaj za linkiem do następnej liczby. Gdy go nie ma — koniec.
+4. Eksport do `collatz_27.json`.
+
+```bash
+scrapy crawl collatz -O collatz_27.json
+```
+
+::: {.callout-warning}
+## Na stronie są DWA linki `/collatz/...`
+Każda strona ma „Przejdź do {next_n}" **oraz** „Idź do 1 (koniec)". Naiwne `response.css("a::attr(href)").get()` może złapać niewłaściwy — spider skoczyłby prosto do `/collatz/1` i crawl skończyłby się po jednym kroku. Wybierz link precyzyjnie. Na stronie końcowej (`n = 1`) jest tylko „Rozpocznij od 7" — i właśnie za nim **nie** chcesz podążać, inaczej spider wpadnie w nieskończoną pętlę 7 → … → 1 → 7. (Z `n = 27` ciąg ma 112 kroków — tyle rekordów powinno być w pliku.)
+:::
+
+::: {.callout-tip}
+## Dlaczego Collatz nie zrównolegli się jak miasta
+Przy miastach Scrapy pobierał strony współbieżnie — wszystkie linki „Następna" wpadały do kolejki niemal naraz. Collatz jest inny: nie znasz następnego URL-a, póki nie pobierzesz bieżącej strony. To **zależność sekwencyjna** — kolejka nigdy nie ma więcej niż jednego oczekującego żądania, więc współbieżność Scrapy nic tu nie przyspiesza. Framework daje moc, ale nie wyczaruje jej z łańcucha, w którym każdy krok zależy od poprzedniego.
+:::
+
+::: {.callout-note}
+## Checkpoint
+1. Czy `collatz_27.json` ma 112 rekordów? Czy zaczyna się od 27, a kończy na 1?
+2. Czy spider zatrzymał się sam, czy musiałeś go ubić (`Ctrl+C`)? Jeśli to drugie — najpewniej podążasz za linkiem „Rozpocznij od 7" ze strony końcowej.
+3. Porównaj z `collatz_27.json` z Lab 4 — ten sam ciąg? Tu kolejność **powinna** być zachowana (w odróżnieniu od miast) — wyjaśnij dlaczego.
 :::
 
 ---
@@ -323,13 +374,11 @@ scrapy crawl books -O bookshop.jsonl
 
 Otwórz oba pliki. Scrapy rozpoznaje format po rozszerzeniu: `.csv` to tabela (pierwszy wiersz to nazwy pól), `.jsonl` (JSON Lines) to jeden obiekt JSON na linię. Które ułatwia podgląd pojedynczego rekordu w edytorze, a które — wczytanie do arkusza?
 
-## Ćwiczenie B: spider na serwer szczytów
+## Ćwiczenie B (opcjonalne): spider na serwer szczytów
 
 Na Labie 4 (Ćwiczenie 2) zbudowałeś serwer `/peaks` — katalog polskich szczytów z paginacją (klucze `name`, `height`, `range`). Uruchom go i napisz spidera `peaks`.
 
-Punkt wyjścia: skopiuj `cities.py`, zmień `name`, `start_urls` i selektory/klucze. **Logika spidera — pętla po stronach przez `response.follow`, `yield dict` — jest identyczna.** Zmieniasz tylko cel i nazwy pól. To ta sama zasada „jedna zmienna na raz", którą widziałeś przy przejściu z miast na szczyty w Lab 4.
-
-Wynik: `peaks.json` z 20 szczytami.
+To samo zadanie co miasta, tylko inny cel i nazwy pól — logika spidera (paginacja przez `response.follow`, `yield dict`) jest identyczna. Punkt wyjścia: skopiuj `cities.py`, zmień `name`, `start_urls`, selektory i klucze. Wynik: `peaks.json` z 20 szczytami.
 
 ## Ćwiczenie C (dodatkowe): zagadki w `scrapy shell`
 
@@ -349,7 +398,7 @@ Rozwiąż w jednej linii każde (echo „dziesięciu zapytań XPath" z Lab 6, ty
 
 ::: {.callout-tip}
 ## CSS vs XPath w jednym `response`
-`response.css(...)` i `response.xpath(...)` działają na tym samym obiekcie — możesz nawet je łączyć (`response.css("div.book").xpath('./h2/text()')`). Zadania 1–4 są wygodniejsze w CSS, zadanie 5 (nawigacja osią) — w XPath.
+`response.css(...)` i `response.xpath(...)` działają na tym samym obiekcie — możesz je nawet łączyć (`response.css("div.book").xpath('./h2/text()')`). Zadania 1–4 są wygodniejsze w CSS, zadanie 5 (nawigacja osią) — w XPath.
 :::
 
 ---
@@ -358,12 +407,20 @@ Rozwiąż w jednej linii każde (echo „dziesięciu zapytań XPath" z Lab 6, ty
 
 W tym labie:
 
-* utworzyłeś projekt Scrapy (`startproject`, `genspider`) i poznałeś role plików — na tym labie dotykaliśmy tylko `spiders/`,
+* utworzyłeś projekt Scrapy (`startproject`, `genspider`) i poznałeś role plików — dotykaliśmy tylko `spiders/`,
 * używałeś `scrapy shell` do sprawdzania selektorów na żywo, zanim trafiły do spidera,
 * przepisałeś crawler miast z Lab 4 na spidera — to samo zadanie, ten sam wynik, kilkanaście linii zamiast pętli z ręcznym pobieraniem, budowaniem URL-i i zapisem,
-* zobaczyłeś, że Scrapy pobiera strony współbieżnie, więc kolejność wyników nie odpowiada kolejności stron — dane porównujemy jako zbiór,
-* napisałeś spidera bookshop w układzie **lista → detal**: `parse` podąża za linkami (do detali i do następnej strony), `parse_book` wyciąga pełne dane,
+* napisałeś — bez szkieletu — spidera bookshop w układzie **lista → detal** (`parse` + drugi callback) oraz spidera Collatza dla **łańcucha** stron,
+* zobaczyłeś, że Scrapy pobiera współbieżnie, więc paginacja miesza kolejność wyników, a łańcuch zależny (Collatz) i tak biegnie sekwencyjnie,
 * eksportowałeś wyniki do JSON, CSV i JSON Lines jednym przełącznikiem `-O`.
+
+Trzy kształty stron, jeden wzorzec spidera:
+
+| Kształt | Strona | Nawigacja w `parse` |
+|---|---|---|
+| Katalog z paginacją | miasta (Lab 4) | jeden link „Następna" → `self.parse` |
+| Lista → detal | bookshop (Lab 5–6) | wiele linków → callback detalu **+** „Następna" → `self.parse` |
+| Łańcuch | Collatz (Wykład 2 / Lab 4) | jeden link do następnej → `self.parse` |
 
 Mapa „ręcznie → Scrapy", którą warto zapamiętać:
 
